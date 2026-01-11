@@ -118,9 +118,10 @@ export const AppContextProvider = (props) => {
 
       const response = await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.PRODUCT.GET_PRODUCT),
-        payload
+        payload,
+        { withCredentials: true }
       );
-      
+
       const newProducts = response.data.products || [];
 
       setProducts((prev) =>
@@ -137,6 +138,11 @@ export const AppContextProvider = (props) => {
   };
   const logout = () => {
     localStorage.removeItem("user");
+    axios.post(
+      apiUrl(API_CONFIG.ENDPOINTS.AUTH.LOGOUT),
+      {},
+      { withCredentials: true }
+    );
     setUserData(null);
     setCartItems({}); // Clear cart on logout
     setWishlistItems([]); // Clear wishlist on logout
