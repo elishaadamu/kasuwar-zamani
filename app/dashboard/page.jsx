@@ -76,7 +76,8 @@ const DashboardHome = () => {
             API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance +
               decryptedUserData.id +
               "/balance"
-          )
+          ),
+          { withCredentials: true }
         );
         console.log("Wallet", walletResponse);
         setWalletBalance(walletResponse.data.data);

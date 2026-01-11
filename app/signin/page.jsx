@@ -38,21 +38,18 @@ const page = () => {
     }
 
     const payload = { phone, password };
-    console.log(payload);
+
     try {
       const response = await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.AUTH.SIGNIN),
-        payload
+        payload,
+        { withCredentials: true }
       );
 
+      console.log("Response data:", response.data);
       if (!response.data) {
         throw new Error("No data received from server");
       }
-
-      // Log the data we're about to save
-      console.log("Data to be saved:", {
-        rawData: response.data,
-      });
 
       const encryptedUser = encryptData(response.data);
 
