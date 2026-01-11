@@ -300,7 +300,8 @@ const DashboardHome = () => {
     try {
       await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.CREATE + userData.id),
-        payload
+        payload,
+        { withCredentials: true }
       );
       toast.success("Account created successfully!");
       setShowCreateAccount(false);
