@@ -28,7 +28,8 @@ const ShippingPage = () => {
     setPageLoading(true);
     try {
       const response = await axios.get(
-        `${apiUrl(API_CONFIG.ENDPOINTS.PROFILE.GET)}/${userData.id}`
+        `${apiUrl(API_CONFIG.ENDPOINTS.PROFILE.GET)}/${userData.id}`,
+        { withCredentials: true }
       );
       console.log("response", response.data.user);
       setAddresses(response.data.user || []);
@@ -57,7 +58,8 @@ const ShippingPage = () => {
       // Update existing address
       const response = await axios.put(
         `${apiUrl(API_CONFIG.ENDPOINTS.PROFILE.UPDATE_USER)}/${userData.id}`,
-        addressData
+        addressData,
+        { withCredentials: true }
       );
       console.log("response", response);
       toast.success("Address updated successfully!");

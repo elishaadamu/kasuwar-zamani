@@ -49,7 +49,8 @@ const GetFollowersPage = () => {
     setError(null);
     try {
       const response = await axios.get(
-        apiUrl(API_CONFIG.ENDPOINTS.FOLLOW.GET_FOLLOWERS + userData.id)
+        apiUrl(API_CONFIG.ENDPOINTS.FOLLOW.GET_FOLLOWERS + userData.id),
+        { withCredentials: true }
       );
       const followersData = response.data.followers || [];
       setFollowers(followersData);

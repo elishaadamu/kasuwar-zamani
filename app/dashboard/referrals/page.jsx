@@ -52,17 +52,20 @@ const ReferralPage = () => {
         // Fetch profile, commissions, and progress concurrently
         const [profileRes, commissionsRes, progressRes] = await Promise.all([
           axios.get(
-            `${apiUrl(API_CONFIG.ENDPOINTS.PROFILE.GET)}/${userData.id}`
+            `${apiUrl(API_CONFIG.ENDPOINTS.PROFILE.GET)}/${userData.id}`,
+            { withCredentials: true }
           ),
           axios.get(
             `${apiUrl(API_CONFIG.ENDPOINTS.REFERRAL.GET_COMMISSIONS)}${
               userData.id
-            }`
+            }`,
+            { withCredentials: true }
           ),
           axios.get(
             `${apiUrl(API_CONFIG.ENDPOINTS.REFERRAL.GET_PROGRESS)}${
               userData.id
-            }`
+            }`,
+            { withCredentials: true }
           ),
         ]);
 

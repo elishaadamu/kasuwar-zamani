@@ -54,7 +54,8 @@ const CategorySidebar = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          apiUrl(API_CONFIG.ENDPOINTS.CATEGORY.GET_ALL)
+          apiUrl(API_CONFIG.ENDPOINTS.CATEGORY.GET_ALL),
+          { withCredentials: true }
         );
         console.log(response.data);
         setCategories(response.data.categories);

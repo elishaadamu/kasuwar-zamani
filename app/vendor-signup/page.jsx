@@ -74,7 +74,8 @@ const VendorSignupForm = () => {
     try {
       const response = await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.AUTH.SIGNUP),
-        payload
+        payload,
+        { withCredentials: true }
       );
       const { user } = response.data;
       console.log("Signup response:", response.data);

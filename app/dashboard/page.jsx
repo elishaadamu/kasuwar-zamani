@@ -213,7 +213,8 @@ const DashboardHome = () => {
 
           const [ordersResponse, productsResponse] = await Promise.all([
             axios.get(
-              apiUrl(API_CONFIG.ENDPOINTS.ORDER.GET_ALL + decryptedUserData.id)
+              apiUrl(API_CONFIG.ENDPOINTS.ORDER.GET_ALL + decryptedUserData.id),
+              { withCredentials: true }
             ),
             // For customers, we don't need to fetch products.
             // If you need other customer-specific data, add the call here.

@@ -52,7 +52,10 @@ const CouponPage = () => {
       }
 
       const response = await axios.get(
-        apiUrl(API_CONFIG.ENDPOINTS.COUPON.GET_ALL)
+        apiUrl(API_CONFIG.ENDPOINTS.COUPON.GET_ALL),
+        {
+          withCredentials: true,
+        }
       );
       console.log(response.data);
       // Map API response to frontend state structure

@@ -557,7 +557,8 @@ const OrderTracking = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        apiUrl(API_CONFIG.ENDPOINTS.ORDER.GET_SELLER_ORDERS + "/" + userId)
+        apiUrl(API_CONFIG.ENDPOINTS.ORDER.GET_SELLER_ORDERS + "/" + userId),
+        { withCredentials: true }
       );
       if (response.data.orders) {
         setOrders(response.data.orders);
@@ -618,9 +619,11 @@ const OrderTracking = () => {
   const updateOrderStatus = async (orderId, newStatus) => {
     setLoading(true);
     try {
-      await axios.put(apiUrl(API_CONFIG.ENDPOINTS.ORDER.UPDATE + orderId), {
-        status: newStatus,
-      });
+      await axios.put(
+        apiUrl(API_CONFIG.ENDPOINTS.ORDER.UPDATE + orderId),
+        { status: newStatus },
+        { withCredentials: true }
+      );
 
       toast.success(`Order status updated to ${newStatus}`);
 

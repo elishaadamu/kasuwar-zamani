@@ -110,7 +110,8 @@ const OrderSummary = () => {
     const fetchShippingFees = async () => {
       try {
         const response = await axios.get(
-          apiUrl(API_CONFIG.ENDPOINTS.SHIPPING_FEE.GET_ALL)
+          apiUrl(API_CONFIG.ENDPOINTS.SHIPPING_FEE.GET_ALL),
+          { withCredentials: true }
         );
         setDeliveryFees(response.data.deliveryFees || []);
       } catch (error) {
@@ -217,7 +218,8 @@ const OrderSummary = () => {
     try {
       const response = await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.ORDER.CREATE),
-        payload
+        payload,
+        { withCredentials: true }
       );
 
       // Trigger confetti celebration
@@ -265,11 +267,11 @@ const OrderSummary = () => {
         showConfirmButton: false,
       });
 
-     if(userData.role === "vendor"){
-      router.push("/vendor-dashboard/all-orders");
-     }else{
-      router.push("/dashboard/all-orders");
-     }
+      if (userData.role === "vendor") {
+        router.push("/vendor-dashboard/all-orders");
+      } else {
+        router.push("/dashboard/all-orders");
+      }
     } catch (error) {
       console.error("Error creating order:", error);
       const errorMessage =
@@ -299,7 +301,8 @@ const OrderSummary = () => {
 
       const response = await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.COUPON.VALIDATE),
-        payload
+        payload,
+        { withCredentials: true }
       );
       console.log(response.data);
 
@@ -549,7 +552,10 @@ const OrderSummary = () => {
                 </div>
                 <p className="font-semibold text-gray-900">
                   {currency}
-                  {option.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  {option.price.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </p>
               </div>
             ))}
@@ -566,7 +572,10 @@ const OrderSummary = () => {
             <p className="text-gray-600">Items ({getCartCount()})</p>
             <p className="font-medium text-gray-800">
               {currency}
-              {getCartAmount().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {getCartAmount().toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </p>
           </div>
           <div className="flex justify-between items-center py-2">
@@ -575,14 +584,20 @@ const OrderSummary = () => {
             </p>
             <p className="font-medium text-gray-800">
               {currency}
-              {shippingFee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {shippingFee.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </p>
           </div>
           <div className="flex justify-between items-center py-2">
             <p className="text-gray-600">Tax (2%)</p>
             <p className="font-medium text-gray-800">
               {currency}
-              {Math.floor(getCartAmount() * 0.02).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              {Math.floor(getCartAmount() * 0.02).toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </p>
           </div>
           {couponDiscount > 0 && (
@@ -590,7 +605,10 @@ const OrderSummary = () => {
               <p className="font-medium">Discount Applied</p>
               <p className="font-bold">
                 -{currency}
-                {couponDiscount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {couponDiscount.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </p>
             </div>
           )}
@@ -605,7 +623,10 @@ const OrderSummary = () => {
                 shippingFee +
                 Math.floor(getCartAmount() * 0.02) -
                 couponDiscount
-            ).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            ).toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </p>
         </div>
       </fieldset>
@@ -645,7 +666,10 @@ const OrderSummary = () => {
         {couponDiscount > 0 && (
           <p className="text-green-600 text-sm font-medium flex items-center gap-1">
             ✓ Coupon applied successfully! You saved {currency}
-            {couponDiscount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            {couponDiscount.toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
           </p>
         )}
       </fieldset>
@@ -707,7 +731,10 @@ const OrderSummary = () => {
               shippingFee +
               Math.floor(getCartAmount() * 0.02) -
               couponDiscount
-          ).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+          ).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          })}`
         )}
       </button>
     </div>

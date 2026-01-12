@@ -22,6 +22,7 @@ const Commission = () => {
         apiUrl(API_CONFIG.ENDPOINTS.DELIVERY.COMMISSIONS),
         {
           headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true,
         }
       );
       setCommissions(response.data);

@@ -16,7 +16,8 @@ const CategoryProducts = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          apiUrl(API_CONFIG.ENDPOINTS.CATEGORY.GET_ALL)
+          apiUrl(API_CONFIG.ENDPOINTS.CATEGORY.GET_ALL),
+          { withCredentials: "true" }
         );
         // console.log("Categories", response.data.categories);
         setCategories(response.data.categories || []);

@@ -14,7 +14,8 @@ const CategoryProducts = () => {
     const fetchCategory = async () => {
       try {
         const response = await axios.get(
-          apiUrl(API_CONFIG.ENDPOINTS.CATEGORY.GET_ALL)
+          apiUrl(API_CONFIG.ENDPOINTS.CATEGORY.GET_ALL),
+          { withCredentials: true }
         );
         setCategories(response.data.categories || []);
       } catch (error) {

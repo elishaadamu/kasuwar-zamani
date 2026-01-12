@@ -9,7 +9,9 @@ import { apiUrl, API_CONFIG } from "@/configs/api";
 
 const HeaderSlider = ({ initialBanners }) => {
   const [banners, setBanners] = useState(initialBanners || []);
-  const [loading, setLoading] = useState(!initialBanners || initialBanners.length === 0);
+  const [loading, setLoading] = useState(
+    !initialBanners || initialBanners.length === 0
+  );
   const [error, setError] = useState(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -32,7 +34,8 @@ const HeaderSlider = ({ initialBanners }) => {
       try {
         setLoading(true);
         const response = await axios.get(
-          apiUrl(API_CONFIG.ENDPOINTS.BANNERS.GET_ALL)
+          apiUrl(API_CONFIG.ENDPOINTS.BANNERS.GET_ALL),
+          { withCredentials: true }
         );
         setBanners(response.data.banners || []);
       } catch (err) {
@@ -112,7 +115,6 @@ const HeaderSlider = ({ initialBanners }) => {
                       href={banner.link || "#"}
                       className="inline-block px-10 py-3 bg-blue-600 text-white rounded-full font-semibold transition-all hover:bg-blue-700"
                     >
-                      
                       Shop Now
                     </Link>
                   </div>
@@ -142,7 +144,9 @@ const HeaderSlider = ({ initialBanners }) => {
                     className="object-contain w-[80%] md:w-[90%] max-h-[280px] md:max-h-[320px]"
                     priority={banners.indexOf(banner) === 0}
                     loading={banners.indexOf(banner) === 0 ? "eager" : "lazy"}
-                    fetchPriority={banners.indexOf(banner) === 0 ? "high" : "auto"}
+                    fetchPriority={
+                      banners.indexOf(banner) === 0 ? "high" : "auto"
+                    }
                   />
                 </div>
               </div>

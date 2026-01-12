@@ -37,7 +37,10 @@ const WithdrawalRequestPage = () => {
     }
     try {
       const response = await axios.get(
-        apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance + userId + "/balance")
+        apiUrl(
+          API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance + userId + "/balance"
+        ),
+        { withCredentials: true }
       );
       setWalletBalance(response.data.data.balance || 0);
     } catch (error) {
@@ -57,7 +60,8 @@ const WithdrawalRequestPage = () => {
     try {
       // API_CONFIG.DELIVERY_WITHDRAWAL.GET_BY_USER ends with '/withdrawal/'
       const resp = await axios.get(
-        apiUrl(API_CONFIG.ENDPOINTS.DELIVERY_WITHDRAWAL.GET_BY_USER + userId)
+        apiUrl(API_CONFIG.ENDPOINTS.DELIVERY_WITHDRAWAL.GET_BY_USER + userId),
+        { withCredentials: true }
       );
       console.log("Fetched withdrawals", resp.data);
       const data = resp.data || [];
@@ -103,7 +107,8 @@ const WithdrawalRequestPage = () => {
       const payload = { userId, amount };
       await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.DELIVERY_WITHDRAWAL.CREATE),
-        payload
+        payload,
+        { withCredentials: true }
       );
       message.success("Withdrawal request submitted successfully.");
       setWithdrawalAmount("");

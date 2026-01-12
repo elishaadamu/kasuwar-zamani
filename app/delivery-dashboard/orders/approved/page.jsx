@@ -31,6 +31,9 @@ const ApprovedOrders = () => {
       const response = await axios.get(
         apiUrl(API_CONFIG.ENDPOINTS.ORDER.GET_ALL + user.id),
         {
+          withCredentials: true,
+        },
+        {
           params: {
             userId: user.id,
             status: "approved",

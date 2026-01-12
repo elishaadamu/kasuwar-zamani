@@ -31,6 +31,9 @@ const PendingOrders = () => {
       const response = await axios.get(
         apiUrl(API_CONFIG.ENDPOINTS.ORDER.GET_ALL + user.id),
         {
+          withCredentials: true,
+        },
+        {
           params: {
             // Fetching both pending and paid orders for this view
             statuses: ["pending", "paid"].join(","),

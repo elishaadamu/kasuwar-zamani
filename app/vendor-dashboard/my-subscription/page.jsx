@@ -39,7 +39,8 @@ const MySubscriptionPage = () => {
         // First, check if the vendor can post products.
         // NOTE: Assuming an endpoint like 'SUBSCRIPTION.CHECK_STATUS' exists in your API_CONFIG.
         const statusResponse = await axios.get(
-          apiUrl(API_CONFIG.ENDPOINTS.SUBSCRIPTION.CHECK_STATUS + userData.id)
+          apiUrl(API_CONFIG.ENDPOINTS.SUBSCRIPTION.CHECK_STATUS + userData.id),
+          { withCredentials: true }
         );
 
         // If canPostProduct is false, set an error and do not proceed.
@@ -51,7 +52,8 @@ const MySubscriptionPage = () => {
 
         // If the status check passes, fetch the full subscription details.
         const response = await axios.get(
-          apiUrl(API_CONFIG.ENDPOINTS.SUBSCRIPTION.GET_DETAILS + userData.id)
+          apiUrl(API_CONFIG.ENDPOINTS.SUBSCRIPTION.GET_DETAILS + userData.id),
+          { withCredentials: true }
         );
 
         if (response.data.success && response.data.subscription) {

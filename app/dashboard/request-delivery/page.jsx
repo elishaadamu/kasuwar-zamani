@@ -165,7 +165,8 @@ const RequestDelivery = () => {
     try {
       const response = await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.DELIVERY.REQUEST_DELIVERY),
-        payload
+        payload,
+        { withCredentials: true }
       );
       console.log("Submitting payload:", payload);
       toast.success(

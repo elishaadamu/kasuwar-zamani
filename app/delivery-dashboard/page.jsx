@@ -36,7 +36,10 @@ const DashboardHome = () => {
         const response = await axios.get(
           apiUrl(
             `${API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance}${currentUser._id}/balance`
-          )
+          ),
+          {
+            withCredentials: true,
+          }
         );
         console.log(response);
         setWalletBalance(response.data.data.balance);

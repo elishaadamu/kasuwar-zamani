@@ -31,7 +31,8 @@ const OrderHistory = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        apiUrl(API_CONFIG.ENDPOINTS.ORDER.GET_ALL + user.id)
+        apiUrl(API_CONFIG.ENDPOINTS.ORDER.GET_ALL + user.id),
+        { withCredentials: true }
       );
       console.log("Orders response:", response.data);
       setOrders(response.data.orders || []);

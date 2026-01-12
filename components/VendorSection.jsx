@@ -48,7 +48,8 @@ const VendorSection = () => {
     const fetchVendors = async () => {
       try {
         const response = await axios.get(
-          apiUrl(API_CONFIG.ENDPOINTS.VENDOR.GET_ALL)
+          apiUrl(API_CONFIG.ENDPOINTS.VENDOR.GET_ALL),
+          { withCredentials: true }
         );
         const sortedVendors = (response.data || []).sort(
           (a, b) => (b.averageRating || 0) - (a.averageRating || 0)

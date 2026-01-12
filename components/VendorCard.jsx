@@ -43,7 +43,8 @@ const VendorCard = ({
     const fetchFollowerCount = async () => {
       try {
         const response = await axios.get(
-          apiUrl(API_CONFIG.ENDPOINTS.FOLLOW.GET_FOLLOWERS + _id)
+          apiUrl(API_CONFIG.ENDPOINTS.FOLLOW.GET_FOLLOWERS + _id),
+          { withCredentials: true }
         );
 
         setFollowerCount(response.data.followersCount || 0);

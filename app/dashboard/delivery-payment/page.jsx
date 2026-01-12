@@ -92,7 +92,10 @@ const DeliveryPaymentPage = () => {
 
     try {
       const res = await axios.get(
-        apiUrl(API_CONFIG.ENDPOINTS.DELIVERY.GET_USER_REQUESTS + userId)
+        apiUrl(API_CONFIG.ENDPOINTS.DELIVERY.GET_USER_REQUESTS + userId),
+        {
+          withCredentials: true,
+        }
       );
       console.log("Fetched requests:", res.data);
       setRequests(res.data.requests || []);

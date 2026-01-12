@@ -72,7 +72,8 @@ const VendorPage = () => {
         try {
           // Fetch all vendors and find the one with the matching ID
           const response = await axios.get(
-            apiUrl(API_CONFIG.ENDPOINTS.VENDOR.GET_ALL)
+            apiUrl(API_CONFIG.ENDPOINTS.VENDOR.GET_ALL),
+            { withCredentials: true }
           );
           console.log(response.data);
           const allVendors = response.data || [];
@@ -83,7 +84,8 @@ const VendorPage = () => {
             const reviewsResponse = await axios.get(
               apiUrl(
                 API_CONFIG.ENDPOINTS.RATING.GET_BY_VENDOR + foundVendor._id
-              )
+              ),
+              { withCredentials: true }
             );
             setReviews(reviewsResponse.data.ratings || []);
 
@@ -91,14 +93,16 @@ const VendorPage = () => {
             const followerCountResponse = await axios.get(
               apiUrl(
                 API_CONFIG.ENDPOINTS.FOLLOW.GET_FOLLOWERS + foundVendor._id
-              )
+              ),
+              { withCredentials: true }
             );
             const checkFollower = followerCountResponse.data.followers?.find(
               (item) => item._id === userData?.id
             );
             // Fetch coupons for the vendor
             const couponsResponse = await axios.get(
-              apiUrl(API_CONFIG.ENDPOINTS.COUPON.GET_ALL + foundVendor._id)
+              apiUrl(API_CONFIG.ENDPOINTS.COUPON.GET_ALL + foundVendor._id),
+              { withCredentials: true }
             );
             setCoupons(couponsResponse.data.coupons || []);
             setFollowerCount(followerCountResponse.data.followersCount || 0);
@@ -132,7 +136,8 @@ const VendorPage = () => {
           const response = await axios.get(
             apiUrl(
               API_CONFIG.ENDPOINTS.PRODUCT.GET_SELLER_PRODUCTS + vendor._id
-            )
+            ),
+            { withCredentials: true }
           );
           console.log(response.data);
           setVendorProducts(response.data || []);
@@ -151,10 +156,10 @@ const VendorPage = () => {
     try {
       // Check if conversation already exists
       const { data: existingConversation } = await supabase
-        .from('conversations')
-        .select('id')
-        .eq('user_id', userData._id || userData.id)
-        .eq('vendor_id', vendor?._id)
+        .from("conversations")
+        .select("id")
+        .eq("user_id", userData._id || userData.id)
+        .eq("vendor_id", vendor?._id)
         .single();
 
       if (existingConversation) {
@@ -162,13 +167,13 @@ const VendorPage = () => {
       } else {
         // Create new conversation
         const { data: newConversation, error } = await supabase
-          .from('conversations')
+          .from("conversations")
           .insert({
             user_id: userData._id || userData.id,
             vendor_id: vendor?._id,
             user_name: `${userData.firstName} ${userData.lastName}`,
             vendor_name: vendor?.businessName,
-            last_message_at: new Date().toISOString()
+            last_message_at: new Date().toISOString(),
           })
           .select()
           .single();
@@ -176,12 +181,12 @@ const VendorPage = () => {
         if (!error && newConversation) {
           router.push(`/chat/${newConversation.id}`);
         } else {
-          console.error('Error creating conversation:', error);
+          console.error("Error creating conversation:", error);
           message.error("Failed to start chat. Please try again.");
         }
       }
     } catch (error) {
-      console.error('Error in handleMessageClick:', error);
+      console.error("Error in handleMessageClick:", error);
       message.error("An error occurred");
     } finally {
       setIsCreatingChat(false);
@@ -244,7 +249,8 @@ const VendorPage = () => {
       console.log(reviewData);
       const response = await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.RATING.ADD),
-        reviewData
+        reviewData,
+        { withCredentials: true }
       );
       console.log(response.data);
       if (response.data) {
@@ -271,7 +277,8 @@ const VendorPage = () => {
       await axios.delete(
         apiUrl(
           `${API_CONFIG.ENDPOINTS.RATING.DELETE}${vendor._id}/${userData._id}`
-        )
+        ),
+        { withCredentials: true }
       );
       message.success("Review deleted successfully!");
       setReviews(reviews.filter((review) => review._id !== reviewId));
@@ -362,15 +369,35 @@ const VendorPage = () => {
                 >
                   {isFollowing ? (
                     <>
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
                       </svg>
                       <span>Following</span>
                     </>
                   ) : (
                     <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+                        />
                       </svg>
                       <span>Follow</span>
                     </>
@@ -388,8 +415,19 @@ const VendorPage = () => {
                     </>
                   ) : (
                     <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                        />
                       </svg>
                       <span>Message Vendor</span>
                     </>

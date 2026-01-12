@@ -19,7 +19,8 @@ const SubscriptionPlans = () => {
       setLoading(true);
       setError(null); // Reset error state on new fetch
       const response = await axios.get(
-        apiUrl(API_CONFIG.ENDPOINTS.SUBSCRIPTION.GET_ALL)
+        apiUrl(API_CONFIG.ENDPOINTS.SUBSCRIPTION.GET_ALL),
+        { withCredentials: true }
       );
 
       setPlans(response.data.plans);

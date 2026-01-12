@@ -41,7 +41,8 @@ const TransactionHistoryPage = () => {
           apiUrl(
             `${API_CONFIG.ENDPOINTS.FUNDING_HISTORY.GET}${userData.id}` +
               "/transactions"
-          )
+          ),
+          { withCredentials: true }
         );
         console.log("Fetched Transactions:", response.data);
         const transactionsData =
@@ -69,7 +70,8 @@ const TransactionHistoryPage = () => {
             API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance +
               userData.id +
               "/balance"
-          )
+          ),
+          { withCredentials: true }
         );
         setWalletBalance(response.data.data.balance || 0);
       } catch (error) {

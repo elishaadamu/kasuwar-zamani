@@ -92,7 +92,8 @@ const DeliveryPaymentPage = () => {
 
     try {
       const res = await axios.get(
-        apiUrl(API_CONFIG.ENDPOINTS.DELIVERY.GET_USER_REQUESTS + userId)
+        apiUrl(API_CONFIG.ENDPOINTS.DELIVERY.GET_USER_REQUESTS + userId),
+        { withCredentials: true }
       );
       console.log("Fetched requests:", res.data);
       setRequests(res.data.requests || []);
@@ -155,7 +156,8 @@ const DeliveryPaymentPage = () => {
         apiUrl(
           API_CONFIG.ENDPOINTS.DELIVERY.PAY_DELIVERY + selectedRequest._id
         ),
-        payload
+        payload,
+        { withCredentials: true }
       );
       toast.success(
         `Payment of ₦${selectedRequest.approvedPrice.toLocaleString()} successful`

@@ -98,7 +98,8 @@ const SetPinForm = () => {
         apiUrl(API_CONFIG.ENDPOINTS.SECURITY.SET_PIN + "/" + userId),
         {
           newPin,
-        }
+        },
+        { withCredentials: true }
       );
       toast.success("PIN set successfully");
       setNewPin("");
@@ -171,7 +172,8 @@ const UpdatePinForm = () => {
         {
           oldPin,
           newPin,
-        }
+        },
+        { withCredentials: true }
       );
       toast.success("PIN updated successfully");
       setOldPin("");

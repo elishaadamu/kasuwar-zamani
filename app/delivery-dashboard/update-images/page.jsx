@@ -113,7 +113,10 @@ const UpdateImages = () => {
     try {
       await axios.put(
         `${apiUrl(API_CONFIG.ENDPOINTS.DELIVERY.UPDATE)}/${userData.user._id}`,
-        formData
+        formData,
+        {
+          withCredentials: true,
+        }
       );
       toast.success("Documents updated successfully!");
     } catch (error) {

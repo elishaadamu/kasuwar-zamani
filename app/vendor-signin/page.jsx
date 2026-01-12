@@ -29,7 +29,8 @@ const VendorSigninPage = () => {
     try {
       const response = await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.VENDOR.SIGNIN),
-        payload
+        payload,
+        { withCredentials: true }
       );
 
       if (!response.data) {

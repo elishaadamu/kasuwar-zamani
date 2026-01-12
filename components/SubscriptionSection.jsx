@@ -19,7 +19,8 @@ const SubscriptionPlans = () => {
       setLoading(true);
       setError(null); // Reset error state on new fetch
       const response = await axios.get(
-        apiUrl(API_CONFIG.ENDPOINTS.SUBSCRIPTION.GET_ALL)
+        apiUrl(API_CONFIG.ENDPOINTS.SUBSCRIPTION.GET_ALL),
+        { withCredentials: true }
       );
 
       setPlans(response.data.plans);
@@ -38,18 +39,21 @@ const SubscriptionPlans = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto w-full">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-                {[...Array(3)].map((_, i) => (
-                    <div key={i} className="rounded-2xl p-6 sm:p-8 shadow-lg bg-white h-96 animate-pulse">
-                        <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
-                        <div className="h-4 bg-gray-200 rounded w-full mx-auto mb-8"></div>
-                        <div className="h-16 bg-gray-200 rounded w-1/2 mx-auto mb-8"></div>
-                        <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                        <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                        <div className="h-12 bg-gray-200 rounded w-full mt-8"></div>
-                    </div>
-                ))}
-            </div>
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {[...Array(3)].map((_, i) => (
+              <div
+                key={i}
+                className="rounded-2xl p-6 sm:p-8 shadow-lg bg-white h-96 animate-pulse"
+              >
+                <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded w-full mx-auto mb-8"></div>
+                <div className="h-16 bg-gray-200 rounded w-1/2 mx-auto mb-8"></div>
+                <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                <div className="h-12 bg-gray-200 rounded w-full mt-8"></div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );

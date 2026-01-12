@@ -11,7 +11,12 @@ export const metadata = {
 
 const fetchBanners = async () => {
   try {
-    const response = await axios.get(apiUrl(API_CONFIG.ENDPOINTS.BANNERS.GET_ALL));
+    const response = await axios.get(
+      apiUrl(API_CONFIG.ENDPOINTS.BANNERS.GET_ALL),
+      {
+        withCredentials: true,
+      }
+    );
     return response.data.banners || [];
   } catch (error) {
     console.error("Error fetching banners:", error);

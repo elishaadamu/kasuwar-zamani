@@ -44,9 +44,12 @@ const FollowingVendorsPage = () => {
       // Use Promise.all for parallel requests when possible
       const [followingResponse, allVendorsResponse] = await Promise.all([
         axios.get(
-          apiUrl(API_CONFIG.ENDPOINTS.FOLLOW.GET_FOLLOWING + userData.id)
+          apiUrl(API_CONFIG.ENDPOINTS.FOLLOW.GET_FOLLOWING + userData.id),
+          { withCredentials: true }
         ),
-        axios.get(apiUrl(API_CONFIG.ENDPOINTS.VENDOR.GET_ALL)),
+        axios.get(apiUrl(API_CONFIG.ENDPOINTS.VENDOR.GET_ALL), {
+          withCredentials: true,
+        }),
       ]);
 
       const followedVendorIds = (followingResponse.data.followingVendors || [])

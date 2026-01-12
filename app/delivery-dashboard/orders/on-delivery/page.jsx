@@ -1,10 +1,10 @@
-'use client';
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { decryptData } from '@/lib/encryption';
-import { apiUrl, API_CONFIG } from '@/configs/api';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+"use client";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { decryptData } from "@/lib/encryption";
+import { apiUrl, API_CONFIG } from "@/configs/api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const OnDeliveryOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -12,7 +12,7 @@ const OnDeliveryOrders = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const encryptedUser = localStorage.getItem('user');
+    const encryptedUser = localStorage.getItem("user");
     if (encryptedUser) {
       const decryptedUser = decryptData(encryptedUser);
       setUser(decryptedUser);
@@ -28,15 +28,21 @@ const OnDeliveryOrders = () => {
   const fetchOnDeliveryOrders = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(apiUrl(API_CONFIG.ENDPOINTS.ORDER.GET_ALL), {
-        params: {
-          userId: user.id,
-          status: 'on-delivery',
+      const response = await axios.get(
+        apiUrl(API_CONFIG.ENDPOINTS.ORDER.GET_ALL),
+        {
+          params: {
+            userId: user.id,
+            status: "on-delivery",
+          },
         },
-      });
+        {
+          withCredentials: true,
+        }
+      );
       setOrders(response.data);
     } catch (error) {
-      toast.error('Failed to fetch orders on delivery.');
+      toast.error("Failed to fetch orders on delivery.");
     } finally {
       setLoading(false);
     }
@@ -63,7 +69,9 @@ const OnDeliveryOrders = () => {
               {orders.map((order) => (
                 <tr key={order.id}>
                   <td className="py-2 px-4 border-b">{order.id}</td>
-                  <td className="py-2 px-4 border-b">{new Date(order.date).toLocaleDateString()}</td>
+                  <td className="py-2 px-4 border-b">
+                    {new Date(order.date).toLocaleDateString()}
+                  </td>
                   <td className="py-2 px-4 border-b">₦{order.totalAmount}</td>
                   <td className="py-2 px-4 border-b">{order.status}</td>
                 </tr>

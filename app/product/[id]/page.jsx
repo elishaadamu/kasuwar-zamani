@@ -33,7 +33,8 @@ const Product = () => {
       try {
         const response = await axios.post(
           apiUrl(API_CONFIG.ENDPOINTS.PRODUCT.GET_PRODUCT),
-          payload
+          payload,
+          { withCredentials: true }
         );
         const foundProduct = response.data.products?.find(
           (item) => item._id === id
@@ -63,10 +64,10 @@ const Product = () => {
     try {
       // Check if conversation already exists
       const { data: existingConversation } = await supabase
-        .from('conversations')
-        .select('id')
-        .eq('user_id', userData._id || userData.id)
-        .eq('vendor_id', product?.vendor?._id)
+        .from("conversations")
+        .select("id")
+        .eq("user_id", userData._id || userData.id)
+        .eq("vendor_id", product?.vendor?._id)
         .single();
 
       if (existingConversation) {
@@ -74,13 +75,13 @@ const Product = () => {
       } else {
         // Create new conversation
         const { data: newConversation, error } = await supabase
-          .from('conversations')
+          .from("conversations")
           .insert({
             user_id: userData._id || userData.id,
             vendor_id: product?.vendor?._id,
             user_name: `${userData.firstName} ${userData.lastName}`,
             vendor_name: product?.vendor?.businessName,
-            last_message_at: new Date().toISOString()
+            last_message_at: new Date().toISOString(),
           })
           .select()
           .single();
@@ -88,12 +89,12 @@ const Product = () => {
         if (!error && newConversation) {
           router.push(`/chat/${newConversation.id}`);
         } else {
-          console.error('Error creating conversation:', error);
+          console.error("Error creating conversation:", error);
           message.error("Failed to start chat. Please try again.");
         }
       }
     } catch (error) {
-      console.error('Error in handleMessageClick:', error);
+      console.error("Error in handleMessageClick:", error);
       message.error("An error occurred");
     } finally {
       setIsCreatingChat(false);
@@ -267,7 +268,7 @@ const Product = () => {
                   Buy now
                 </button>
               </div>
-              
+
               {/* Message Vendor Button */}
               {isLoggedIn && product?.vendor && (
                 <button
@@ -282,8 +283,19 @@ const Product = () => {
                     </>
                   ) : (
                     <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                        />
                       </svg>
                       <span>Message Vendor</span>
                     </>

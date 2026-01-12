@@ -4,9 +4,9 @@ import axios from "axios";
 import { decryptData, encryptData } from "@/lib/encryption";
 import { ToastContainer, toast } from "react-toastify";
 import { apiUrl, API_CONFIG } from "@/configs/api";
-import { 
-  FaUserEdit, 
-  FaCloudUploadAlt, 
+import {
+  FaUserEdit,
+  FaCloudUploadAlt,
   FaCheckCircle,
   FaBuilding,
   FaCreditCard,
@@ -15,7 +15,7 @@ import {
   FaPhone,
   FaEnvelope,
   FaUser,
-  FaHome
+  FaHome,
 } from "react-icons/fa";
 import { MdLocationOn, MdDescription } from "react-icons/md";
 import { HiIdentification } from "react-icons/hi";
@@ -35,7 +35,7 @@ const FormField = ({
   readOnly = false,
   icon: Icon,
   placeholder = "",
-  options = []
+  options = [],
 }) => (
   <div className="space-y-2">
     <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -83,7 +83,6 @@ const FormField = ({
     )}
   </div>
 );
-
 
 const SectionHeader = ({ title, icon: Icon, description }) => (
   <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-200">
@@ -141,7 +140,7 @@ const PersonalDetails = () => {
     shippingState: "",
     shippingAddress: "",
     zipCode: "",
-    role: ""
+    role: "",
   });
 
   useEffect(() => {
@@ -240,7 +239,8 @@ const PersonalDetails = () => {
 
       const response = await axios.put(
         `${apiUrl(API_CONFIG.ENDPOINTS.PROFILE.UPDATE_USER)}/${userData.id}`,
-        payload
+        payload,
+        { withCredentials: true }
       );
 
       if (response.data) {
@@ -268,13 +268,15 @@ const PersonalDetails = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <ToastContainer position="top-right" autoClose={3000} />
-      
+
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div className="text-white">
-              <h1 className="text-2xl md:text-3xl font-bold">Personal Details</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">
+                Personal Details
+              </h1>
               <p className="text-blue-100 mt-2">
                 Manage your account information and preferences
               </p>
@@ -301,7 +303,7 @@ const PersonalDetails = () => {
               icon={FaUser}
               description="Your basic personal details"
             />
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <FormField
                 label="First Name"
@@ -350,7 +352,7 @@ const PersonalDetails = () => {
               icon={FaHome}
               description="Your residential and shipping addresses"
             />
-            
+
             <div className="space-y-6">
               <FormField
                 label="Residential Address"
@@ -362,7 +364,7 @@ const PersonalDetails = () => {
                 icon={MdLocationOn}
                 placeholder="Enter your full address"
               />
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <FormField
                   label="State"
@@ -385,7 +387,7 @@ const PersonalDetails = () => {
                   placeholder="Enter zip code"
                 />
               </div>
-              
+
               <FormField
                 label="Shipping Address"
                 name="shippingAddress"
@@ -409,7 +411,7 @@ const PersonalDetails = () => {
                   icon={FaBuilding}
                   description="Details about your business"
                 />
-                
+
                 <div className="space-y-6">
                   <FormField
                     label="Business Name"
@@ -440,7 +442,7 @@ const PersonalDetails = () => {
                   icon={RiBankFill}
                   description="Where we'll send your payments"
                 />
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <FormField
                     label="Bank Name"
@@ -481,7 +483,7 @@ const PersonalDetails = () => {
                   icon={FaIdCard}
                   description="Verify your identity for security purposes"
                 />
-                
+
                 {isEditing ? (
                   <div className="space-y-6">
                     <div>
@@ -493,13 +495,17 @@ const PersonalDetails = () => {
                         <IDTypeButton
                           type="NIN"
                           currentType={profile.idType}
-                          onClick={(type) => setProfile({ ...profile, idType: type })}
+                          onClick={(type) =>
+                            setProfile({ ...profile, idType: type })
+                          }
                           label="National ID (NIN)"
                         />
                         <IDTypeButton
                           type="BVN"
                           currentType={profile.idType}
-                          onClick={(type) => setProfile({ ...profile, idType: type })}
+                          onClick={(type) =>
+                            setProfile({ ...profile, idType: type })
+                          }
                           label="Bank Verification (BVN)"
                         />
                       </div>
@@ -518,63 +524,67 @@ const PersonalDetails = () => {
                     )}
                     {/* File Upload */}
                     {profile.idType !== "BVN" && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-3">
-                        Upload Verification Document
-                      </label>
-                      <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-blue-400 transition-colors duration-300 bg-gradient-to-b from-gray-50/50 to-white hover:from-blue-50/30">
-                        <div className="space-y-4">
-                          {profile.slip ? (
-                            <div className="flex flex-col items-center">
-                              <div className="relative w-48 h-48 mx-auto border-2 border-gray-200 rounded-xl overflow-hidden bg-white p-2">
-                                <img
-                                  src={profile.slip}
-                                  alt="Document Preview"
-                                  className="w-full h-full object-contain"
-                                />
-                              </div>
-                              <p className="text-sm text-gray-500 mt-4">
-                                Document uploaded successfully
-                                <FaCheckCircle className="inline ml-2 text-green-500" />
-                              </p>
-                              <button
-                                type="button"
-                                onClick={() => document.getElementById('file-upload').click()}
-                                className="mt-3 text-sm text-blue-600 hover:text-blue-700 font-medium"
-                              >
-                                Change document
-                              </button>
-                            </div>
-                          ) : (
-                            <>
-                              <FaCloudUploadAlt className="mx-auto h-16 w-16 text-gray-400" />
-                              <div className="space-y-2">
-                                <p className="font-medium text-gray-700">
-                                  Drop your file here or click to browse
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-3">
+                          Upload Verification Document
+                        </label>
+                        <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 text-center hover:border-blue-400 transition-colors duration-300 bg-gradient-to-b from-gray-50/50 to-white hover:from-blue-50/30">
+                          <div className="space-y-4">
+                            {profile.slip ? (
+                              <div className="flex flex-col items-center">
+                                <div className="relative w-48 h-48 mx-auto border-2 border-gray-200 rounded-xl overflow-hidden bg-white p-2">
+                                  <img
+                                    src={profile.slip}
+                                    alt="Document Preview"
+                                    className="w-full h-full object-contain"
+                                  />
+                                </div>
+                                <p className="text-sm text-gray-500 mt-4">
+                                  Document uploaded successfully
+                                  <FaCheckCircle className="inline ml-2 text-green-500" />
                                 </p>
-                                <p className="text-sm text-gray-500">
-                                  Supports: JPG, PNG, PDF • Max: 50KB
-                                </p>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    document
+                                      .getElementById("file-upload")
+                                      .click()
+                                  }
+                                  className="mt-3 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                                >
+                                  Change document
+                                </button>
                               </div>
-                            </>
-                          )}
-                          <input
-                            id="file-upload"
-                            type="file"
-                            className="hidden"
-                            onChange={handleFileChange}
-                            accept="image/*,.pdf"
-                          />
-                          <label
-                            htmlFor="file-upload"
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md"
-                          >
-                            <FaCloudUploadAlt />
-                            Choose File
-                          </label>
+                            ) : (
+                              <>
+                                <FaCloudUploadAlt className="mx-auto h-16 w-16 text-gray-400" />
+                                <div className="space-y-2">
+                                  <p className="font-medium text-gray-700">
+                                    Drop your file here or click to browse
+                                  </p>
+                                  <p className="text-sm text-gray-500">
+                                    Supports: JPG, PNG, PDF • Max: 50KB
+                                  </p>
+                                </div>
+                              </>
+                            )}
+                            <input
+                              id="file-upload"
+                              type="file"
+                              className="hidden"
+                              onChange={handleFileChange}
+                              accept="image/*,.pdf"
+                            />
+                            <label
+                              htmlFor="file-upload"
+                              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 cursor-pointer shadow-sm hover:shadow-md"
+                            >
+                              <FaCloudUploadAlt />
+                              Choose File
+                            </label>
+                          </div>
                         </div>
                       </div>
-                    </div>
                     )}
                   </div>
                 ) : (

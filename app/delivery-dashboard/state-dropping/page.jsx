@@ -24,7 +24,10 @@ const StateDropping = () => {
 
       try {
         const response = await axios.get(
-          apiUrl(API_CONFIG.ENDPOINTS.ORDER.GET_SELLER_ORDERS)
+          apiUrl(API_CONFIG.ENDPOINTS.ORDER.GET_SELLER_ORDERS),
+          {
+            withCredentials: true,
+          }
         );
         // Filter deliveries for state dropping (you might want to adjust this based on your actual data structure)
         const stateDropDeliveries = response.data.filter(

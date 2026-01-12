@@ -49,7 +49,8 @@ const SubscriptionPaymentContent = () => {
       setLoading(true);
       setError(null);
       const response = await axios.get(
-        apiUrl(API_CONFIG.ENDPOINTS.SUBSCRIPTION.GET_ALL)
+        apiUrl(API_CONFIG.ENDPOINTS.SUBSCRIPTION.GET_ALL),
+        { withCredentials: true }
       );
 
       const allPlans = response.data.plans || [];
@@ -84,7 +85,8 @@ const SubscriptionPaymentContent = () => {
 
       const response = await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.SUBSCRIPTION.SUBSCRIBE), // Changed to SUBSCRIBE endpoint
-        payload
+        payload,
+        { withCredentials: true }
       );
 
       const result = response.data;

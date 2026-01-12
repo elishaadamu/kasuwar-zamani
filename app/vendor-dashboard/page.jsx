@@ -235,7 +235,10 @@ const DashboardHome = () => {
               API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance +
                 decryptedUserData.id +
                 "/balance"
-            )
+            ),
+            {
+              withCredentials: true,
+            }
           );
           setWalletBalance(walletResponse.data.data);
         }
@@ -285,7 +288,10 @@ const DashboardHome = () => {
     try {
       await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.CREATE + userData.id),
-        payload
+        payload,
+        {
+          withCredentials: true,
+        }
       );
       toast.success("Account created successfully!");
       setShowCreateAccount(false);
@@ -307,7 +313,10 @@ const DashboardHome = () => {
       const walletResponse = await axios.get(
         apiUrl(
           API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance + userData.id + "/balance"
-        )
+        ),
+        {
+          withCredentials: true,
+        }
       );
       console.log("walletResponse", walletResponse);
       setAccountDetails(walletResponse.data.data);
@@ -803,8 +812,6 @@ const DashboardHome = () => {
                           )}
                         </div>
                       </div>
-
-
                     </div>
                   ))}
                 </div>
@@ -868,7 +875,6 @@ const DashboardHome = () => {
               </div>
             )}
           </div>
-
         </>
       )}
 

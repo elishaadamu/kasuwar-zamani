@@ -50,7 +50,8 @@ const Wallet = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.GET + user.id)
+        apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.GET + user.id),
+        { withCredentials: true }
       );
       console.log("Details", response.data);
       setAccountDetails(response.data);
@@ -66,10 +67,14 @@ const Wallet = () => {
     setLoading(true);
     try {
       // Call your backend API to verify and process the payment
-      await axios.post(apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.FUND + user.id), {
-        amount: amount,
-        reference: transaction.reference,
-      });
+      await axios.post(
+        apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.FUND + user.id),
+        {
+          amount: amount,
+          reference: transaction.reference,
+        },
+        { withCredentials: true }
+      );
 
       toast.success("Wallet funded successfully!");
       setAmount("");
@@ -94,7 +99,8 @@ const Wallet = () => {
     try {
       await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.CREATE + user.id),
-        payload
+        payload,
+        { withCredentials: true }
       );
       toast.success("Account created successfully!");
       fetchAccountDetails();
@@ -116,7 +122,8 @@ const Wallet = () => {
               API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance +
                 userData.id +
                 "/balance"
-            )
+            ),
+            { withCredentials: true }
           );
           console.log("Wallet Balance", walletResponse.data.data);
           setWalletBalance(walletResponse.data.data);
