@@ -124,6 +124,10 @@ export const API_CONFIG = {
       GET_FOLLOWERS: "/follow/my-followers/", // append vendorId
       CHECK_FOLLOW: "/follow/check", // POST with { followerId, followingId }
     },
+    POS: {
+      GET_ORDERS: "/order/user/", // GET user POS orders GET_ALL: "/order/user/",
+      PAY: "/pos/pay/", // POST with { pin }, append posOrderId
+    },
   },
   SHIPPING_FEE: {
     GET_ALL: "/shipping-fee/all",
