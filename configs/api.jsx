@@ -3,6 +3,29 @@ import axios from "axios";
 // Set withCredentials to true for all requests globally
 axios.defaults.withCredentials = true;
 
+// Add a response interceptor
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      if (typeof window !== "undefined") {
+        const currentPath = window.location.pathname;
+        // Avoid redirect loop if already on a signin page
+        if (
+          currentPath !== "/signin" &&
+          currentPath !== "/vendor-signin" &&
+          currentPath !== "/delivery-signin"
+        ) {
+          localStorage.removeItem("user");
+          window.location.href = "/signin";
+        }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+
 export const API_CONFIG = {
   BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000",
   ENDPOINTS: {
