@@ -17,7 +17,7 @@ axios.interceptors.response.use(
           currentPath !== "/delivery-signin"
         ) {
           localStorage.removeItem("user");
-          window.location.href = "/signin";
+          window.location.href = "/";
         }
       }
     }
