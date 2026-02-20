@@ -10,14 +10,18 @@ axios.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       if (typeof window !== "undefined") {
         const currentPath = window.location.pathname;
-        // Avoid redirect loop if already on a signin page
+        // Avoid redirect loop if already on a signin page or the home page
         if (
+          currentPath !== "/" &&
           currentPath !== "/signin" &&
           currentPath !== "/vendor-signin" &&
           currentPath !== "/delivery-signin"
         ) {
           localStorage.removeItem("user");
           window.location.href = "/";
+        } else {
+          // On home/signin pages, just clear the stored user data silently
+          localStorage.removeItem("user");
         }
       }
     }
