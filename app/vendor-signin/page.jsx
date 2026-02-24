@@ -6,7 +6,7 @@ import Logo from "@/assets/logo/logo.png";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { encryptData } from "@/lib/encryption";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import { ToastContainer, toast } from "react-toastify";
@@ -15,11 +15,19 @@ import { useAppContext } from "@/context/AppContext";
 
 const VendorSigninPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
   const { fetchUserData } = useAppContext();
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("user")) {
+      router.push(redirect || "/vendor-dashboard");
+    }
+  }, [router, redirect]);
 
   const handleSignin = async (e) => {
     e.preventDefault();
@@ -46,7 +54,7 @@ const VendorSigninPage = () => {
       localStorage.setItem("user", encryptedUser);
       fetchUserData(); // Call fetchUserData to update global state
       toast.success("Vendor signin successful!"); // Changed toast message
-      router.push("/vendor-dashboard"); // Redirect to seller dashboard after signin
+      router.push(redirect || "/vendor-dashboard"); // Redirect to seller dashboard after signin
     } catch (error) {
       console.error("Error signing in as vendor:", error); // Changed error message
       toast.error(
@@ -131,9 +139,7 @@ const VendorSigninPage = () => {
         </button>
         <p className="text-sm text-center">
           Don't have a vendor account?{" "}
-          <Link className="text-blue-500" href={"/vendor-signup"}>
-            {" "}
-            {/* Changed signup link */}
+          <Link className="text-blue-500" href={`/vendor-signup${redirect ? `?redirect=${redirect}` : ""}`}>
             Sign up
           </Link>
         </p>

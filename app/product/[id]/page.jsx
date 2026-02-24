@@ -5,7 +5,7 @@ import ProductCard from "@/components/ProductCard";
 import ImageMagnify from "@/components/ImageMagnify/ImageMagnify.jsx";
 
 import Image from "next/image";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import Loading from "@/components/Loading.jsx";
 import { useAppContext } from "@/context/AppContext";
 import React from "react";
@@ -16,6 +16,7 @@ import { supabase } from "@/lib/supabase";
 
 const Product = () => {
   const { id } = useParams();
+  const pathname = usePathname();
 
   const { products, router, addToCart, isLoggedIn, currency, userData } =
     useAppContext();
@@ -54,7 +55,7 @@ const Product = () => {
   const handleMessageClick = async () => {
     if (!isLoggedIn) {
       message.error("Please sign in to message the vendor.");
-      router.push("/signin");
+      router.push(`/signin?redirect=${pathname}`);
       return;
     }
 
@@ -238,7 +239,7 @@ const Product = () => {
                   onClick={() => {
                     if (!isLoggedIn) {
                       message.error("Please sign in to add items to cart");
-                      router.push("/signin");
+                      router.push(`/signin?redirect=${pathname}`);
                       return;
                     }
                     addToCart(product._id);
@@ -254,7 +255,7 @@ const Product = () => {
                   onClick={() => {
                     if (!isLoggedIn) {
                       message.error("Please sign in to add items to cart");
-                      router.push("/signin");
+                      router.push(`/signin?redirect=${pathname}`);
                       return;
                     }
                     addToCart(product._id);

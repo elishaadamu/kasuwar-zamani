@@ -6,7 +6,7 @@ import Logo from "@/assets/logo/logo.png";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { encryptData } from "@/lib/encryption";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import { ToastContainer, toast } from "react-toastify";
@@ -15,11 +15,19 @@ import { useAppContext } from "@/context/AppContext";
 
 const DeliverySigninPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
   const { fetchUserData } = useAppContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("user")) {
+      router.push(redirect || "/delivery-dashboard");
+    }
+  }, [router, redirect]);
 
   const handleSignin = async (e) => {
     e.preventDefault();
@@ -46,7 +54,7 @@ const DeliverySigninPage = () => {
       localStorage.setItem("user", encryptedUser);
       fetchUserData(); // Call fetchUserData to update global state
       toast.success("Delivery partner signin successful!");
-      router.push("/delivery-dashboard"); // Redirect to delivery dashboard after signin
+      router.push(redirect || "/delivery-dashboard"); // Redirect to delivery dashboard after signin
     } catch (error) {
       console.error("Error signing in as delivery partner:", error);
       toast.error(
@@ -134,7 +142,7 @@ const DeliverySigninPage = () => {
         </button>
         <p className="text-sm text-center">
           Don't have a delivery account?{" "}
-          <Link className="text-blue-500" href={"/delivery-signup"}>
+          <Link className="text-blue-500" href={`/delivery-signup${redirect ? `?redirect=${redirect}` : ""}`}>
             Sign up
           </Link>
         </p>

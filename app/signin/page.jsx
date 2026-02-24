@@ -6,7 +6,7 @@ import Logo from "@/assets/logo/logo.png";
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { encryptData } from "@/lib/encryption";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import { ToastContainer, toast } from "react-toastify";
@@ -15,6 +15,8 @@ import { useAppContext } from "@/context/AppContext";
 
 const page = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
   const { fetchUserData } = useAppContext();
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -23,9 +25,9 @@ const page = () => {
 
   useEffect(() => {
     if (localStorage.getItem("user")) {
-      router.push("/");
+      router.push(redirect || "/");
     }
-  }, [router]);
+  }, [router, redirect]);
 
   const handleSignin = async (e) => {
     e.preventDefault();
@@ -67,7 +69,9 @@ const page = () => {
       toast.success("Signin successful!");
 
       const userRole = response.data?.role;
-      if (userRole === "vendor") {
+      if (redirect) {
+        router.push(redirect);
+      } else if (userRole === "vendor") {
         router.push("/vendor-dashboard");
       } else if (userRole === "delivery") {
         router.push("/delivery-dashboard");
@@ -157,7 +161,7 @@ const page = () => {
         </button>
         <p className="text-sm text-center">
           Don't have an account?{" "}
-          <Link className="text-blue-500" href={"/signup"}>
+          <Link className="text-blue-500" href={`/signup${redirect ? `?redirect=${redirect}` : ""}`}>
             Sign up
           </Link>
         </p>

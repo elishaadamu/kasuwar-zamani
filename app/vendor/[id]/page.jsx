@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import { useAppContext } from "@/context/AppContext";
 import Loading from "@/components/Loading";
@@ -45,6 +45,7 @@ const StarRating = ({ rating, setRating }) => {
 const VendorPage = () => {
   const { id } = useParams();
   const router = useRouter();
+  const pathname = usePathname();
   const {
     isLoggedIn,
     userData,
@@ -199,7 +200,7 @@ const VendorPage = () => {
 
     if (!isLoggedIn) {
       message.error("Please sign in to follow vendors.");
-      router.push("/signin");
+      router.push(`/signin?redirect=${pathname}`);
       return;
     }
 
@@ -215,7 +216,7 @@ const VendorPage = () => {
     e.preventDefault();
     if (!isLoggedIn) {
       message.error("Please log in to submit a review.");
-      router.push("/signin");
+      router.push(`/signin?redirect=${pathname}`);
       return;
     }
 

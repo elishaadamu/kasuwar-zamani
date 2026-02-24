@@ -10,8 +10,10 @@ import { toast } from "react-toastify";
 import { FaShoppingCart, FaTrash } from "react-icons/fa";
 import { supabase } from "@/lib/supabase";
 import { message } from "antd";
+import { usePathname } from "next/navigation";
 
 const Cart = () => {
+  const pathname = usePathname();
   const {
     products,
     router,
@@ -28,14 +30,14 @@ const Cart = () => {
   useEffect(() => {
     if (!isLoggedIn) {
       toast.error("Please sign in to view your cart.");
-      router.push("/signin");
+      router.push(`/signin?redirect=${pathname}`);
     }
-  }, [isLoggedIn, router]);
+  }, [isLoggedIn, router, pathname]);
 
   const handleMessageClick = async (product) => {
     if (!isLoggedIn) {
       message.error("Please sign in to message the vendor.");
-      router.push("/signin");
+      router.push(`/signin?redirect=${pathname}`);
       return;
     }
 

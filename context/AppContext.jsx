@@ -1,6 +1,6 @@
 "use client";
 import { decryptData } from "@/lib/encryption";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { apiUrl, API_CONFIG } from "@/configs/api";
@@ -17,6 +17,7 @@ export const useAppContext = () => {
 export const AppContextProvider = (props) => {
   const currency = process.env.NEXT_PUBLIC_CURRENCY;
   const router = useRouter();
+  const pathname = usePathname();
 
   const [products, setProducts] = useState([]);
   const [productPage, setProductPage] = useState(1);
@@ -159,7 +160,7 @@ export const AppContextProvider = (props) => {
   const addToCart = async (itemId) => {
     if (!isLoggedIn) {
       toast.error("Please sign in to add items to cart.");
-      router.push("/signin");
+      router.push(`/signin?redirect=${pathname}`);
       return;
     }
     setCartItems((prevCartItems) => {
@@ -203,7 +204,7 @@ export const AppContextProvider = (props) => {
   const addToWishlist = (itemId) => {
     if (!isLoggedIn) {
       toast.error("Please sign in to add items to wishlist.");
-      router.push("/signin");
+      router.push(`/signin?redirect=${pathname}`);
       return;
     }
     let wishlistData = structuredClone(wishlistItems);
@@ -268,7 +269,7 @@ export const AppContextProvider = (props) => {
   const followVendor = async (vendorId) => {
     if (!isLoggedIn || !userData?.id) {
       toast.error("Please sign in to follow vendors.");
-      router.push("/signin");
+      router.push(`/signin?redirect=${pathname}`);
       return;
     }
 

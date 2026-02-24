@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { decryptData } from "../../lib/encryption";
 import Logo from "@/assets/logo/logo.png";
 import axios from "axios";
@@ -13,6 +13,7 @@ import Sidebar from "@/components/vendor-dashboard/Sidebar";
 
 const DashboardLayout = ({ children }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const [openOrders, setOpenOrders] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
   const [openDelivery, setOpenDelivery] = useState(false);
@@ -27,16 +28,16 @@ const DashboardLayout = ({ children }) => {
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (!user) {
-      router.push("/signin");
+      router.push(`/signin?redirect=${pathname}`);
     } else {
       const decryptedData = decryptData(user);
       setUserData(decryptedData);
       if (decryptedData.role !== "vendor") {
         toast.error("You are not authorized to view this page.");
-        router.push("/signin");
+        router.push(`/signin?redirect=${pathname}`);
       }
     }
-  }, [router]);
+  }, [router, pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem("user");

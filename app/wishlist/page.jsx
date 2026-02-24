@@ -2,17 +2,18 @@
 import ProductCard from "@/components/ProductCard";
 import { useAppContext } from "@/context/AppContext";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 const Page = () => {
   const { products, wishlistItems, isLoggedIn } = useAppContext();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isLoggedIn) {
-      router.push("/signin");
+      router.push(`/signin?redirect=${pathname}`);
     }
-  }, [isLoggedIn, router]);
+  }, [isLoggedIn, router, pathname]);
 
   const wishlistProducts = products.filter((product) =>
     wishlistItems.includes(product._id)

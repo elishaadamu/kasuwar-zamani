@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { decryptData } from "../../lib/encryption";
 import Logo from "@/assets/logo/logo.png";
 import axios from "axios";
@@ -47,6 +47,7 @@ const WalletNotification = ({ onDismiss }) => (
 
 const DashboardLayout = ({ children }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const [openSettings, setOpenSettings] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -55,12 +56,12 @@ const DashboardLayout = ({ children }) => {
   useEffect(() => {
     const user = localStorage.getItem("user");
     if (!user) {
-      router.push("/delivery-signin");
+      router.push(`/delivery-signin?redirect=${pathname}`);
     } else {
       const decryptedData = decryptData(user);
       setUserData(decryptedData);
     }
-  }, [router]);
+  }, [router, pathname]);
 
   useEffect(() => {
     if (userData) {

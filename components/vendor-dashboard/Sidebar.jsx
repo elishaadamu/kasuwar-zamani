@@ -338,9 +338,9 @@ const Sidebar = ({
                 </Link>
                
                 <Link
-                  href="/vendor-dashboard/shipping"
+                  href="/vendor-dashboard/pin-management"
                   className={`block pl-11 pr-4 py-2 rounded-lg hover:bg-gray-700 transition-colors ${
-                    pathname === "/vendor-dashboard/shipping"
+                    pathname === "/vendor-dashboard/pin-management"
                       ? "bg-gray-700"
                       : ""
                   }`}
