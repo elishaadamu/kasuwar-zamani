@@ -3,9 +3,21 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import { useAppContext } from "@/context/AppContext";
-import { FaUserTie, FaUsers, FaSpinner, FaLayerGroup, FaUserPlus, FaTimes, FaExchangeAlt, FaWallet, FaChartLine, FaPlusCircle, FaChevronRight, FaArrowRight } from "react-icons/fa";
+import { FaUserTie, FaUsers, FaSpinner, FaLayerGroup, FaUserPlus, FaTimes, FaExchangeAlt, FaWallet, FaChartLine, FaPlusCircle, FaChevronRight, FaArrowRight, FaBox, FaStore, FaUserCheck, FaTruck, FaClipboardList, FaBriefcase, FaIdBadge } from "react-icons/fa";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "react-toastify";
+
+const MetricCard = ({ icon, title, value, bg }) => (
+    <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+        <div className={`w-12 h-12 rounded-xl ${bg} flex items-center justify-center text-xl`}>
+            {icon}
+        </div>
+        <div>
+            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">{title}</p>
+            <h3 className="text-xl font-bold text-gray-800">{value}</h3>
+        </div>
+    </div>
+);
 
 const AssignMemberModal = ({ isOpen, onClose, onAssign, loading, form, setForm, teams, showTeamSelect }) => {
     if (!isOpen) return null;
@@ -612,17 +624,34 @@ const MyTeamDashboardView = ({ teamId }) => {
                     <div className="absolute top-0 right-0 p-4 opacity-10">
                         <FaWallet className="text-8xl" />
                     </div>
-                    <div className="relative z-10">
-                        <div className="flex items-center gap-2 mb-4 opacity-80">
-                            <FaWallet className="text-sm" />
-                            <span className="text-xs font-bold uppercase tracking-wider">Current Balance</span>
+                    <div className="relative z-10 flex flex-col h-full justify-between">
+                        <div>
+                            <div className="flex items-center gap-2 mb-4 opacity-80">
+                                <FaWallet className="text-sm" />
+                                <span className="text-xs font-bold uppercase tracking-wider">Current Balance</span>
+                            </div>
+                            {walletLoading ? (
+                                 <FaSpinner className="animate-spin text-2xl" />
+                            ) : (
+                                <h2 className="text-2xl font-bold">₦{walletData?.balance?.toLocaleString() || "0"}</h2>
+                            )}
+                            <p className="text-xs mt-2 opacity-60">Currency: {walletData?.currency || "NGN"}</p>
                         </div>
-                        {walletLoading ? (
-                             <FaSpinner className="animate-spin text-2xl" />
-                        ) : (
-                            <h2 className="text-2xl font-bold">₦{walletData?.balance?.toLocaleString() || "0"}</h2>
-                        )}
-                        <p className="text-xs mt-2 opacity-60">Currency: {walletData?.currency || "NGN"}</p>
+                        
+                        <div className="space-y-2 mt-4 pt-4 border-t border-indigo-500/30 text-sm">
+                            <div className="flex justify-between items-center">
+                                <span className="opacity-80 text-xs text-indigo-100">Commission on Sales</span>
+                                <span className="font-semibold">₦{walletData?.commissions?.sales?.toLocaleString() || "0"}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="opacity-80 text-xs text-indigo-100">Delivery</span>
+                                <span className="font-semibold">₦{walletData?.commissions?.delivery?.toLocaleString() || "0"}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                                <span className="opacity-80 text-xs text-indigo-100">Vendor Subscriptions</span>
+                                <span className="font-semibold">₦{walletData?.commissions?.subscriptions?.toLocaleString() || "0"}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -666,6 +695,20 @@ const MyTeamDashboardView = ({ teamId }) => {
                         </h3>
                     </div>
                 </div>
+            </div>
+
+            {/* Extended Metrics Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                <MetricCard icon={<FaBox className="text-blue-500" />} title="Total Products" value={dashboardData?.metrics?.totalProducts || 0} bg="bg-blue-50" />
+                <MetricCard icon={<FaStore className="text-purple-500" />} title="Total Vendors" value={dashboardData?.metrics?.totalVendors || 0} bg="bg-purple-50" />
+                <MetricCard icon={<FaUserCheck className="text-green-500" />} title="Total Customers" value={dashboardData?.metrics?.totalCustomers || 0} bg="bg-green-50" />
+                <MetricCard icon={<FaTruck className="text-orange-500" />} title="Delivery Men" value={dashboardData?.metrics?.totalDeliveryMen || 0} bg="bg-orange-50" />
+                <MetricCard icon={<FaBriefcase className="text-teal-500" />} title="Total SM" value={dashboardData?.metrics?.totalSM || 0} bg="bg-teal-50" />
+                <MetricCard icon={<FaUserTie className="text-indigo-500" />} title="Total BDM / BDs" value={dashboardData?.metrics?.totalBDM || 0} bg="bg-indigo-50" />
+                <MetricCard icon={<FaIdBadge className="text-pink-500" />} title="Total Agents" value={dashboardData?.metrics?.totalAgents || 0} bg="bg-pink-50" />
+                <MetricCard icon={<FaClipboardList className="text-yellow-500" />} title="Delivery Requests" value={dashboardData?.metrics?.totalDeliveryRequests || 0} bg="bg-yellow-50" />
+                <MetricCard icon={<FaStore className="text-red-500" />} title="New Vendors (Active)" value={dashboardData?.metrics?.newActiveVendors || 0} bg="bg-red-50" />
+                <MetricCard icon={<FaChartLine className="text-cyan-500" />} title="Total Orders" value={dashboardData?.stats?.totalOrders || dashboardData?.metrics?.totalOrders || 0} bg="bg-cyan-50" />
             </div>
 
             {/* Content: Regional View - Show all teams */}
@@ -982,6 +1025,98 @@ const MyTeamDashboardView = ({ teamId }) => {
                     </div>
                 </div>
             )}
+
+            {/* Performance Rankings */}
+            <div className="space-y-6 pt-6">
+                <h2 className="text-xl font-bold text-gray-800 border-b pb-2">Team Performance Rankings</h2>
+                
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    {/* SM Performance List */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="p-4 border-b border-gray-100 bg-teal-50/50">
+                            <h3 className="font-bold text-gray-800 flex items-center gap-2"><FaBriefcase className="text-teal-600"/> Top Sales Managers (SM)</h3>
+                        </div>
+                        <div className="p-0">
+                            {(dashboardData?.performances?.sm || []).length > 0 ? (
+                                <ul className="divide-y divide-gray-100">
+                                    {(dashboardData?.performances?.sm || []).map((user, idx) => (
+                                        <li key={idx} className="p-4 hover:bg-gray-50 transition-colors">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span className="font-semibold text-sm text-gray-800">{user.name}</span>
+                                                <span className="text-xs font-bold text-teal-600 bg-teal-50 px-2 py-1 rounded-full">Rank #{idx + 1}</span>
+                                            </div>
+                                            <div className="flex gap-4 text-xs text-gray-500 flex-wrap">
+                                                <span>Sales: <strong className="text-gray-700">{user.sales || 0}</strong></span>
+                                                <span>Customers: <strong className="text-gray-700">{user.customers || 0}</strong></span>
+                                                <span>Agents: <strong className="text-gray-700">{user.agents || 0}</strong></span>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div className="p-6 text-center text-sm text-gray-500">No SM performance data available.</div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* BDM Performance List */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="p-4 border-b border-gray-100 bg-indigo-50/50">
+                            <h3 className="font-bold text-gray-800 flex items-center gap-2"><FaUserTie className="text-indigo-600"/> Top BDMs</h3>
+                        </div>
+                        <div className="p-0">
+                            {(dashboardData?.performances?.bdm || []).length > 0 ? (
+                                <ul className="divide-y divide-gray-100">
+                                    {(dashboardData?.performances?.bdm || []).map((user, idx) => (
+                                        <li key={idx} className="p-4 hover:bg-gray-50 transition-colors">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span className="font-semibold text-sm text-gray-800">{user.name}</span>
+                                                <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full">Rank #{idx + 1}</span>
+                                            </div>
+                                            <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
+                                                <span>Vendors: <strong className="text-gray-700">{user.vendors || 0}</strong></span>
+                                                <span>Customers: <strong className="text-gray-700">{user.customers || 0}</strong></span>
+                                                <span>BDs: <strong className="text-gray-700">{user.bds || 0}</strong></span>
+                                                <span>Agents: <strong className="text-gray-700">{user.agents || 0}</strong></span>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div className="p-6 text-center text-sm text-gray-500">No BDM performance data available.</div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* BD Performance List */}
+                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div className="p-4 border-b border-gray-100 bg-blue-50/50">
+                            <h3 className="font-bold text-gray-800 flex items-center gap-2"><FaIdBadge className="text-blue-600"/> Top BDs</h3>
+                        </div>
+                        <div className="p-0">
+                            {(dashboardData?.performances?.bd || []).length > 0 ? (
+                                <ul className="divide-y divide-gray-100">
+                                    {(dashboardData?.performances?.bd || []).map((user, idx) => (
+                                        <li key={idx} className="p-4 hover:bg-gray-50 transition-colors">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span className="font-semibold text-sm text-gray-800">{user.name}</span>
+                                                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full">Rank #{idx + 1}</span>
+                                            </div>
+                                            <div className="flex gap-4 text-xs text-gray-500 flex-wrap">
+                                                <span>Vendors: <strong className="text-gray-700">{user.vendors || 0}</strong></span>
+                                                <span>Customers: <strong className="text-gray-700">{user.customers || 0}</strong></span>
+                                                <span>Agents: <strong className="text-gray-700">{user.agents || 0}</strong></span>
+                                            </div>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div className="p-6 text-center text-sm text-gray-500">No BD performance data available.</div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             {!isRegionalView && !isTeamView && (
                 <div className="bg-yellow-50 p-6 rounded-xl border border-yellow-100 text-yellow-800">
