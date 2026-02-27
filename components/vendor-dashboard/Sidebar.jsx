@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import Logo from "@/assets/logo/logo.png";
 import { FaTruck } from "react-icons/fa";
 import { FaHistory } from "react-icons/fa";
-import { FaStar, FaUsers } from "react-icons/fa";
 import { FaStar, FaUsers, FaLayerGroup, FaUser, FaUserTie } from "react-icons/fa";
 import axios from "axios";
 import { apiUrl, API_CONFIG } from "@/configs/api";
