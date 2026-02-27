@@ -13,7 +13,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAppContext } from "@/context/AppContext";
 
-const page = () => {
+import { Suspense } from "react";
+
+const SigninPageContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
@@ -167,6 +169,14 @@ const page = () => {
         </p>
       </form>
     </div>
+  );
+};
+
+const page = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SigninPageContent />
+    </Suspense>
   );
 };
 

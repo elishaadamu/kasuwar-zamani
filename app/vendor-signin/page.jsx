@@ -13,7 +13,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAppContext } from "@/context/AppContext";
 
-const VendorSigninPage = () => {
+import { Suspense } from "react";
+
+const VendorSigninContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
@@ -145,6 +147,14 @@ const VendorSigninPage = () => {
         </p>
       </form>
     </div>
+  );
+};
+
+const VendorSigninPage = () => {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VendorSigninContent />
+    </Suspense>
   );
 };
 
