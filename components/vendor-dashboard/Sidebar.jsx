@@ -150,6 +150,14 @@ const Sidebar = ({
                 <p className="px-2 text-xs font-semibold text-blue-400 uppercase tracking-wider mb-2 flex items-center gap-2">
                   {isRegionalLeader ? "Region Teams" : isTeamLeader ? "Team Members" : "My Team"}
                 </p>
+                 <Link
+                    href="/vendor-dashboard/team"
+                    className={`block mt-2 pl-3 pr-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm text-gray-300 font-medium ${
+                      pathname === "/vendor-dashboard/team" && !(typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('id')) ? "bg-gray-700 text-white" : ""
+                    }`}
+                  >
+                    View Full Dashboard
+                  </Link>
                 <div className="space-y-1">
                   {isRegionalLeader && teamData?.teams?.map((team) => (
                     <Link
@@ -184,14 +192,7 @@ const Sidebar = ({
                     </div>
                   ))}
                   
-                  <Link
-                    href="/vendor-dashboard/team"
-                    className={`block mt-2 pl-3 pr-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm text-gray-300 font-medium ${
-                      pathname === "/vendor-dashboard/team" && !(typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('id')) ? "bg-gray-700 text-white" : ""
-                    }`}
-                  >
-                    View Full Dashboard
-                  </Link>
+                 
                 </div>
               </div>
             )}
