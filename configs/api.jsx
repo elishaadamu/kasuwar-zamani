@@ -155,6 +155,28 @@ export const API_CONFIG = {
       GET_ORDERS: "/order/user/", // GET user POS orders GET_ALL: "/order/user/",
       PAY: "/pos/pay/", // POST with { pin }, append posOrderId
     },
+    REGIONAL: {
+      GET_ZONES: "/admin/regional/zones",
+      GET_ZONE_TEAMS: "/admin/regional/zones/", // append zoneId/teams
+      GET_ZONE_STATES: "/admin/regional/zones/", // append zoneId/states
+      GET_METRICS: "/admin/regional/zones/", // append zoneId/metrics
+      ASSIGN_MEMBER: "/admin/regional/management/assign-member",
+      GET_STATS: "/admin/regional/management/regions-stats",
+      GET_DETAILS: "/admin/regional/management/region/", // append zoneId/details
+      REASSIGN_MEMBER: "/admin/regional/management/reassign-member",
+      SET_TEAM_LEAD: "/admin/regional/management/team-lead",
+      CREATE_TEAM: "/admin/regional/zones/", // append {zoneId}/teams
+      GET_MY_REGION_TEAMS: "/admin/regional/management/my-region-teams",
+      GET_MY_TEAM_DASHBOARD: "/admin/regional/management/my-team-dashboard",
+      GET_TEAM_MEMBERS: "/team-members/team/", // append teamId
+      GET_MY_TEAM: "/team-members/my-team",
+    },
+    ZONE_WALLET: {
+      GET_ALL_REGIONAL: "/zone-wallet/regional/all",
+      GET_REGIONAL: "/zone-wallet/regional/", // append zoneId
+      GET_REGIONAL_TEAMS: "/zone-wallet/regional/", // append zoneId/teams
+      GET_TEAM: "/zone-wallet/team/", // append teamId
+    },
   },
   SHIPPING_FEE: {
     GET_ALL: "/shipping-fee/all",
