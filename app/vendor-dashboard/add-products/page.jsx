@@ -23,6 +23,7 @@ const AddProduct = () => {
   const [minOrder, setMinOrder] = useState("");
   const [condition, setCondition] = useState("NEW");
   const [stock, setStock] = useState("");
+  const [commission, setCommission] = useState("");
   const [loading, setLoading] = useState(false);
   const [isCheckingStatus, setIsCheckingStatus] = useState(true);
   const [categories, setCategories] = useState([]); // Removed duplicate state declaration if any
@@ -58,20 +59,20 @@ const AddProduct = () => {
         );
         const canPost = response.data?.canPostProduct;
         setSubscriptionInvalid(!canPost);
-        
+
         if (!canPost) {
           setError("Your subscription does not allow adding products. Please upgrade.");
         } else {
-             try {
-                const detailsResponse = await axios.get(
-                  apiUrl(API_CONFIG.ENDPOINTS.SUBSCRIPTION.GET_DETAILS + userData.id)
-                );
-                if (detailsResponse.data.success) {
-                  setSubscription(detailsResponse.data.subscription);
-                }
-             } catch (detailErr) {
-                console.error("Failed to fetch subscription details", detailErr);
-             }
+          try {
+            const detailsResponse = await axios.get(
+              apiUrl(API_CONFIG.ENDPOINTS.SUBSCRIPTION.GET_DETAILS + userData.id)
+            );
+            if (detailsResponse.data.success) {
+              setSubscription(detailsResponse.data.subscription);
+            }
+          } catch (detailErr) {
+            console.error("Failed to fetch subscription details", detailErr);
+          }
         }
       } catch (err) {
         setSubscriptionInvalid(true);
@@ -108,6 +109,7 @@ const AddProduct = () => {
       formData.append("minOrder", parseInt(minOrder) || 1);
       formData.append("condition", condition);
       formData.append("stock", parseInt(stock) || 0);
+      formData.append("commission", parseFloat(commission) || 0);
 
       images.filter(Boolean).forEach((img) => formData.append("images", img));
 
@@ -169,7 +171,7 @@ const AddProduct = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <ToastContainer position="top-right" theme="light" />
-      
+
       <div className="max-w-5xl mx-auto">
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-8 py-6">
@@ -180,27 +182,27 @@ const AddProduct = () => {
           <form onSubmit={handleSubmit} className="p-8 space-y-8">
             {subscription && (
               <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                 <div>
-                    <h3 className="text-sm font-semibold text-indigo-900 uppercase tracking-wider mb-1">Current Plan</h3>
-                    <p className="text-2xl font-bold text-indigo-700">{subscription.plan.package}</p>
-                 </div>
-                 <div className="flex flex-col items-end gap-2">
-                    <div className="text-left sm:text-right">
-                        <p className="text-sm text-indigo-800 font-medium mb-1">
-                        Allowed Products: <span className="font-bold">{subscription.plan.products >= 1000 ? "Unlimited" : subscription.plan.products}</span>
-                        </p>
-                        <p className="text-xs text-indigo-500 font-medium">
-                        Expires: {new Date(subscription.endDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-                        </p>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={() => router.push("/vendor-dashboard/subscription-plans")}
-                        className="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
-                    >
-                        Upgrade Plan
-                    </button>
-                 </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-indigo-900 uppercase tracking-wider mb-1">Current Plan</h3>
+                  <p className="text-2xl font-bold text-indigo-700">{subscription.plan.package}</p>
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <div className="text-left sm:text-right">
+                    <p className="text-sm text-indigo-800 font-medium mb-1">
+                      Allowed Products: <span className="font-bold">{subscription.plan.products >= 1000 ? "Unlimited" : subscription.plan.products}</span>
+                    </p>
+                    <p className="text-xs text-indigo-500 font-medium">
+                      Expires: {new Date(subscription.endDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => router.push("/vendor-dashboard/subscription-plans")}
+                    className="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
+                  >
+                    Upgrade Plan
+                  </button>
+                </div>
               </div>
             )}
             {error && (
@@ -268,13 +270,16 @@ const AddProduct = () => {
               <div className="space-y-6">
                 <InputField label="Product Name" required value={name} onChange={setName} placeholder="e.g. Premium Leather Wallet" />
                 <SelectField label="Category" value={category} onChange={setCategory} options={categories.map(c => ({ value: c.name, label: c.name.charAt(0).toUpperCase() + c.name.slice(1) }))} />
-                
+
                 <div className="grid grid-cols-2 gap-4">
                   <InputField label="Price (₦)" type="number" required value={price} onChange={setPrice} placeholder="25000" />
                   <InputField label="Min Order" type="number" required value={minOrder} onChange={setMinOrder} placeholder="1" />
                 </div>
 
-                <InputField label="Stock Quantity" type="number" required value={stock} onChange={setStock} placeholder="50" />
+                <div className="grid grid-cols-2 gap-4">
+                  <InputField label="Stock Quantity" type="number" required value={stock} onChange={setStock} placeholder="50" />
+                  <InputField label="Commission" type="number" required value={commission} onChange={setCommission} placeholder="e.g. 5" />
+                </div>
               </div>
 
               {/* Right Column */}
