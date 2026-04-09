@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import { useAppContext } from "@/context/AppContext";
@@ -63,6 +63,8 @@ const VendorPage = () => {
   const [coupons, setCoupons] = useState([]);
   const [followerCount, setFollowerCount] = useState(0);
   const [isCreatingChat, setIsCreatingChat] = useState(false);
+  const [productPage, setProductPage] = useState(1);
+  const PRODUCTS_PER_PAGE = 8;
 
   // Follow state
   const [isFollowing, setIsFollowing] = useState(followingList?.includes(id));
@@ -149,6 +151,18 @@ const VendorPage = () => {
     };
     fetchVendorProducts();
   }, [vendor]);
+
+  // Pagination computed values
+  const totalPages = useMemo(() => Math.ceil(vendorProducts.length / PRODUCTS_PER_PAGE), [vendorProducts]);
+  const paginatedProducts = useMemo(() => {
+    const start = (productPage - 1) * PRODUCTS_PER_PAGE;
+    return vendorProducts.slice(start, start + PRODUCTS_PER_PAGE);
+  }, [vendorProducts, productPage]);
+
+  // Reset to page 1 when products change
+  useEffect(() => {
+    setProductPage(1);
+  }, [vendorProducts]);
 
   const handleMessageClick = async () => {
     if (isCreatingChat || !vendor || !userData) return;
@@ -557,15 +571,90 @@ const VendorPage = () => {
 
       {/* Products Section */}
       <div className="mb-12">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6">
-          Products from {vendor.businessName}
-        </h2>
-        {vendorProducts.length > 0 ? (
-          <div className="grid home-products grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
-            {vendorProducts.map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-800">
+            Products from {vendor.businessName}
+          </h2>
+          {vendorProducts.length > 0 && (
+            <span className="text-sm text-gray-500 font-medium bg-gray-100 px-3 py-1.5 rounded-lg">
+              {vendorProducts.length} {vendorProducts.length === 1 ? "product" : "products"}
+            </span>
+          )}
+        </div>
+        {paginatedProducts.length > 0 ? (
+          <>
+            <div className="grid home-products grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-6">
+              {paginatedProducts.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center mt-10 gap-2">
+                {/* Previous Button */}
+                <button
+                  onClick={() => setProductPage((p) => Math.max(1, p - 1))}
+                  disabled={productPage === 1}
+                  className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 text-gray-500 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-500 disabled:hover:border-gray-200 transition-all duration-200"
+                  aria-label="Previous page"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+
+                {/* Page Numbers */}
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                  // Show: first, last, current, and neighbors of current
+                  const showPage =
+                    page === 1 ||
+                    page === totalPages ||
+                    Math.abs(page - productPage) <= 1;
+                  const showEllipsisBefore =
+                    page === productPage - 2 && productPage > 3;
+                  const showEllipsisAfter =
+                    page === productPage + 2 && productPage < totalPages - 2;
+
+                  if (showEllipsisBefore || showEllipsisAfter) {
+                    return (
+                      <span key={page} className="w-10 h-10 flex items-center justify-center text-gray-400 text-sm">
+                        …
+                      </span>
+                    );
+                  }
+
+                  if (!showPage) return null;
+
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setProductPage(page)}
+                      className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-semibold transition-all duration-200 ${
+                        page === productPage
+                          ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
+                          : "border border-gray-200 text-gray-600 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+
+                {/* Next Button */}
+                <button
+                  onClick={() => setProductPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={productPage === totalPages}
+                  className="w-10 h-10 flex items-center justify-center rounded-xl border border-gray-200 text-gray-500 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-gray-500 disabled:hover:border-gray-200 transition-all duration-200"
+                  aria-label="Next page"
+                >
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            )}
+          </>
         ) : (
           <p className="text-gray-500">No products found for this vendor.</p>
         )}

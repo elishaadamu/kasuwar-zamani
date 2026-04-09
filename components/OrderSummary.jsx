@@ -18,7 +18,29 @@ import {
   FaShieldAlt,
 } from "react-icons/fa";
 
-const OrderSummary = () => {
+const OrderSummary = ({ externalState }) => {
+  // Use either external state from props (for sync with parent) or local fallback
+  const [_deliveryState, _setDeliveryState] = useState("");
+  const [_deliveryLga, _setDeliveryLga] = useState("");
+  const [_deliveryAddress, _setDeliveryAddress] = useState("");
+  const [_selectedShipping, _setSelectedShipping] = useState(null);
+  const [_pin, _setPin] = useState("");
+
+  const deliveryState = externalState ? externalState.deliveryState : _deliveryState;
+  const setDeliveryState = externalState ? externalState.setDeliveryState : _setDeliveryState;
+  
+  const deliveryLga = externalState ? externalState.deliveryLga : _deliveryLga;
+  const setDeliveryLga = externalState ? externalState.setDeliveryLga : _setDeliveryLga;
+  
+  const deliveryAddress = externalState ? externalState.deliveryAddress : _deliveryAddress;
+  const setDeliveryAddress = externalState ? externalState.setDeliveryAddress : _setDeliveryAddress;
+  
+  const selectedShipping = externalState ? externalState.selectedShipping : _selectedShipping;
+  const setSelectedShipping = externalState ? externalState.setSelectedShipping : _setSelectedShipping;
+  
+  const pin = externalState ? externalState.pin : _pin;
+  const setPin = externalState ? externalState.setPin : _setPin;
+
   const {
     currency,
     router,
@@ -34,18 +56,11 @@ const OrderSummary = () => {
 
   const [, setPageLoading] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [pin, setPin] = useState("");
   const [showPin, setShowPin] = useState(false);
-
-  // Delivery logic states
-  const [deliveryState, setDeliveryState] = useState("");
-  const [deliveryLga, setDeliveryLga] = useState("");
   const [isInterState, setIsInterState] = useState(false);
-  const [deliveryAddress, setDeliveryAddress] = useState("");
-
-  // New shipping logic states
+  
+  // Shipping logic states managed locally for calculation
   const [shippingOptions, setShippingOptions] = useState([]);
-  const [selectedShipping, setSelectedShipping] = useState(null);
   const [shippingFee, setShippingFee] = useState(0);
   const [deliveryFees, setDeliveryFees] = useState([]);
 
@@ -94,12 +109,13 @@ const OrderSummary = () => {
         if (cartItems[itemId] <= 0) continue;
         
         const product = products.find((p) => p._id === itemId);
-        if (product && product.vendor && typeof product.vendor === 'object') {
+        if (product) {
           return {
-            businessName: product.vendor.businessName || product.vendor.name || "Vendor",
-            shippingAddress: product.vendor.shippingAddress || product.vendor.address || product.vendor.shopAddress || product.vendor.location || null,
-            shippingState: product.vendor.shippingState || product.vendor.state || null,
-            zipCode: product.vendor.zipCode || product.vendor.zipcode || "",
+            businessName: product.vendor?.businessName || product.vendor?.name || "Vendor",
+            shippingAddress: product.pickupAddress || product.vendor?.shippingAddress || product.vendor?.address || product.vendor?.shopAddress || product.vendor?.location || null,
+            shippingState: product.pickupState || product.vendor?.shippingState || product.vendor?.state || null,
+            shippingLga: product.pickupLga || null,
+            zipCode: product.vendor?.zipCode || product.vendor?.zipcode || "",
           };
         }
       }
@@ -405,6 +421,16 @@ const OrderSummary = () => {
       Math.floor(getCartAmount() * 0.02) -
       couponDiscount;
 
+  const validationErrors = useMemo(() => {
+    const errors = [];
+    if (!deliveryState) errors.push("Select a delivery state");
+    if (deliveryState && !deliveryLga) errors.push("Select a local government area (LGA)");
+    if (deliveryState && !deliveryAddress) errors.push("Enter your full delivery address");
+    if (deliveryState && !selectedShipping) errors.push("Select a delivery speed");
+    if (!pin || pin.length !== 4) errors.push("Enter your 4-digit transaction PIN");
+    return errors;
+  }, [deliveryState, deliveryLga, deliveryAddress, selectedShipping, pin]);
+
   return (
     <div className="w-full rounded-2xl overflow-hidden border border-slate-200/70 shadow-xl shadow-slate-200/40 bg-white">
 
@@ -444,9 +470,13 @@ const OrderSummary = () => {
                 <p className="text-sm font-semibold text-slate-700 line-clamp-1">
                   {vendorShippingInfo?.shippingAddress || (vendorShippingInfo?.businessName ? `Warehouse (${vendorShippingInfo.businessName})` : "No shipping origin")}
                 </p>
-                {(vendorShippingInfo?.shippingState || vendorShippingInfo?.businessName) && (
+                {(vendorShippingInfo?.shippingState || vendorShippingInfo?.shippingLga || vendorShippingInfo?.businessName) && (
                   <p className="text-xs text-slate-400 mt-0.5">
-                    {vendorShippingInfo.shippingState ? `${vendorShippingInfo.shippingState} State` : "Location specified"} · {vendorShippingInfo.zipCode || "No ZIP"}
+                    {[
+                      vendorShippingInfo.shippingLga && `${vendorShippingInfo.shippingLga} LGA`,
+                      vendorShippingInfo.shippingState && `${vendorShippingInfo.shippingState} State`,
+                    ].filter(Boolean).join(', ') || "Location specified"} 
+                    {vendorShippingInfo.zipCode && ` · ${vendorShippingInfo.zipCode}`}
                   </p>
                 )}
               </div>
@@ -744,11 +774,33 @@ const OrderSummary = () => {
           </p>
         </div>
 
+        {/* ═══════════ VALIDATION ERRORS ═══════════ */}
+        {validationErrors.length > 0 && (
+          <div className="mt-4 p-3.5 bg-amber-50 rounded-xl border border-amber-100 flex items-start gap-3 animate-fadeIn">
+            <div className="w-5 h-5 rounded-full bg-amber-200 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <svg className="w-3 h-3 text-amber-700" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-[11px] font-bold text-amber-800 uppercase tracking-wider mb-1">Items needed to place order:</p>
+              <ul className="space-y-1">
+                {validationErrors.map((error, idx) => (
+                  <li key={idx} className="text-xs text-amber-700/80 flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-amber-400" />
+                    {error}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+
         {/* ═══════════ PLACE ORDER BUTTON ═══════════ */}
         <button
           onClick={createOrder}
-          disabled={loading || !pin || pin.length !== 4 || !selectedShipping}
-          className="w-full relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white font-extrabold py-4 mt-4 rounded-xl hover:from-blue-700 hover:via-blue-800 hover:to-indigo-800 disabled:from-slate-300 disabled:via-slate-300 disabled:to-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed transition-all duration-300 transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-500/25 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 disabled:shadow-none group"
+          disabled={loading || validationErrors.length > 0}
+          className="w-full relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white font-extrabold py-4 mt-4 rounded-xl hover:from-blue-700 hover:via-blue-800 hover:to-indigo-800 disabled:from-slate-200 disabled:via-slate-200 disabled:to-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-all duration-300 transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-500/25 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 disabled:shadow-none group"
         >
           {loading ? (
             <div className="flex items-center justify-center gap-2.5">

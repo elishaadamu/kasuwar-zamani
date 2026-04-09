@@ -27,6 +27,13 @@ const Cart = () => {
   } = useAppContext();
   const [creatingChatFor, setCreatingChatFor] = useState(null);
 
+  // States lifted from OrderSummary to make progress bar dynamic
+  const [deliveryState, setDeliveryState] = useState("");
+  const [deliveryLga, setDeliveryLga] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [selectedShipping, setSelectedShipping] = useState(null);
+  const [pin, setPin] = useState("");
+
   useEffect(() => {
     if (!isLoggedIn) {
       toast.error("Please sign in to view your cart.");
@@ -114,18 +121,25 @@ const Cart = () => {
     [allRelatedProducts]
   );
 
+  // Dynamic steps calculation
+  const currentStep = useMemo(() => {
+    if (pin.length === 4 && selectedShipping && deliveryAddress) return 2; // Payment stage (entered PIN)
+    if (selectedShipping && deliveryAddress) return 2; // Payment stage (ready to pay)
+    if (deliveryState) return 1; // Shipping stage
+    return 0; // Cart stage
+  }, [deliveryState, deliveryLga, deliveryAddress, selectedShipping, pin]);
+
+  const steps = [
+    { icon: FaShoppingCart, label: "Cart", active: currentStep >= 0 },
+    { icon: FaBox, label: "Shipping", active: currentStep >= 1 },
+    { icon: FaCreditCard, label: "Payment", active: currentStep >= 2 },
+    { icon: FaCheckCircle, label: "Done", active: false }, // Only active on success page
+  ];
+
   if (!isLoggedIn) {
     // Render nothing or a loader while redirecting
     return null;
   }
-
-  // Steps for the progress indicator
-  const steps = [
-    { icon: FaShoppingCart, label: "Cart", active: true },
-    { icon: FaBox, label: "Shipping", active: false },
-    { icon: FaCreditCard, label: "Payment", active: false },
-    { icon: FaCheckCircle, label: "Done", active: false },
-  ];
 
   if (cartProductList.length === 0) {
     return (
@@ -183,8 +197,8 @@ const Cart = () => {
                   </span>
                 </div>
                 {i < steps.length - 1 && (
-                  <div className={`w-10 sm:w-16 h-0.5 mx-2 rounded-full ${
-                    step.active ? "bg-gradient-to-r from-blue-500 to-slate-200" : "bg-slate-200"
+                  <div className={`w-10 sm:w-16 h-0.5 mx-2 rounded-full transition-all duration-500 ${
+                    steps[i + 1].active ? "bg-gradient-to-r from-blue-600 to-indigo-600" : "bg-slate-200"
                   }`} />
                 )}
               </React.Fragment>
@@ -382,7 +396,15 @@ const Cart = () => {
           {/* Order Summary Sidebar */}
           <div className="w-full lg:w-[420px] flex-shrink-0">
             <div className="lg:sticky lg:top-20">
-              <OrderSummary />
+              <OrderSummary 
+                externalState={{
+                  deliveryState, setDeliveryState,
+                  deliveryLga, setDeliveryLga,
+                  deliveryAddress, setDeliveryAddress,
+                  selectedShipping, setSelectedShipping,
+                  pin, setPin
+                }}
+              />
             </div>
           </div>
         </div>

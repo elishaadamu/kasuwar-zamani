@@ -8,7 +8,11 @@ axios.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      if (typeof window !== "undefined") {
+      // Check if it's an invalid PIN error (shouldn't trigger logout)
+      const message = error.response.data?.message || "";
+      const isPinError = message.toLowerCase().includes("pin");
+
+      if (typeof window !== "undefined" && !isPinError) {
         const currentPath = window.location.pathname;
         // Avoid redirect loop if already on a signin page or the home page
         if (
