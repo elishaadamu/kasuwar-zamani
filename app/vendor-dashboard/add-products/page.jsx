@@ -9,6 +9,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { decryptData } from "@/lib/encryption";
 import statesData from "@/lib/states.json";
+import lgasData from "@/lib/lgas.json";
 import { FaTimesCircle, FaUpload, FaTrash } from "react-icons/fa";
 import axios from "axios";
 
@@ -24,6 +25,10 @@ const AddProduct = () => {
   const [condition, setCondition] = useState("NEW");
   const [stock, setStock] = useState("");
   const [commission, setCommission] = useState("");
+  const [pickupState, setPickupState] = useState("");
+  const [pickupLga, setPickupLga] = useState("");
+  const [pickupAddress, setPickupAddress] = useState("");
+  const [pickupLgas, setPickupLgas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isCheckingStatus, setIsCheckingStatus] = useState(true);
   const [categories, setCategories] = useState([]); // Removed duplicate state declaration if any
@@ -47,6 +52,18 @@ const AddProduct = () => {
     };
     fetchCategories();
   }, []);
+
+  // Populate LGAs when pickup state changes
+  useEffect(() => {
+    if (pickupState) {
+      const lgasForState = lgasData[pickupState] || [];
+      setPickupLgas(lgasForState);
+      setPickupLga(""); // Reset LGA when state changes
+    } else {
+      setPickupLgas([]);
+      setPickupLga("");
+    }
+  }, [pickupState]);
 
   useEffect(() => {
     if (!userData?.id) return;
@@ -110,6 +127,9 @@ const AddProduct = () => {
       formData.append("condition", condition);
       formData.append("stock", parseInt(stock) || 0);
       formData.append("commission", parseFloat(commission) || 0);
+      formData.append("pickupState", pickupState);
+      formData.append("pickupLga", pickupLga);
+      formData.append("pickupAddress", pickupAddress);
 
       images.filter(Boolean).forEach((img) => formData.append("images", img));
 
@@ -314,6 +334,46 @@ const AddProduct = () => {
                     ]}
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* Pickup Address Section */}
+            <div className="border-t border-gray-200 pt-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-md">
+                  <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-800">Pickup Address</h2>
+                  <p className="text-sm text-gray-500">Where buyers will pick up this product</p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-6">
+                <SelectField
+                  label="State"
+                  value={pickupState}
+                  onChange={setPickupState}
+                  options={states.map(s => ({ value: s, label: s }))}
+                  placeholder="Select state"
+                />
+                <SelectField
+                  label="LGA"
+                  value={pickupLga}
+                  onChange={setPickupLga}
+                  options={pickupLgas.map(l => ({ value: l, label: l }))}
+                  placeholder={pickupState ? "Select LGA" : "Select state first"}
+                />
+                <InputField
+                  label="Address"
+                  required
+                  value={pickupAddress}
+                  onChange={setPickupAddress}
+                  placeholder="e.g. PMB 1234, Main Market"
+                />
               </div>
             </div>
 

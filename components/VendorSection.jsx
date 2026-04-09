@@ -79,18 +79,98 @@ const VendorSection = () => {
             gap: 10px;
           }
         }
-        /* Custom styles for slick-dots */
+
+        /* Premium Custom slick-dots */
+        .slick-dots {
+          bottom: -35px;
+          display: flex !important;
+          justify-content: center;
+          align-items: center;
+          gap: 6px;
+        }
+        .slick-dots li {
+          margin: 0;
+          width: auto;
+          height: auto;
+        }
+        .slick-dots li button {
+          width: 8px;
+          height: 8px;
+          border-radius: 999px;
+          background-color: #d1d5db; /* gray-300 */
+          padding: 0;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
         .slick-dots li button:before {
-          font-size: 10px;
-          color: #9ca3af; /* gray-400 */
+          content: none !important; /* remove default dot */
         }
-        .slick-dots li.slick-active button:before {
-          color: #3b82f6; /* blue-500 */
+        .slick-dots li.slick-active button {
+          width: 28px;
+          background-color: #3b82f6; /* blue-500 */
         }
-        /* Custom styles for slick arrows */
+
+        /* Premium Custom slick arrows */
+        .slick-prev,
+        .slick-next {
+          width: 44px !important;
+          height: 44px !important;
+          background: #ffffff !important;
+          border-radius: 50% !important;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04) !important;
+          z-index: 20 !important;
+          transition: all 0.2s ease-in-out !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+        }
+        
+        .slick-prev:hover,
+        .slick-next:hover,
+        .slick-prev:focus,
+        .slick-next:focus {
+          background: #3b82f6 !important;
+          box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.2) !important;
+          transform: translateY(-2px) !important;
+          outline: none;
+        }
+
+        .slick-prev {
+          left: -15px;
+        }
+        
+        .slick-next {
+          right: 5px; /* Kept slightly in so it doesn't overlap the partially visible slide */
+        }
+
+        /* Chevron drawing using border */
         .slick-prev:before,
         .slick-next:before {
-          color: #3b82f6; /* blue-500 */
+          content: "" !important;
+          display: inline-block;
+          width: 11px;
+          height: 11px;
+          border-top: 2.5px solid #3b82f6;
+          border-right: 2.5px solid #3b82f6;
+          opacity: 1 !important;
+          transition: all 0.2s ease;
+        }
+        
+        /* Change chevron color to white on hover */
+        .slick-prev:hover:before,
+        .slick-next:hover:before,
+        .slick-prev:focus:before,
+        .slick-next:focus:before {
+           border-color: #ffffff;
+        }
+        
+        .slick-prev:before {
+          transform: rotate(-135deg);
+          margin-left: 4px;
+        }
+        
+        .slick-next:before {
+          transform: rotate(45deg);
+          margin-right: 4px;
         }
       `}</style>
       <div className="flex  button-see_more justify-between items-center mb-8">

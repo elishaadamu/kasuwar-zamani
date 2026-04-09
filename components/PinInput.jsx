@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useRef } from "react";
 
-const PinInput = ({ length, onChange }) => {
+const PinInput = ({ length, onChange, type = "password" }) => {
   const [pin, setPin] = useState(new Array(length).fill(""));
   const inputRefs = useRef([]);
 
@@ -42,13 +42,13 @@ const PinInput = ({ length, onChange }) => {
         <input
           key={index}
           ref={(el) => (inputRefs.current[index] = el)}
-          type="password"
+          type={type}
           maxLength="1"
           value={digit}
           onChange={(e) => handleChange(e, index)}
           onKeyDown={(e) => handleKeyDown(e, index)}
           onPaste={handlePaste}
-          className="w-12 h-12 text-center text-2xl font-bold border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500"
+          className="w-12 h-12 text-center text-2xl font-bold border-gray-300 bg-white text-slate-800 rounded-md shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-all"
           autoComplete="off"
         />
       ))}

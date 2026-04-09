@@ -35,8 +35,9 @@ export const AppContextProvider = (props) => {
       const encryptedUser = localStorage.getItem("user");
       if (encryptedUser) {
         const decryptedUser = decryptData(encryptedUser);
-        if (decryptedUser && decryptedUser._id) {
-          const cartStorageKey = `cartItems_storage_${decryptedUser._id}`;
+        const userId = decryptedUser?._id || decryptedUser?.id;
+        if (userId) {
+          const cartStorageKey = `cartItems_storage_${userId}`;
           const storedCart = localStorage.getItem(cartStorageKey);
           if (storedCart) {
             try {
@@ -57,8 +58,9 @@ export const AppContextProvider = (props) => {
       const encryptedUser = localStorage.getItem("user");
       if (encryptedUser) {
         const decryptedUser = decryptData(encryptedUser);
-        if (decryptedUser && decryptedUser._id) {
-          const wishlistStorageKey = `wishlistItems_storage_${decryptedUser._id}`;
+        const userId = decryptedUser?._id || decryptedUser?.id;
+        if (userId) {
+          const wishlistStorageKey = `wishlistItems_storage_${userId}`;
           const storedWishlist = localStorage.getItem(wishlistStorageKey);
           if (storedWishlist) {
             try {
@@ -138,6 +140,14 @@ export const AppContextProvider = (props) => {
     }
   };
   const logout = () => {
+    // Clear user-specific localStorage keys before removing user data
+    if (typeof window !== "undefined" && userData) {
+      const userId = userData._id || userData.id;
+      if (userId) {
+        localStorage.removeItem(`cartItems_storage_${userId}`);
+        localStorage.removeItem(`wishlistItems_storage_${userId}`);
+      }
+    }
     localStorage.removeItem("user");
     axios.post(
       apiUrl(API_CONFIG.ENDPOINTS.AUTH.LOGOUT),
@@ -310,13 +320,13 @@ export const AppContextProvider = (props) => {
   // Effect to load cart and wishlist based on userData
   useEffect(() => {
     if (typeof window !== "undefined") {
-      if (userData && userData._id) {
-        const userId = userData._id;
+      const userId = userData?._id || userData?.id;
+      if (userData && userId) {
         const cartStorageKey = `cartItems_storage_${userId}`;
         const wishlistStorageKey = `wishlistItems_storage_${userId}`;
 
         // Fetch user-specific data
-        if (userId) fetchFollowingList(userId);
+        fetchFollowingList(userId);
 
         // Load cart items
         const storedCart = localStorage.getItem(cartStorageKey);
@@ -337,8 +347,6 @@ export const AppContextProvider = (props) => {
             localStorage.removeItem(cartStorageKey);
             setCartItems({});
           }
-        } else {
-          setCartItems({});
         }
 
         // Load wishlist items
@@ -360,22 +368,20 @@ export const AppContextProvider = (props) => {
             localStorage.removeItem(wishlistStorageKey);
             setWishlistItems([]);
           }
-        } else {
-          setWishlistItems([]);
         }
-      } else {
-        // Clear cart and wishlist if no user is logged in
+      } else if (!authLoading && !userData) {
+        // Only clear cart and wishlist after auth check confirms no user is logged in
         setCartItems({});
         setWishlistItems([]);
         setFollowingList([]);
       }
     }
-  }, [userData]); // Re-run when userData changes
+  }, [userData, authLoading]); // Re-run when userData or authLoading changes
 
   // Save cartItems to localStorage whenever it changes (user-specific)
   useEffect(() => {
-    if (typeof window !== "undefined" && userData && userData._id) {
-      const userId = userData._id;
+    const userId = userData?._id || userData?.id;
+    if (typeof window !== "undefined" && userData && userId) {
       const cartStorageKey = `cartItems_storage_${userId}`;
       localStorage.setItem(
         cartStorageKey,
@@ -386,8 +392,8 @@ export const AppContextProvider = (props) => {
 
   // Save wishlistItems to localStorage whenever it changes (user-specific)
   useEffect(() => {
-    if (typeof window !== "undefined" && userData && userData._id) {
-      const userId = userData._id;
+    const userId = userData?._id || userData?.id;
+    if (typeof window !== "undefined" && userData && userId) {
       const wishlistStorageKey = `wishlistItems_storage_${userId}`;
       localStorage.setItem(
         wishlistStorageKey,

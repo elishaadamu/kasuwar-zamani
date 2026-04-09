@@ -13,6 +13,9 @@ import {
   FaShippingFast,
   FaTag,
   FaLock,
+  FaChevronDown,
+  FaCheckCircle,
+  FaShieldAlt,
 } from "react-icons/fa";
 
 const OrderSummary = () => {
@@ -86,14 +89,19 @@ const OrderSummary = () => {
   };
   const vendorShippingInfo = useMemo(() => {
     if (getCartCount() > 0) {
-      const firstItemId = Object.keys(cartItems)[0];
-      const product = products.find((p) => p._id === firstItemId);
-      if (product && product.vendor) {
-        return {
-          shippingAddress: product.vendor.shippingAddress,
-          shippingState: product.vendor.shippingState,
-          zipCode: product.vendor.zipCode,
-        };
+      const cartItemIds = Object.keys(cartItems);
+      for (const itemId of cartItemIds) {
+        if (cartItems[itemId] <= 0) continue;
+        
+        const product = products.find((p) => p._id === itemId);
+        if (product && product.vendor && typeof product.vendor === 'object') {
+          return {
+            businessName: product.vendor.businessName || product.vendor.name || "Vendor",
+            shippingAddress: product.vendor.shippingAddress || product.vendor.address || product.vendor.shopAddress || product.vendor.location || null,
+            shippingState: product.vendor.shippingState || product.vendor.state || null,
+            zipCode: product.vendor.zipCode || product.vendor.zipcode || "",
+          };
+        }
       }
     }
     return null;
@@ -390,353 +398,390 @@ const OrderSummary = () => {
     }
   }, [selectedShipping, shippingType]);
 
+  const totalAmount = finalAmount !== null
+    ? finalAmount
+    : getCartAmount() +
+      shippingFee +
+      Math.floor(getCartAmount() * 0.02) -
+      couponDiscount;
+
   return (
-    <div className="w-full bg-white p-6 rounded-xl shadow-lg border border-gray-200">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="p-2 bg-blue-100 rounded-lg">
-          <FaShippingFast className="text-blue-600 text-xl" />
+    <div className="w-full rounded-2xl overflow-hidden border border-slate-200/70 shadow-xl shadow-slate-200/40 bg-white">
+
+      {/* ═══════════ DARK HEADER ═══════════ */}
+      <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 px-6 py-6 relative overflow-hidden">
+        {/* Subtle pattern dots */}
+        <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '16px 16px' }} />
+        <div className="relative flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/10 shadow-inner">
+            <FaShippingFast className="text-white text-lg" />
+          </div>
+          <div>
+            <h2 className="text-xl font-extrabold text-white tracking-tight">Order Summary</h2>
+            <p className="text-sm text-slate-400 font-medium mt-0.5">{getCartCount()} {getCartCount() === 1 ? 'item' : 'items'} · Secure checkout</p>
+          </div>
         </div>
-        <h2 className="text-2xl font-bold text-gray-800">Order Summary</h2>
       </div>
 
-      <hr className="border-gray-200 my-6" />
+      <div className="p-5 sm:p-6 space-y-0">
 
-      {/* Shipping Information Section */}
-      <fieldset className="space-y-6">
-        <legend className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          <FaMapMarkerAlt className="text-red-500" />
-          Shipping Information
-        </legend>
+        {/* ═══════════ SHIPPING INFO ═══════════ */}
+        <div className="pb-6 border-b border-dashed border-slate-200">
+          <div className="flex items-center gap-2.5 mb-4">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-rose-500 to-red-600 flex items-center justify-center shadow-sm shadow-rose-200">
+              <FaMapMarkerAlt className="text-white text-[11px]" />
+            </div>
+            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Shipping Info</h3>
+          </div>
 
-        <div className="space-y-4">
-          {/* Shipping From */}
-          <div>
-            <label className="text-sm font-medium text-gray-700 block mb-2">
-              Shipping From
-            </label>
-            <div className="w-full text-left px-4 py-3 bg-gray-50 text-gray-700 rounded-lg border border-gray-300">
-              <div className="flex-1">
-                <span className="block text-gray-900 font-medium line-clamp-1">
-                  {vendorShippingInfo?.shippingAddress || "No shipping origin"}
-                </span>
-                {vendorShippingInfo?.shippingState && (
-                  <span className="text-sm text-gray-500">
-                    {vendorShippingInfo.shippingState} State •{" "}
-                    {vendorShippingInfo.zipCode}
-                  </span>
+          <div className="space-y-3">
+            {/* Shipping From */}
+            <div>
+              <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest block mb-1.5">
+                Shipping from
+              </label>
+              <div className="px-3.5 py-3 bg-slate-50 rounded-xl border border-slate-100">
+                <p className="text-sm font-semibold text-slate-700 line-clamp-1">
+                  {vendorShippingInfo?.shippingAddress || (vendorShippingInfo?.businessName ? `Warehouse (${vendorShippingInfo.businessName})` : "No shipping origin")}
+                </p>
+                {(vendorShippingInfo?.shippingState || vendorShippingInfo?.businessName) && (
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    {vendorShippingInfo.shippingState ? `${vendorShippingInfo.shippingState} State` : "Location specified"} · {vendorShippingInfo.zipCode || "No ZIP"}
+                  </p>
                 )}
               </div>
             </div>
-          </div>
 
-          {/* Delivery State Selection */}
-          <div>
-            <label
-              htmlFor="delivery-state"
-              className="text-sm font-medium text-gray-700 block mb-2"
-            >
-              Delivery To <span className="text-red-500">*</span>
-            </label>
-            <select
-              id="delivery-state"
-              value={deliveryState}
-              onChange={(e) => setDeliveryState(e.target.value)}
-              className="w-full outline-none p-3 text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-50"
-              required
-            >
-              <option value="" disabled className="text-gray-400">
-                Select delivery state
-              </option>
-              {states.map((s) => (
-                <option key={s} value={s} className="text-gray-700">
-                  {s}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* LGA Selection */}
-          {deliveryState && (
-            <div className="animate-fadeIn">
+            {/* Delivery State */}
+            <div>
               <label
-                htmlFor="delivery-lga"
-                className="text-sm font-medium text-gray-700 block mb-2"
+                htmlFor="delivery-state"
+                className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest block mb-1.5"
               >
-                Delivery LGA <span className="text-red-500">*</span>
+                Deliver to <span className="text-red-400">*</span>
               </label>
-              <select
-                id="delivery-lga"
-                value={deliveryLga}
-                onChange={(e) => setDeliveryLga(e.target.value)}
-                className="w-full outline-none p-3 text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-50"
-                required
-              >
-                <option value="">Select delivery LGA</option>
-                {lgas.map((lga) => (
-                  <option key={lga} value={lga}>
-                    {lga}
-                  </option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  id="delivery-state"
+                  value={deliveryState}
+                  onChange={(e) => setDeliveryState(e.target.value)}
+                  className="w-full outline-none px-3.5 py-3 pr-10 text-sm font-medium text-slate-700 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white appearance-none cursor-pointer"
+                  required
+                >
+                  <option value="" disabled>Select delivery state</option>
+                  {states.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+                <FaChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] pointer-events-none" />
+              </div>
             </div>
-          )}
-          {/* Delivery Address Form */}
-          {deliveryState && (
-            <div className="animate-fadeIn">
-              <label className="text-sm font-medium text-gray-700 block mb-2">
-                Delivery Address <span className="text-red-500">*</span>
-              </label>
-              <textarea
-                value={deliveryAddress}
-                onChange={(e) => setDeliveryAddress(e.target.value)}
-                placeholder="Enter the full delivery address for the selected state..."
-                className="w-full outline-none p-3 text-gray-700 border border-gray-300 resize-none rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all bg-gray-50"
-                rows="3"
-              />
-            </div>
-          )}
-        </div>
-      </fieldset>
 
-      <hr className="border-gray-200 my-6" />
-
-      {/* Shipping Method Selection */}
-      {shippingOptions.length > 0 && (
-        <fieldset className="space-y-4 animate-fadeIn">
-          <legend className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <FaShippingFast className="text-blue-500" />
-            Shipping Method
-            {shippingType && (
-              <span className="text-xs font-semibold uppercase px-2.5 py-1 rounded-full bg-blue-100 text-blue-800">
-                {shippingType.replace(/([A-Z])/g, " $1").trim()}
-              </span>
+            {/* LGA */}
+            {deliveryState && (
+              <div className="animate-fadeIn">
+                <label
+                  htmlFor="delivery-lga"
+                  className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest block mb-1.5"
+                >
+                  Local Govt. Area <span className="text-red-400">*</span>
+                </label>
+                <div className="relative">
+                  <select
+                    id="delivery-lga"
+                    value={deliveryLga}
+                    onChange={(e) => setDeliveryLga(e.target.value)}
+                    className="w-full outline-none px-3.5 py-3 pr-10 text-sm font-medium text-slate-700 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white appearance-none cursor-pointer"
+                    required
+                  >
+                    <option value="">Select LGA</option>
+                    {lgas.map((lga) => (
+                      <option key={lga} value={lga}>{lga}</option>
+                    ))}
+                  </select>
+                  <FaChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[10px] pointer-events-none" />
+                </div>
+              </div>
             )}
-          </legend>
-          <div className="space-y-3">
-            {shippingOptions.map((option) => (
-              <div
-                key={option.name}
-                onClick={() => {
-                  setSelectedShipping(option.name);
-                  setShippingFee(option.price);
-                }}
-                className={`flex items-center justify-between p-4 border rounded-lg cursor-pointer transition-all ${
-                  selectedShipping === option.name
-                    ? "border-blue-500 bg-blue-50 ring-2 ring-blue-500"
-                    : "border-gray-300 bg-white hover:border-blue-400"
-                }`}
-              >
-                <div className="flex items-center gap-4">
-                  <input
-                    type="radio"
-                    id={`shipping-${option.name}`}
-                    name="shipping-option"
-                    value={option.name}
-                    checked={selectedShipping === option.name}
-                    onChange={() => {
+
+            {/* Address */}
+            {deliveryState && (
+              <div className="animate-fadeIn">
+                <label className="text-[11px] font-semibold text-slate-400 uppercase tracking-widest block mb-1.5">
+                  Delivery address <span className="text-red-400">*</span>
+                </label>
+                <textarea
+                  value={deliveryAddress}
+                  onChange={(e) => setDeliveryAddress(e.target.value)}
+                  placeholder="Enter your full delivery address..."
+                  className="w-full outline-none px-3.5 py-3 text-sm font-medium text-slate-700 border border-slate-200 resize-none rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white placeholder:text-slate-300"
+                  rows="2"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ═══════════ SHIPPING METHOD ═══════════ */}
+        {shippingOptions.length > 0 && (
+          <div className="py-6 border-b border-dashed border-slate-200 animate-fadeIn">
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm shadow-blue-200">
+                <FaShippingFast className="text-white text-[11px]" />
+              </div>
+              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Delivery Speed</h3>
+              {shippingType && (
+                <span className="ml-auto text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-100">
+                  {shippingType.replace(/([A-Z])/g, " $1").trim()}
+                </span>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              {shippingOptions.map((option) => {
+                const isSelected = selectedShipping === option.name;
+                return (
+                  <div
+                    key={option.name}
+                    onClick={() => {
                       setSelectedShipping(option.name);
                       setShippingFee(option.price);
                     }}
-                    className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
-                  />
-                  <label
-                    htmlFor={`shipping-${option.name}`}
-                    className="font-medium text-gray-800 cursor-pointer"
+                    className={`flex items-center justify-between p-3.5 rounded-xl cursor-pointer transition-all duration-200 border-2 ${
+                      isSelected
+                        ? "border-blue-500 bg-blue-50/60 shadow-sm shadow-blue-100/50"
+                        : "border-transparent bg-slate-50 hover:bg-slate-100/80"
+                    }`}
                   >
-                    {option.name}{" "}
-                    <span className="text-sm text-gray-500 font-normal">
-                      ({option.days})
-                    </span>
-                  </label>
-                </div>
-                <p className="font-semibold text-gray-900">
-                  {currency}
-                  {option.price.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </p>
-              </div>
-            ))}
-          </div>
-        </fieldset>
-      )}
-      {/* Cost Breakdown Section */}
-      <fieldset className="space-y-4 mt-8">
-        <legend className="text-lg font-semibold text-gray-800 mb-4">
-          Cost Breakdown
-        </legend>
-        <div className="space-y-3 text-sm bg-gray-50 p-4 rounded-lg">
-          <div className="flex justify-between items-center py-2">
-            <p className="text-gray-600">Items ({getCartCount()})</p>
-            <p className="font-medium text-gray-800">
-              {currency}
-              {getCartAmount().toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
+                    <div className="flex items-center gap-3">
+                      {/* Custom Radio */}
+                      <div className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                        isSelected ? "border-blue-500 bg-blue-500" : "border-slate-300 bg-white"
+                      }`}>
+                        {isSelected && (
+                          <div className="w-[6px] h-[6px] rounded-full bg-white" />
+                        )}
+                      </div>
+                      <div>
+                        <p className={`text-sm font-bold ${isSelected ? "text-blue-700" : "text-slate-700"}`}>
+                          {option.name}
+                        </p>
+                        <p className="text-xs text-slate-400 mt-0.5">
+                          {option.days} delivery
+                        </p>
+                      </div>
+                    </div>
+                    <p className={`text-sm font-bold tabular-nums ${isSelected ? "text-blue-600" : "text-slate-600"}`}>
+                      {currency}
+                      {option.price.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </p>
+                  </div>
+                );
               })}
-            </p>
+            </div>
           </div>
-          <div className="flex justify-between items-center py-2">
-            <p className="text-gray-600">
-              Shipping Fee{selectedShipping && ` (${selectedShipping})`}
-            </p>
-            <p className="font-medium text-gray-800">
-              {currency}
-              {shippingFee.toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </p>
-          </div>
-          <div className="flex justify-between items-center py-2">
-            <p className="text-gray-600">Tax (2%)</p>
-            <p className="font-medium text-gray-800">
-              {currency}
-              {Math.floor(getCartAmount() * 0.02).toLocaleString(undefined, {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </p>
-          </div>
-          {couponDiscount > 0 && (
-            <div className="flex justify-between items-center py-2 text-green-600 bg-green-50 -mx-4 px-4 border-y border-green-100">
-              <p className="font-medium">Discount Applied</p>
-              <p className="font-bold">
-                -{currency}
-                {couponDiscount.toLocaleString(undefined, {
+        )}
+
+        {/* ═══════════ COST BREAKDOWN ═══════════  */}
+        <div className="py-6 border-b border-dashed border-slate-200">
+          <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">Price Details</h3>
+
+          <div className="space-y-2.5">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-slate-500">Items ({getCartCount()})</span>
+              <span className="text-sm font-semibold text-slate-700 tabular-nums">
+                {currency}
+                {getCartAmount().toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
                 })}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-slate-500">
+                Shipping{selectedShipping && ` · ${selectedShipping}`}
+              </span>
+              <span className="text-sm font-semibold text-slate-700 tabular-nums">
+                {shippingFee > 0 ? (
+                  <>
+                    {currency}
+                    {shippingFee.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </>
+                ) : (
+                  <span className="text-slate-400 italic font-normal">Select state</span>
+                )}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-slate-500">Tax (2%)</span>
+              <span className="text-sm font-semibold text-slate-700 tabular-nums">
+                {currency}
+                {Math.floor(getCartAmount() * 0.02).toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
+            </div>
+            {couponDiscount > 0 && (
+              <div className="flex justify-between items-center py-2 px-3 -mx-3 bg-emerald-50 rounded-lg border border-emerald-100 animate-fadeIn">
+                <span className="text-sm font-semibold text-emerald-600 flex items-center gap-1.5">
+                  <FaTag className="text-[10px]" />
+                  Discount
+                </span>
+                <span className="text-sm font-bold text-emerald-600 tabular-nums">
+                  −{currency}
+                  {couponDiscount.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Grand Total */}
+          <div className="mt-5 p-4 bg-gradient-to-r from-slate-900 to-slate-800 rounded-xl flex justify-between items-center">
+            <span className="text-white/70 text-sm font-semibold">Total</span>
+            <span className="text-white text-xl font-extrabold tabular-nums tracking-tight">
+              {currency}
+              {totalAmount.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </span>
+          </div>
+        </div>
+
+        {/* ═══════════ COUPON ═══════════ */}
+        <div className="py-6 border-b border-dashed border-slate-200">
+          <div className="flex items-center gap-2.5 mb-3">
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-sm shadow-emerald-200">
+              <FaTag className="text-white text-[10px]" />
+            </div>
+            <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Promo Code</h3>
+          </div>
+
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={couponCode}
+              onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+              placeholder="e.g. SAVE20"
+              className="flex-1 outline-none px-3.5 py-2.5 text-sm font-mono font-semibold text-slate-700 tracking-widest border border-slate-200 rounded-xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all disabled:bg-slate-50 disabled:text-slate-400 disabled:cursor-not-allowed placeholder:text-slate-300 placeholder:font-sans placeholder:tracking-normal placeholder:font-normal"
+              disabled={couponDiscount > 0}
+            />
+            <button
+              onClick={handleApplyCoupon}
+              disabled={couponLoading || !couponCode || couponDiscount > 0}
+              className="bg-slate-900 text-white font-bold py-2.5 px-5 rounded-xl hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-all text-sm active:scale-[0.97]"
+            >
+              {couponLoading ? (
+                <div className="w-4 h-4 border-2 border-slate-400 border-t-white rounded-full animate-spin" />
+              ) : (
+                "Apply"
+              )}
+            </button>
+          </div>
+          {couponDiscount > 0 && (
+            <div className="flex items-center gap-1.5 mt-2.5 text-emerald-600 animate-fadeIn">
+              <FaCheckCircle className="text-xs" />
+              <p className="text-xs font-semibold">
+                Saved {currency}
+                {couponDiscount.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}!
               </p>
             </div>
           )}
         </div>
-        <div className="flex justify-between items-center text-lg font-bold text-gray-900 border-t border-gray-300 pt-4 mt-2">
-          <p>Order Total</p>
-          <p className="text-blue-600 text-xl">
-            {currency}
-            {(finalAmount !== null
-              ? finalAmount
-              : getCartAmount() +
-                shippingFee +
-                Math.floor(getCartAmount() * 0.02) -
-                couponDiscount
-            ).toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </p>
-        </div>
-      </fieldset>
 
-      <hr className="border-gray-200 my-6" />
-
-      {/* Coupon Section */}
-      <fieldset className="space-y-3">
-        <label className="text-sm font-medium text-gray-700  flex items-center gap-2">
-          <FaTag className="text-green-500" />
-          Have a coupon?
-        </label>
-        <div className="flex gap-2 w-[100%] sm:w-full flex-col sm:flex-row">
-          <input
-            type="text"
-            value={couponCode}
-            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-            placeholder="Enter coupon code"
-            className="flex-1 outline-none p-3 text-gray-700 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
-            disabled={couponDiscount > 0}
-          />
-          <button
-            onClick={handleApplyCoupon}
-            disabled={couponLoading || !couponCode || couponDiscount > 0}
-            className="bg-green-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all whitespace-nowrap min-w-[100px]"
-          >
-            {couponLoading ? (
-              <div className="flex items-center gap-2">
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Applying
+        {/* ═══════════ TRANSACTION PIN ═══════════ */}
+        <div className="pt-6 pb-2">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-sm shadow-amber-200">
+                <FaLock className="text-white text-[10px]" />
               </div>
-            ) : (
-              "Apply"
-            )}
-          </button>
-        </div>
-        {couponDiscount > 0 && (
-          <p className="text-green-600 text-sm font-medium flex items-center gap-1">
-            ✓ Coupon applied successfully! You saved {currency}
-            {couponDiscount.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+              <h3 className="text-sm font-bold text-slate-800 uppercase tracking-wider">Transaction PIN</h3>
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-red-400 bg-red-50 px-2 py-1 rounded-md border border-red-100">Required</span>
+          </div>
+
+          <div className="relative">
+            <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 focus-within:ring-2 focus-within:ring-blue-500/20 focus-within:border-blue-500 transition-all">
+              <PinInput
+                length={4}
+                onChange={setPin}
+                type={showPin ? "text" : "password"}
+                className="justify-center"
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowPin(!showPin)}
+              className="absolute top-1/2 right-3 -translate-y-1/2 p-2 text-slate-400 hover:text-slate-600 transition-colors bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow active:scale-95"
+              title={showPin ? "Hide PIN" : "Show PIN"}
+            >
+              {showPin ? (
+                <FaEyeSlash className="w-3.5 h-3.5" />
+              ) : (
+                <FaEye className="w-3.5 h-3.5" />
+              )}
+            </button>
+          </div>
+
+          <p className="text-[11px] text-slate-400 mt-2 flex items-center gap-1.5">
+            <FaShieldAlt className="text-[10px] text-slate-300" />
+            Encrypted · Never stored
           </p>
-        )}
-      </fieldset>
-
-      <hr className="border-gray-200 my-6" />
-
-      {/* Payment Section */}
-      <fieldset className="space-y-3">
-        <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-          <FaLock className="text-red-500" />
-          Transaction PIN <span className="text-red-500">*</span>
-        </label>
-
-        <div className="relative">
-          <div className="bg-gray-50 p-4 rounded-lg border border-gray-300">
-            <PinInput
-              length={4}
-              onChange={setPin}
-              inputType={showPin ? "text" : "password"}
-              className="justify-center"
-            />
-          </div>
-
-          {/* Enhanced Toggle Button */}
-          <button
-            type="button"
-            onClick={() => setShowPin(!showPin)}
-            className="absolute top-1/2 right-4 transform -translate-y-1/2 p-2 text-gray-500 hover:text-gray-700 transition-colors bg-white rounded-full border border-gray-300 shadow-sm hover:shadow-md"
-            title={showPin ? "Hide PIN" : "Show PIN"}
-          >
-            {showPin ? (
-              <FaEyeSlash className="w-4 h-4" />
-            ) : (
-              <FaEye className="w-4 h-4" />
-            )}
-          </button>
         </div>
 
-        <p className="text-xs text-gray-500 mt-2">
-          Enter your 4-digit transaction PIN to complete the order
-        </p>
-      </fieldset>
+        {/* ═══════════ PLACE ORDER BUTTON ═══════════ */}
+        <button
+          onClick={createOrder}
+          disabled={loading || !pin || pin.length !== 4 || !selectedShipping}
+          className="w-full relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white font-extrabold py-4 mt-4 rounded-xl hover:from-blue-700 hover:via-blue-800 hover:to-indigo-800 disabled:from-slate-300 disabled:via-slate-300 disabled:to-slate-300 disabled:text-slate-500 disabled:cursor-not-allowed transition-all duration-300 transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-500/25 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 disabled:shadow-none group"
+        >
+          {loading ? (
+            <div className="flex items-center justify-center gap-2.5">
+              <div className="w-5 h-5 border-[2.5px] border-white/30 border-t-white rounded-full animate-spin" />
+              <span>Processing Order...</span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center gap-2">
+              <FaLock className="text-xs opacity-60" />
+              <span>Place Order</span>
+              <span className="w-1 h-1 rounded-full bg-white/30" />
+              <span className="tabular-nums">
+                {currency}
+                {totalAmount.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
+              </span>
+              <svg className="w-4 h-4 ml-0.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </div>
+          )}
+        </button>
 
-      {/* Place Order Button */}
-      <button
-        onClick={createOrder}
-        disabled={loading || !pin || pin.length !== 4 || !selectedShipping}
-        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold py-4 mt-6 rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-offset-2 shadow-lg"
-      >
-        {loading ? (
-          <div className="flex items-center justify-center gap-2">
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            Placing Order...
-          </div>
-        ) : (
-          `Place Order • ${currency}${(finalAmount !== null
-            ? finalAmount
-            : getCartAmount() +
-              shippingFee +
-              Math.floor(getCartAmount() * 0.02) -
-              couponDiscount
-          ).toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}`
-        )}
-      </button>
+        {/* Security Footer */}
+        <div className="flex items-center justify-center gap-1.5 mt-4 text-[11px] text-slate-400">
+          <svg className="w-3.5 h-3.5 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+          <span>256-bit SSL secured checkout</span>
+        </div>
+      </div>
     </div>
   );
 };

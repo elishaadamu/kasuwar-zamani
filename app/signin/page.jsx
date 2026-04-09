@@ -50,7 +50,6 @@ const SigninPageContent = () => {
         { withCredentials: true }
       );
 
-      console.log("Response data:", response.data);
       if (!response.data) {
         throw new Error("No data received from server");
       }
@@ -63,10 +62,6 @@ const SigninPageContent = () => {
 
       // Store and verify encrypted data
       localStorage.setItem("user", encryptedUser);
-      console.log(
-        "Verification - Data in localStorage:",
-        localStorage.getItem("user")
-      );
       fetchUserData(); // Call fetchUserData to update global state
       toast.success("Signin successful!");
 

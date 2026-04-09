@@ -160,10 +160,10 @@ const HomeClient = ({ initialBanners }) => {
     <>
       <div className="flex justify-center max-w-[1280px] mb-10 mx-auto gap-10 min-h-[400px]">
         <div className="hidden md:block md:w-[20%] min-w-[250px]">
-             <CategorySidebar />
+          <CategorySidebar />
         </div>
         <div className="w-full md:w-[80%]">
-             <HeaderSlider initialBanners={initialBanners} />
+          <HeaderSlider initialBanners={initialBanners} />
         </div>
       </div>
       <div className="px-6  max-w-[1280px] mx-auto lg:px-32">
@@ -181,8 +181,6 @@ const HomeClient = ({ initialBanners }) => {
         <SubscriptionPlans />
         <hr className="my-12 border-gray-200" />
 
-        <Banner />
-        <hr className="my-12 border-gray-200" />
 
         {/* <NewsLetter /> */}
       </div>

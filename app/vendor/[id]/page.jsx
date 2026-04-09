@@ -362,11 +362,10 @@ const VendorPage = () => {
               <div className="flex items-center gap-3">
                 <button
                   onClick={handleFollowClick}
-                  className={`px-6 py-3 text-base font-bold rounded-full transition-all duration-200 whitespace-nowrap flex items-center gap-2 transform hover:scale-105 ${
-                    isFollowing
-                      ? "bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 hover:shadow-lg"
-                      : "bg-gradient-to-r from-gray-200 to-gray-300 text-gray-800 hover:shadow-lg"
-                  }`}
+                  className={`px-6 py-3 text-base font-bold rounded-full transition-all duration-200 whitespace-nowrap flex items-center gap-2 transform hover:scale-105 ${isFollowing
+                    ? "bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 hover:shadow-lg"
+                    : "bg-gradient-to-r from-gray-200 to-gray-300 text-gray-800 hover:shadow-lg"
+                    }`}
                 >
                   {isFollowing ? (
                     <>
@@ -472,37 +471,33 @@ const VendorPage = () => {
               return (
                 <div
                   key={coupon._id}
-                  className={`border-2 rounded-2xl p-6 transition-all duration-300 hover:shadow-lg ${
-                    active
-                      ? "bg-gradient-to-br from-green-50 to-emerald-100 border-green-200"
-                      : "bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200"
-                  }`}
+                  className={`border-2 rounded-2xl p-6 transition-all duration-300 hover:shadow-lg ${active
+                    ? "bg-gradient-to-br from-green-50 to-emerald-100 border-green-200"
+                    : "bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200"
+                    }`}
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <h3
-                        className={`text-xl font-bold ${
-                          active ? "text-gray-900" : "text-gray-500"
-                        }`}
+                        className={`text-xl font-bold ${active ? "text-gray-900" : "text-gray-500"
+                          }`}
                       >
                         {coupon.discountType === "fixed"
                           ? `₦${coupon.discountAmount} OFF`
                           : `${coupon.discount}% OFF`}
                       </h3>
                       <p
-                        className={`text-sm ${
-                          active ? "text-gray-600" : "text-gray-400"
-                        }`}
+                        className={`text-sm ${active ? "text-gray-600" : "text-gray-400"
+                          }`}
                       >
                         {coupon.description || "Special discount coupon"}
                       </p>
                     </div>
                     <span
-                      className={`text-xs px-2 py-1 rounded-full ${
-                        active
-                          ? "bg-green-500 text-white"
-                          : "bg-gray-400 text-white"
-                      }`}
+                      className={`text-xs px-2 py-1 rounded-full ${active
+                        ? "bg-green-500 text-white"
+                        : "bg-gray-400 text-white"
+                        }`}
                     >
                       {active ? "Active" : "Expired"}
                     </span>
@@ -510,22 +505,20 @@ const VendorPage = () => {
 
                   <div className="flex items-center justify-between mb-4">
                     <code
-                      className={`text-lg font-mono font-bold px-3 py-2 rounded-lg border ${
-                        active
-                          ? "bg-white text-gray-900"
-                          : "bg-gray-200 text-gray-500"
-                      }`}
+                      className={`text-lg font-mono font-bold px-3 py-2 rounded-lg border ${active
+                        ? "bg-white text-gray-900"
+                        : "bg-gray-200 text-gray-500"
+                        }`}
                     >
                       {coupon.code}
                     </code>
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleCopyCoupon(coupon.code)}
-                        className={`p-2 rounded-lg transition-colors ${
-                          active
-                            ? "bg-green-500 hover:bg-green-600 text-white"
-                            : "bg-gray-400 text-white cursor-not-allowed"
-                        }`}
+                        className={`p-2 rounded-lg transition-colors ${active
+                          ? "bg-green-500 hover:bg-green-600 text-white"
+                          : "bg-gray-400 text-white cursor-not-allowed"
+                          }`}
                         title="Copy code"
                         disabled={!active}
                       >
