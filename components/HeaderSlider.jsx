@@ -71,7 +71,7 @@ const HeaderSlider = ({ initialBanners }) => {
   };
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl mt-6 bg-gray-100">
+    <div className="relative w-full h-full min-h-[400px] overflow-hidden bg-white group">
       {loading ? (
         <div className="flex items-center justify-center min-h-[280px] bg-gray-200 rounded-xl">
           <div className="animate-spin h-12 w-12 border-b-2 border-blue-600 rounded-full"></div>
@@ -84,13 +84,13 @@ const HeaderSlider = ({ initialBanners }) => {
         <>
           {/* SLIDER */}
           <div
-            className="flex transition-transform duration-700 ease-out"
+            className="flex transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] h-full"
             style={{ transform: `translateX(-${currentSlide * 100}%)` }}
           >
             {banners.map((banner) => (
               <div
                 key={banner._id}
-                className="min-w-full flex flex-col-reverse md:flex-row items-center justify-between px-6 md:px-16 py-8 md:py-6 bg-gradient-to-r from-[#E7ECF5] to-[#F6F7FA]"
+                className="min-w-full h-full flex flex-col-reverse md:flex-row items-center justify-between px-8 md:px-16 py-12 md:py-8 bg-gradient-to-br from-[#f8f9fa] to-[#e9ecef]"
               >
                 {/* TEXT SECTION */}
                 <div

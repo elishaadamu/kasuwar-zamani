@@ -5,8 +5,9 @@ import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import statesData from "@/lib/states.json";
-import { toast } from "react-toastify";
 import lgasData from "@/lib/lgas.json";
+import { customToast } from "@/lib/customToast";
+import { FiCheckCircle, FiInfo } from "react-icons/fi";
 
 export const AppContext = createContext();
 
@@ -135,12 +136,26 @@ export const AppContextProvider = (props) => {
       setProductPage(page);
     } catch (error) {
       console.error("Error fetching products:", error);
-      toast.error("Could not load products.");
+      customToast.error("Failed to load products", "Could not load products at this time.");
     } finally {
       setProductsLoading(false);
     }
   };
   const logout = () => {
+    // Determine the correct redirect path based on user role before clearing data
+    const role = userData?.user?.role || userData?.role;
+    let redirectPath = "/";
+    
+    if (role === "user") {
+      redirectPath = "/signin";
+    } else if (role === "admin") {
+      redirectPath = "/admin/signin";
+    } else if (role === "vendor") {
+      redirectPath = "/vendor-signin";
+    } else if (role === "delivery") {
+      redirectPath = "/delivery-signin";
+    }
+
     if (typeof window !== "undefined" && userData) {
       const userId = userData._id || userData.id;
       if (userId) {
@@ -155,7 +170,7 @@ export const AppContextProvider = (props) => {
     setWishlistItems([]);
     setFollowingList([]);
     setShowSessionExpired(false);
-    window.location.href = "/"; // Force a full reload to clear all states
+    window.location.href = redirectPath; // Force a full reload to clear all states
   };
 
   useEffect(() => {
@@ -177,7 +192,7 @@ export const AppContextProvider = (props) => {
   };
   const addToCart = async (itemId) => {
     if (!isLoggedIn) {
-      toast.error("Please sign in to add items to cart.");
+      customToast.error("Authentication Required", "Please sign in to add items to cart.");
       router.push(`/signin?redirect=${pathname}`);
       return;
     }
@@ -221,7 +236,7 @@ export const AppContextProvider = (props) => {
 
   const addToWishlist = (itemId) => {
     if (!isLoggedIn) {
-      toast.error("Please sign in to add items to wishlist.");
+      customToast.error("Authentication Required", "Please sign in to add items to wishlist.");
       router.push(`/signin?redirect=${pathname}`);
       return;
     }
@@ -285,17 +300,26 @@ export const AppContextProvider = (props) => {
   };
 
   const followVendor = async (vendorId) => {
-    if (!isLoggedIn || !userData?.id) {
-      toast.error("Please sign in to follow vendors.");
+    const userId = userData?._id || userData?.id;
+
+    if (!isLoggedIn || !userId) {
+      customToast.error("Authentication Required", "Please sign in to follow vendors.");
       router.push(`/signin?redirect=${pathname}`);
       return;
     }
 
     const isCurrentlyFollowing = followingList.includes(vendorId);
 
+    // Optimistically update the context list to guarantee UI updates instantly
+    if (isCurrentlyFollowing) {
+      setFollowingList((prev) => prev.filter((id) => id !== vendorId));
+    } else {
+      setFollowingList((prev) => [...prev, vendorId]);
+    }
+
     try {
       const payload = {
-        followerId: userData.id,
+        followerId: userId,
         followingId: vendorId,
       };
 
@@ -304,19 +328,27 @@ export const AppContextProvider = (props) => {
         payload
       );
 
+      console.log(`Follow API Response for vendor ${vendorId}:`, response.data);
+
+      // Show alert based on the explicit backend response action
       if (response.data.action === "follow") {
-        toast.success("You are now following this vendor.");
+        console.log(`Successfully Followed Vendor: ${vendorId}`);
+        customToast.success("Vendor Subscribed!", "You'll now receive updates from this store.");
       } else if (response.data.action === "unfollow") {
-        toast.success("You have unfollowed this vendor.");
+        console.log(`Successfully Unfollowed Vendor: ${vendorId}`);
+        customToast.info("Vendor Unfollowed", "You will no longer see their updates.");
       }
 
-      // Refetch the list to ensure it's in sync with the database
-      if (userData?.id) fetchFollowingList(userData.id);
+      // Final synchronization with the server
+      fetchFollowingList(userId);
+
+      return response.data;
     } catch (error) {
       console.error("Error following/unfollowing vendor:", error);
-      toast.error(error.response?.data?.message || "An error occurred.");
-      // Revert optimistic UI by refetching
-      if (userData?.id) fetchFollowingList(userData.id);
+      customToast.error("Action Failed", error.response?.data?.message || "An error occurred.");
+      // Revert optimistic UI on error
+      fetchFollowingList(userId);
+      return null;
     }
   };
 

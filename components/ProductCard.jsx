@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useAppContext } from "@/context/AppContext";
-import { toast } from "react-toastify";
+import { customToast } from "@/lib/customToast";
 import { FaStar, FaHeart } from "react-icons/fa";
 import { FiHeart } from "react-icons/fi";
 import Image from "next/image";
@@ -26,12 +26,13 @@ const ProductCard = ({ product }) => {
   const handleWishlistClick = (e) => {
     e.stopPropagation();
     if (!isLoggedIn) {
-      toast.error("Please sign in to add items to your wishlist.");
+      customToast.error("Sign In Required", "Please sign in to add items to your wishlist.");
       router.push("/signin");
       return;
     }
     addToWishlist(product._id);
-    toast.success(
+    customToast.success(
+      wishlistItems.includes(product._id) ? "Wishlist Updated" : "Wishlist Updated",
       wishlistItems.includes(product._id)
         ? `${product.name} removed from wishlist`
         : `${product.name} added to wishlist`
@@ -46,17 +47,16 @@ const ProductCard = ({ product }) => {
         router.push(`/product/${product._id}`);
         scrollTo(0, 0);
       }}
-      className="group relative flex w-full  max-w-xs cursor-pointer flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-lg"
+      className="group relative flex w-full max-w-xs cursor-pointer flex-col overflow-hidden rounded-[2rem] border border-white bg-white/60 backdrop-blur-xl shadow-xl shadow-gray-200/50 p-2 sm:p-3 transition-all duration-400 hover:-translate-y-2 hover:shadow-2xl hover:shadow-indigo-900/10 hover:bg-white"
     >
       {/* Product Image */}
-      <div className="relative  h-64 md:h-64 overflow-hidden rounded-t-2xl bg-gray-50">
+      <div className="relative h-48 sm:h-56 md:h-64 overflow-hidden rounded-[1.5rem] bg-gray-50/50 border border-gray-100/50">
         <Image
           src={productImage.includes("cloudinary.com") ? `${productImage}?q_auto,f_auto` : productImage}
           alt={product.name}
-          width={400}
-          height={400}
+          fill
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+          className="object-cover transition-transform duration-700 group-hover:scale-110"
           loading="lazy"
         />
         {hasOffer && (
@@ -70,10 +70,10 @@ const ProductCard = ({ product }) => {
         {/* Wishlist Icon */}
         <div
           onClick={handleWishlistClick}
-          className="absolute top-2 right-2 flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow backdrop-blur-sm transition hover:bg-white"
+          className="absolute top-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 shadow-md backdrop-blur-md transition-all duration-300 hover:bg-white hover:scale-110"
         >
           {wishlistItems.includes(product._id) ? (
-            <FaHeart className="h-5 w-5 text-red-500" />
+            <FaHeart className="h-5 w-5 text-red-500 scale-110" />
           ) : (
             <FiHeart className="h-5 w-5 text-gray-600" />
           )}
@@ -115,31 +115,15 @@ const ProductCard = ({ product }) => {
           onClick={(e) => {
             e.stopPropagation();
             if (!isLoggedIn) {
-              toast.error("Please sign in to buy items.");
+              customToast.error("Sign In Required", "Please sign in to buy items.");
               router.push("/signin");
               return;
             }
             addToCart(product._id);
             router.push("/cart");
           }}
-          className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-bold text-white transition-all duration-300 hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/30 active:scale-95"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-4 w-4"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 
-                0a2 2 0 100 4 2 2 0 000-4zm-8 
-                2a2 2 0 11-4 0 2 2 0 014 0z"
-            />
-          </svg>
           Buy now
         </button>
       </div>

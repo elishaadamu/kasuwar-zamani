@@ -36,7 +36,21 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${outfit.variable} antialiased text-gray-700 font-sans`}>
-        <ToastContainer />
+        <ToastContainer 
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={true}
+          newestOnTop={true}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          toastClassName={() => "relative flex p-1 min-h-10 rounded-2xl justify-between overflow-hidden cursor-pointer"}
+          bodyClassName={() => "flex text-sm font-white font-med block p-3"}
+          className="z-[9999]"
+        />
         <AppContextProvider>
           <ClientLayout isSpecialRoute={isSpecialRoute}>
             {children}

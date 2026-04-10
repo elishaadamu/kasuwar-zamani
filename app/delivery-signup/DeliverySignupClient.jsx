@@ -3,8 +3,7 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { customToast } from "@/lib/customToast";
 import { useRouter } from "next/navigation";
 
 import Logo from "@/assets/logo/logo.png";
@@ -98,7 +97,7 @@ const DeliverySignupClient = () => {
 
         setStates(response.data);
       } catch (error) {
-        toast.error("Failed to fetch states.");
+        customToast.error("Failed to fetch states.");
         console.error("Error fetching states:", error);
       }
     };
@@ -118,7 +117,7 @@ const DeliverySignupClient = () => {
         );
         setLgas(response.data);
       } catch (error) {
-        toast.error("Failed to fetch LGAs for the selected state.");
+        customToast.error("Failed to fetch LGAs for the selected state.");
         console.error("Error fetching LGAs:", error);
       } finally {
         setLgaLoading(false);
@@ -143,7 +142,7 @@ const DeliverySignupClient = () => {
 
     if (file.size > 50 * 1024) {
       // 50KB limit
-      toast.error("Image size must not exceed 50KB.");
+      customToast.error("Image size must not exceed 50KB.");
       e.target.value = null; // Reset file input
       return;
     }
@@ -154,7 +153,7 @@ const DeliverySignupClient = () => {
       setImage(reader.result); // Set base64 string
     };
     reader.onerror = (error) => {
-      toast.error("Failed to read file.");
+      customToast.error("Failed to read file.");
       console.error("Error reading file:", error);
     };
   };
@@ -179,24 +178,24 @@ const DeliverySignupClient = () => {
       !formData.accountNumber ||
       !formData.accountName
     ) {
-      toast.error("Please fill in all required fields.");
+      customToast.error("Please fill in all required fields.");
       setLoading(false);
       return;
     }
 
     if (vehicleTypes.length === 0) {
-      toast.error("Please select at least one vehicle type.");
+      customToast.error("Please select at least one vehicle type.");
       setLoading(false);
       return;
     }
     if (formData.password.length < 6) {
-      toast.error("Password must be at least 6 characters long.");
+      customToast.error("Password must be at least 6 characters long.");
       setLoading(false);
       return;
     }
 
     if (!idImage || (requiresLicense && !licenseImage)) {
-      toast.error("Please upload all required documents.");
+      customToast.error("Please upload all required documents.");
       setLoading(false);
       return;
     }
@@ -222,11 +221,11 @@ const DeliverySignupClient = () => {
       localStorage.setItem("user", encryptedUser);
 
       fetchUserData();
-      toast.success("Delivery person signup successful!");
+      customToast.success("Delivery person signup successful!");
       router.push("/delivery-signin"); // Redirect to delivery dashboard
     } catch (error) {
       console.error("Error signing up as delivery person:", error);
-      toast.error(
+      customToast.error(
         error.response?.data?.message || "An error occurred during signup."
       );
     } finally {
@@ -248,7 +247,6 @@ const DeliverySignupClient = () => {
 
   return (
     <div className="flex justify-center items-center my-16">
-      <ToastContainer />
       <form
         onSubmit={handleSignup}
         className="flex flex-col gap-6 w-[90%] max-w-[800px] text-gray-700"

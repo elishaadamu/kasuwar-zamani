@@ -6,8 +6,7 @@ import { decryptData } from "@/lib/encryption";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import { useAppContext } from "@/context/AppContext";
 import Loading from "@/components/Loading";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { customToast } from "@/lib/customToast";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title, TimeScale } from "chart.js";
 import { Pie, Line } from "react-chartjs-2";
 import "chartjs-adapter-date-fns";
@@ -123,7 +122,7 @@ const DashboardHome = () => {
   }, [dashboardData.orders]);
 
   const handlePayment = () => {
-    if (!amount || amount < 100) { toast.error("Minimum ₦100 required"); return; }
+    if (!amount || amount < 100) { customToast.warn("Minimum ₦100 required"); return; }
     
     // Use the script that was loaded via Next/Script
     if (window.PaystackPop) {
@@ -132,13 +131,13 @@ const DashboardHome = () => {
         email: userData?.email,
         amount: amount * 100,
         onSuccess: async () => {
-          toast.success("Wallet funded!");
+          customToast.success("Success", "Wallet funded successfully!");
           setShowFundModal(false);
           await fetchWalletBalance(userData.id);
         },
       });
     } else {
-      toast.error("Payment secure layer is initializing. Please retry in a moment.");
+      customToast.info("Redirecting", "Payment secure layer is initializing. Please retry in a moment.");
     }
   };
 
@@ -147,11 +146,11 @@ const DashboardHome = () => {
     setLoading(true);
     try {
       await axios.post(apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.CREATE + userData.id), { nin }, { withCredentials: true });
-      toast.success("Account created!");
+      customToast.success("Account created!");
       setShowCreateAccount(false);
       await fetchWalletBalance(userData.id);
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to create account.");
+      customToast.error(error.response?.data?.message || "Failed to create account.");
     } finally {
       setLoading(false);
     }
@@ -161,7 +160,6 @@ const DashboardHome = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 pb-24 md:pb-12 bg-white">
-      <ToastContainer />
       <Script 
         src="https://js.paystack.co/v2/inline.js" 
         strategy="lazyOnload"

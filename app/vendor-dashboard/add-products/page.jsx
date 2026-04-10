@@ -4,8 +4,7 @@ import Image from "next/image";
 import { useAppContext } from "@/context/AppContext";
 import { API_CONFIG, apiUrl } from "@/configs/api";
 import Loading from "@/components/Loading";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { customToast } from "@/lib/customToast";
 import { decryptData } from "@/lib/encryption";
 import statesData from "@/lib/states.json";
 import lgasData from "@/lib/lgas.json";
@@ -106,7 +105,7 @@ const AddProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (images.filter(Boolean).length === 0) {
-      toast.error("Please provide at least one product visual.");
+      customToast.error("Visual Required", "Please provide at least one product visual.");
       return;
     }
 
@@ -137,10 +136,10 @@ const AddProduct = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      toast.success("Asset cataloged successfully!");
+      customToast.success("Success", "Asset cataloged successfully!");
       router.push("/vendor-dashboard/products-list");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Ingestion Failure");
+      customToast.error("Ingestion Failure", err.response?.data?.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -153,7 +152,7 @@ const AddProduct = () => {
       newImages[index] = file;
       setImages(newImages);
     } else if (file) {
-      toast.error("File exceeds 5MB limit.");
+      customToast.warn("File Rejected", "File exceeds 5MB limit.");
     }
   };
 
@@ -187,7 +186,6 @@ const AddProduct = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32 pt-4">
-      <ToastContainer position="top-right" autoClose={3000} />
       
       {/* Premium Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">

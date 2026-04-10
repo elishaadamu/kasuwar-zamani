@@ -4,7 +4,7 @@ import axios from "axios";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import { useAppContext } from "@/context/AppContext";
 import ProductCard from "./ProductCard";
-import { FaTags } from "react-icons/fa";
+import { FaArrowRight } from "react-icons/fa";
 
 const CategoryProducts = () => {
   const { products, router } = useAppContext();
@@ -58,12 +58,9 @@ const CategoryProducts = () => {
         return (
           <section key={category._id} className="w-full">
             <div className="flex flex-col items-center text-center mb-12">
-              <div className="inline-flex items-center gap-3 mb-4">
-                <FaTags className="w-6 h-6 text-blue-600" />
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
-                  {category.name}
-                </h2>
-              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                {category.name}
+              </h2>
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                 Check out our latest arrivals in the {category.name} category.
               </p>
@@ -85,9 +82,10 @@ const CategoryProducts = () => {
                       .replace(/ /g, "-")}`
                   )
                 }
-                className="px-8 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-all duration-300"
+                className="group px-8 py-3.5 rounded-full bg-indigo-50 text-indigo-600 font-bold border border-transparent hover:bg-indigo-600 hover:text-white hover:shadow-lg hover:shadow-indigo-500/30 transition-all text-sm flex items-center justify-center gap-3 mx-auto"
               >
                 View All in {category.name}
+                <FaArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
               </button>
             </div>
           </section>

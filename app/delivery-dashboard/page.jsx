@@ -4,8 +4,7 @@ import { useAppContext } from "@/context/AppContext";
 import { useRouter, usePathname } from "next/navigation";
 import axios from "axios";
 import { API_CONFIG, apiUrl } from "@/configs/api";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { customToast } from "@/lib/customToast";
 import Loading from "@/components/Loading";
 import Link from "next/link";
 import {
@@ -83,15 +82,15 @@ const DashboardHome = () => {
     setLoading(true);
     try {
       if (!currentUser?._id) {
-        toast.error("Unable to create wallet.");
+        customToast.error("Request Failed", "Unable to create wallet.");
         return;
       }
       await axios.post(apiUrl(API_CONFIG.ENDPOINTS.DELIVERY.CREATE_WALLET + currentUser._id));
-      toast.success("Wallet created successfully!");
+      customToast.success("Wallet Created", "Wallet created successfully!");
       setHasWallet(true);
       window.location.reload();
     } catch (error) {
-      toast.error(error.response?.data?.message || "Failed to create wallet.");
+      customToast.error("Creation Failed", error.response?.data?.message || "Failed to create wallet.");
     } finally {
       setLoading(false);
     }
@@ -100,10 +99,10 @@ const DashboardHome = () => {
   const handleTaskUpdate = async (taskId, status) => {
     try {
       await axios.put(apiUrl(`${API_CONFIG.ENDPOINTS.DELIVERY.UPDATE_TASK_STATUS}/${taskId}`), { status });
-      toast.success(`Task status updated to ${status}`);
+      customToast.success("Status Updated", `Task status updated to ${status}`);
       router.refresh(); // Or fetch data again
     } catch (error) {
-      toast.error("Failed to update task status.");
+      customToast.error("Update Failed", "Failed to update task status.");
     }
   };
 
@@ -168,7 +167,6 @@ const DashboardHome = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32 pt-4">
-      <ToastContainer />
 
       {/* Modern Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">

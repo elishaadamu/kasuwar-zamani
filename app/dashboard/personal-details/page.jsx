@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { decryptData, encryptData } from "@/lib/encryption";
-import { ToastContainer, toast } from "react-toastify";
+import { customToast } from "@/lib/customToast";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import {
   FaUserEdit,
@@ -21,7 +21,6 @@ import { MdLocationOn, MdDescription } from "react-icons/md";
 import { HiIdentification } from "react-icons/hi";
 import { RiBankFill } from "react-icons/ri";
 import Image from "next/image";
-import "react-toastify/dist/ReactToastify.css";
 import Loading from "@/components/Loading";
 import statesData from "@/lib/states.json";
 
@@ -170,7 +169,7 @@ const PersonalDetails = () => {
     const file = e.target.files[0];
     if (file) {
       if (file.size > 50 * 1024) {
-        toast.error("File size too large. Please upload an image under 50KB.");
+        customToast.error("File size too large. Please upload an image under 50KB.");
         return;
       }
       const reader = new FileReader();
@@ -179,7 +178,7 @@ const PersonalDetails = () => {
           ...prev,
           slip: reader.result,
         }));
-        toast.success("File uploaded successfully!");
+        customToast.success("File uploaded successfully!");
       };
       reader.readAsDataURL(file);
     }
@@ -198,7 +197,7 @@ const PersonalDetails = () => {
       }
     } catch (error) {
       console.error("Error fetching profile:", error);
-      toast.error("Failed to load profile data");
+      customToast.error("Failed to load profile data");
     } finally {
       setLoading(false);
     }
@@ -249,13 +248,13 @@ const PersonalDetails = () => {
           ...profile,
         };
         localStorage.setItem("user", encryptData(updatedUser));
-        toast.success("Profile updated successfully!");
+        customToast.success("Profile updated successfully!");
         setIsEditing(false);
         fetchProfile();
       }
     } catch (error) {
       console.error("Error updating profile:", error);
-      toast.error(error.response?.data?.message || "Failed to update profile");
+      customToast.error(error.response?.data?.message || "Failed to update profile");
     } finally {
       setLoading(false);
     }
@@ -267,7 +266,6 @@ const PersonalDetails = () => {
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <ToastContainer position="top-right" autoClose={3000} />
 
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
         {/* Header */}

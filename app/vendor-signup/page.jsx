@@ -6,8 +6,7 @@ import Logo from "@/assets/logo/logo.png";
 import Link from "next/link";
 import React, { useState, useEffect, Suspense } from "react";
 import axios from "axios";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { customToast } from "@/lib/customToast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { encryptData } from "@/lib/encryption";
 import { apiUrl, API_CONFIG } from "@/configs/api";
@@ -45,7 +44,7 @@ const VendorSignupForm = () => {
     const refCodeFromUrl = searchParams.get("ref");
     if (refCodeFromUrl) {
       setFormData((prev) => ({ ...prev, appliedReferralCode: refCodeFromUrl }));
-      toast.info("Referral code applied!");
+      customToast.info("Referral code applied!");
     }
   }, [searchParams]);
 
@@ -59,7 +58,7 @@ const VendorSignupForm = () => {
     setLoading(true);
 
     if (formData.password.length < 6) {
-      toast.error("Password must be at least 6 characters long.");
+      customToast.error("Password must be at least 6 characters long.");
       setLoading(false);
       return;
     }
@@ -84,11 +83,11 @@ const VendorSignupForm = () => {
       localStorage.setItem("user", encryptedUser);
 
       fetchUserData();
-      toast.success("Vendor signup successful!");
+      customToast.success("Vendor signup successful!");
       router.push("/vendor-dashboard"); // Redirect to seller dashboard after signup
     } catch (error) {
       console.error("Error signing up as vendor:", error);
-      toast.error(
+      customToast.error(
         error.response?.data?.message ||
           "An error occurred during vendor signup."
       );
@@ -99,7 +98,6 @@ const VendorSignupForm = () => {
 
   return (
     <div className="flex justify-center items-center my-16">
-      <ToastContainer />
       <form
         onSubmit={handleSignup}
         className="flex flex-col gap-4 w-[90%] md:w-[450px] text-gray-700"

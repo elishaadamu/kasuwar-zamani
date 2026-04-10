@@ -4,8 +4,7 @@ import { MoreVertical, Edit2, Trash2, X, Save, AlertTriangle } from "lucide-reac
 import { useAppContext } from "@/context/AppContext";
 import axios from "axios";
 import { API_CONFIG, apiUrl } from "@/configs/api";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { customToast } from "@/lib/customToast";
 import Modal from "../Modal";
 
 const ActionMenu = ({ product, onDelete, onEdit, categories, states }) => {
@@ -39,7 +38,7 @@ const ActionMenu = ({ product, onDelete, onEdit, categories, states }) => {
     try {
       if (!userId) {
         console.error("User not authenticated");
-        toast.error("User not authenticated.");
+        customToast.error("Auth Error", "User not authenticated.");
         return;
       }
       await axios.delete(
@@ -52,10 +51,10 @@ const ActionMenu = ({ product, onDelete, onEdit, categories, states }) => {
       );
       onDelete(product._id);
       setIsDeleteModalOpen(false);
-      toast.success("Product deleted successfully!");
+      customToast.success("Deleted", "Product deleted successfully!");
     } catch (err) {
       console.error("Failed to delete product:", err);
-      toast.error("Failed to delete product.");
+      customToast.error("Delete Failed", "Failed to delete product.");
     }
   };
 
@@ -65,7 +64,7 @@ const ActionMenu = ({ product, onDelete, onEdit, categories, states }) => {
     try {
       if (!userId) {
         console.error("User not authenticated");
-        toast.error("User not authenticated.");
+        customToast.error("Auth Error", "User not authenticated.");
         return;
       }
       await axios.put(
@@ -80,19 +79,10 @@ const ActionMenu = ({ product, onDelete, onEdit, categories, states }) => {
       onEdit(editedProduct);
       setIsEditModalOpen(false);
       
-      // Ensure toast is called
-      toast.success("Product has been updated!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
+      customToast.success("Updated", "Product has been updated!");
     } catch (err) {
       console.error("Failed to update product:", err);
-      toast.error("Failed to update product.");
+      customToast.error("Update Failed", "Failed to update product.");
     } finally {
       setIsSaving(false);
     }

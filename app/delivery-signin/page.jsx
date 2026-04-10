@@ -9,8 +9,7 @@ import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { encryptData } from "@/lib/encryption";
 import { apiUrl, API_CONFIG } from "@/configs/api";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { customToast } from "@/lib/customToast";
 import { useAppContext } from "@/context/AppContext";
 
 import { Suspense } from "react";
@@ -55,11 +54,11 @@ const DeliverySigninContent = () => {
 
       localStorage.setItem("user", encryptedUser);
       fetchUserData(); // Call fetchUserData to update global state
-      toast.success("Delivery partner signin successful!");
+      customToast.success("Delivery partner signin successful!");
       router.push(redirect || "/delivery-dashboard"); // Redirect to delivery dashboard after signin
     } catch (error) {
       console.error("Error signing in as delivery partner:", error);
-      toast.error(
+      customToast.error(
         error.response?.data?.message ||
           "An error occurred during delivery partner signin."
       );
@@ -70,7 +69,6 @@ const DeliverySigninContent = () => {
 
   return (
     <div className="flex justify-center items-center my-16">
-      <ToastContainer />
       <form
         onSubmit={handleSignin}
         className="flex flex-col gap-4 w-[90%] md:w-[450px] text-gray-700"

@@ -184,9 +184,9 @@ const VendorSection = () => {
         </div>
         <Link
           href="/all-vendors"
-          className="px-6 py-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition text-sm whitespace-nowrap"
+          className="group px-6 py-2.5 rounded-full bg-indigo-50 text-indigo-600 font-bold border border-transparent hover:bg-indigo-600 hover:text-white hover:shadow-lg hover:shadow-indigo-500/30 transition-all text-sm flex items-center gap-2 whitespace-nowrap"
         >
-          View All Vendors
+          View All Vendors <span className="group-hover:translate-x-1 transition-transform">→</span>
         </Link>
       </div>
       {loading ? (

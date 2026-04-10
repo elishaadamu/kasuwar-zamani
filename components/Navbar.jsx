@@ -10,18 +10,9 @@ import { apiUrl, API_CONFIG } from "@/configs/api";
 import axios from "axios";
 import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { message as antdMessage } from "antd";
+import { customToast } from "@/lib/customToast";
 import {
-  HiOutlineCpuChip,
   HiOutlineShoppingBag,
-  HiOutlineSparkles,
-  HiOutlineHome,
-  HiOutlineHeart,
-  HiOutlineTruck,
-  HiOutlineBuildingOffice2,
-  HiOutlineArchiveBox,
-  HiOutlineWrenchScrewdriver,
-  HiOutlineComputerDesktop,
 } from "react-icons/hi2";
 
 const Navbar = () => {
@@ -64,38 +55,6 @@ const Navbar = () => {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [walletBalance, setWalletBalance] = useState(0);
 
-  // Icons mapping
-  const iconMap = {
-    Electronics: <HiOutlineCpuChip className="w-5 h-5 mr-2 text-gray-500" />,
-    Fashion: <HiOutlineShoppingBag className="w-5 h-5 mr-2 text-gray-500" />,
-    "Foods and Drinks": (
-      <HiOutlineSparkles className="w-5 h-5 mr-2 text-gray-500" />
-    ),
-    Furnitures: <HiOutlineHome className="w-5 h-5 mr-2 text-gray-500" />,
-    "Beauty & Health": (
-      <HiOutlineHeart className="w-5 h-5 mr-2 text-gray-500" />
-    ),
-    Automobiles: <HiOutlineTruck className="w-5 h-5 mr-2 text-gray-500" />,
-    Property: (
-      <HiOutlineBuildingOffice2 className="w-5 h-5 mr-2 text-gray-500" />
-    ),
-    "Kitchen Utensils": (
-      <HiOutlineArchiveBox className="w-5 h-5 mr-2 text-gray-500" />
-    ),
-    "Home appliance": <HiOutlineHome className="w-5 h-5 mr-2 text-gray-500" />,
-    Agriculture: <HiOutlineSparkles className="w-5 h-5 mr-2 text-gray-500" />,
-    "Industrial equipment": (
-      <HiOutlineWrenchScrewdriver className="w-5 h-5 mr-2 text-gray-500" />
-    ),
-    "Digital products": (
-      <HiOutlineComputerDesktop className="w-5 h-5 mr-2 text-gray-500" />
-    ),
-    default: <HiOutlineArchiveBox className="w-5 h-5 mr-2 text-gray-500" />,
-  };
-
-  const getCategoryIcon = (categoryName) => {
-    return iconMap[categoryName] || iconMap.default;
-  };
 
   // Fetch categories
   useEffect(() => {
@@ -199,7 +158,7 @@ const Navbar = () => {
 
   const handleMessageClick = async () => {
     if (!isLoggedIn) {
-      antdMessage.error("Please sign in to access messages.");
+      customToast.error("Sign In Required", "Please sign in to access messages.");
       router.push("/signin");
       return;
     }
@@ -293,7 +252,6 @@ const Navbar = () => {
                         .replace(/ /g, "-")}`}
                       className="flex items-center p-2 rounded-md text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200"
                     >
-                      {getCategoryIcon(category.name)}
                       <span className="text-sm">{category.name}</span>
                     </Link>
                   ))
@@ -479,7 +437,7 @@ const Navbar = () => {
         <button
           onClick={handleMessageClick}
           disabled={isCreatingChat}
-          className="px-3 py-1  hidden md:px-5 md:py-2.5 text-base font-bold rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg transform hover:scale-105 transition-all duration-200 whitespace-nowrap md:flex items-center gap-2"
+          className="px-3 py-1  hidden md:px-5 md:py-2.5 text-lg font-semibold rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg transform hover:scale-105 transition-all duration-200 whitespace-nowrap md:flex items-center gap-2"
         >
           {isCreatingChat ? (
             <>
@@ -622,7 +580,7 @@ const Navbar = () => {
                       <>
                         <Link
                           href="/delivery-dashboard"
-                          className={`block px-4 py-2.5 rounded-xl text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all ${
+                          className={`block px-4 py-2.5 rounded-xl text-base font-semibold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all ${
                             pathname === "/delivery-dashboard" ? "bg-blue-50 text-blue-600" : ""
                           }`}
                         >
@@ -633,7 +591,7 @@ const Navbar = () => {
                       <>
                         <Link
                           href="/vendor-dashboard"
-                          className={`block px-4 py-2.5 rounded-xl text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all ${
+                          className={`block px-4 py-2.5 rounded-xl text-base font-semibold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all ${
                             pathname === "/vendor-dashboard" ? "bg-blue-50 text-blue-600" : ""
                           }`}
                         >
@@ -643,7 +601,7 @@ const Navbar = () => {
                     ) : (
                       <Link
                         href="/dashboard"
-                        className={`block px-4 py-2.5 rounded-xl text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all ${
+                        className={`block px-4 py-2.5 rounded-xl text-base font-semibold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all ${
                           pathname === "/dashboard" ? "bg-blue-50 text-blue-600" : ""
                         }`}
                       >
@@ -653,7 +611,7 @@ const Navbar = () => {
                     <div className="h-px bg-gray-100 my-2" />
                     <button
                       onClick={logout}
-                      className="flex items-center w-full px-4 py-2.5 rounded-xl text-sm font-bold text-red-600 hover:bg-red-50 transition-all"
+                      className="flex items-center w-full px-4 py-2.5 rounded-xl text-base font-semibold text-red-600 hover:bg-red-50 transition-all"
                     >
                       Logout
                     </button>
@@ -664,13 +622,13 @@ const Navbar = () => {
               <div className="flex items-center gap-3">
                 <Link
                   href="/signin"
-                  className="px-6 py-2 rounded-full text-sm font-bold text-gray-700 hover:bg-gray-100 transition-all"
+                  className="px-6 py-2 rounded-full text-base font-semibold text-gray-700 hover:bg-gray-100 transition-all"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/signup"
-                  className="px-6 py-2 bg-blue-600 text-white rounded-full text-sm font-bold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all active:scale-95"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-full text-base font-semibold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all active:scale-95"
                 >
                   Sign Up
                 </Link>
@@ -880,7 +838,6 @@ const Navbar = () => {
                             onClick={handleCloseMenu}
                             className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 rounded-md"
                           >
-                            {getCategoryIcon(category.name)}
                             <span className="text-sm">{category.name}</span>
                           </Link>
                         ))
@@ -939,7 +896,7 @@ const Navbar = () => {
                   <button
                     onClick={handleMessageClick}
                     disabled={isCreatingChat}
-                    className="px-5 py-2.5 text-base font-bold rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg transform hover:scale-105 transition-all duration-200 whitespace-nowrap flex items-center gap-2"
+                    className="px-5 py-2.5 text-lg font-semibold rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg transform hover:scale-105 transition-all duration-200 whitespace-nowrap flex items-center gap-2"
                   >
                     {isCreatingChat ? (
                       <>

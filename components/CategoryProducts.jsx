@@ -4,7 +4,6 @@ import axios from "axios";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import { useAppContext } from "@/context/AppContext";
 import ProductCard from "./ProductCard";
-import { FaTags } from "react-icons/fa";
 
 const CategoryProducts = () => {
   const { products, router } = useAppContext();
@@ -39,13 +38,6 @@ const CategoryProducts = () => {
 
   return (
     <>
-      <style jsx global>{`
-        @media screen and (max-width: 360px) {
-          .home-products {
-            grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
-          }
-        }
-      `}</style>
 
       {validCategories.map((category) => {
         const categoryProducts = products
@@ -56,12 +48,9 @@ const CategoryProducts = () => {
           <React.Fragment key={category._id}>
             <section className="py-1">
               <div className="flex flex-col text-left mb-12">
-                <div className="inline-flex gap-3 mb-4">
-                  <FaTags className="w-6 h-6 text-blue-600" />
-                  <h2 className="text-xl md:text-3xl font-bold text-gray-900">
-                    {category.name}
-                  </h2>
-                </div>
+                <h2 className="text-xl md:text-3xl font-bold text-gray-900 mb-4">
+                  {category.name}
+                </h2>
                 <p className="text-lg text-gray-600 text-left max-w-2xl">
                   Check out our latest arrivals in the {category.name} category.
                 </p>

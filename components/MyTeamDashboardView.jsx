@@ -5,7 +5,7 @@ import { apiUrl, API_CONFIG } from "@/configs/api";
 import { useAppContext } from "@/context/AppContext";
 import { FaUserTie, FaUsers, FaSpinner, FaLayerGroup, FaUserPlus, FaTimes, FaExchangeAlt, FaWallet, FaChartLine, FaPlusCircle, FaChevronRight, FaArrowRight, FaBox, FaStore, FaUserCheck, FaTruck, FaClipboardList, FaBriefcase, FaIdBadge } from "react-icons/fa";
 import { useRouter, usePathname } from "next/navigation";
-import { toast } from "react-toastify";
+import { customToast } from "@/lib/customToast";
 import Loading from "@/components/Loading";
 
 const MetricCard = ({ icon, title, value, bg }) => (
@@ -317,7 +317,7 @@ const MyTeamDashboardView = ({ teamId }) => {
                 }
             }
         } catch (error) {
-            toast.error(error?.response?.data?.message || "Failed to load team data");
+            customToast.error("Load Failed", error?.response?.data?.message || "Failed to load team data");
         } finally {
             setLoading(false);
         }
@@ -399,17 +399,17 @@ const MyTeamDashboardView = ({ teamId }) => {
             };
 
             if (!payload.teamId) {
-                toast.error("Team ID is missing. Please select a team.");
+                customToast.warn("Selection Required", "Team ID is missing. Please select a team.");
                 setAssignLoading(false);
                 return;
             }
             await axios.post(apiUrl(API_CONFIG.ENDPOINTS.REGIONAL.ASSIGN_MEMBER), payload, { withCredentials: true });
-            toast.success("Member assigned successfully!");
+            customToast.success("Member Assigned", "New member has been added successfully!");
             setShowAssignModal(false);
             setAssignForm({ email: "", role: "bd", teamId: "" });
             fetchData(); // Refresh data
         } catch (error) {
-            toast.error(error?.response?.data?.message || "Failed to assign member");
+            customToast.error("Assignment Failed", error?.response?.data?.message || "Failed to assign member");
         } finally {
             setAssignLoading(false);
         }
@@ -425,12 +425,12 @@ const MyTeamDashboardView = ({ teamId }) => {
             };
             
             await axios.put(apiUrl(API_CONFIG.ENDPOINTS.REGIONAL.SET_TEAM_LEAD), payload, { withCredentials: true });
-            toast.success("Team Leader Set successfully!");
+            customToast.success("Lead Assigned", "Team Leader set successfully!");
             setShowSetLeadModal(false);
             setSetLeadForm({ email: "", teamId: "" });
             fetchData(); // Refresh data
         } catch (error) {
-            toast.error(error?.response?.data?.message || "Failed to set Team Leader");
+            customToast.error("Update Failed", error?.response?.data?.message || "Failed to set Team Leader");
         } finally {
             setSetLeadLoading(false);
         }
@@ -446,12 +446,12 @@ const MyTeamDashboardView = ({ teamId }) => {
             };
             
             await axios.put(apiUrl(API_CONFIG.ENDPOINTS.REGIONAL.REASSIGN_MEMBER), payload, { withCredentials: true });
-            toast.success("Member reassigned successfully!");
+            customToast.success("Member Moved", "Member reassigned successfully!");
             setShowReassignModal(false);
             setReassignForm({ email: "", teamId: "" });
             fetchData(); // Refresh data
         } catch (error) {
-            toast.error(error?.response?.data?.message || "Failed to reassign member");
+            customToast.error("Move Failed", error?.response?.data?.message || "Failed to reassign member");
         } finally {
             setReassignLoading(false);
         }
@@ -466,7 +466,7 @@ const MyTeamDashboardView = ({ teamId }) => {
                 setSelectedZoneStates(response.data.teams || []);
             }
         } catch (error) {
-            toast.error("Failed to fetch states for selected zone");
+            customToast.error("Fetch Error", "Failed to fetch states for selected zone");
         } finally {
             setFetchingStates(false);
         }
@@ -482,12 +482,12 @@ const MyTeamDashboardView = ({ teamId }) => {
                 state: createTeamForm.state
             }, { withCredentials: true });
 
-            toast.success("Team created successfully!");
+            customToast.success("Team Created", "New team created successfully!");
             setShowCreateTeamModal(false);
             setCreateTeamForm({ name: "", state: "", zoneId: "" });
             fetchData(); // Refresh data
         } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to create team");
+            customToast.error("Creation Failed", error.response?.data?.message || "Failed to create team");
         } finally {
             setCreateTeamLoading(false);
         }
@@ -502,7 +502,7 @@ const MyTeamDashboardView = ({ teamId }) => {
                 setCreateTeamForm(prev => ({ ...prev, zoneId }));
                 fetchTeamStates(zoneId);
             } else {
-                toast.warn("Could not identify your zone. Please contact support.");
+                customToast.warn("Zone Missing", "Could not identify your zone. Please contact support.");
             }
         }
     }, [showCreateTeamModal, dashboardData, userData]);

@@ -51,24 +51,23 @@ const FeaturedProduct = () => {
   if (!featuredProducts.length) return null;
 
   return (
-    <section className=" bg-gradient-to-b from-gray-50 to-white">
+    <section className="bg-transparent relative z-10 w-full mb-12">
       <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         {/* Header Section */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-16 relative">
           <div className="inline-flex items-center gap-3 mb-4">
-            <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
-            <span className="text-blue-600 font-semibold text-sm uppercase tracking-wider">
+            <div className="w-3 h-3 bg-indigo-600 rounded-full animate-pulse shadow-lg shadow-indigo-500/50"></div>
+            <span className="text-indigo-600 font-bold text-xs uppercase tracking-widest pl-2">
               Featured Collection
             </span>
-            <div className="w-3 h-3 bg-blue-600 rounded-full"></div>
+            <div className="w-3 h-3 bg-indigo-600 rounded-full animate-pulse shadow-lg shadow-indigo-500/50"></div>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            Featured Products
+          <h2 className="text-4xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">
+            Premium Picks
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Discover our handpicked selection of premium products
+          <p className="text-lg text-gray-500 max-w-2xl mx-auto font-medium">
+            Discover our handpicked selection of premium quality items
           </p>
-          <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto mt-6 rounded-full"></div>
         </div>
 
         {/* Products Grid */}
@@ -76,13 +75,13 @@ const FeaturedProduct = () => {
           {featuredProducts.map((product, index) => (
             <div
               key={product._id}
-              className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden"
+              className="group relative bg-white/60 backdrop-blur-xl rounded-[2rem] border border-white shadow-xl shadow-gray-200/50 hover:shadow-2xl hover:shadow-indigo-900/10 hover:-translate-y-2 transition-all duration-400 overflow-hidden"
               onMouseEnter={() => setHoveredProduct(product._id)}
               onMouseLeave={() => setHoveredProduct(null)}
               onClick={() => router.push(`/product/${product._id}`)}
             >
               {/* Product Image Container */}
-              <div className="relative overflow-hidden bg-gray-100">
+              <div className="relative overflow-hidden bg-gray-50/50 rounded-[1.5rem] m-3 border border-gray-100/50">
                 <Image
                   src={product.images?.[0]?.url || "/placeholder-product.jpg"}
                   alt={product.name}
@@ -194,7 +193,7 @@ const FeaturedProduct = () => {
                       e.stopPropagation();
                       router.push(`/product/${product._id}`);
                     }}
-                    className="bg-gradient-to-r md:py-3 p-4 from-blue-600 to-purple-600 text-white  md:px-6  rounded-xl font-semibold flex items-center justify-center gap-2 hover:shadow-lg transform hover:scale-105 transition-all duration-200 group/btn"
+                    className="bg-indigo-600 md:py-3 p-4 text-white md:px-6 rounded-xl font-bold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-indigo-500/30 transform hover:bg-indigo-700 transition-all duration-300 group/btn"
                   >
                     <FaShoppingCart className="w-4 h-4" />
                     <span className="hidden text-[12px] md:inline">
@@ -205,7 +204,7 @@ const FeaturedProduct = () => {
               </div>
 
               {/* Hover Border Effect */}
-              <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-blue-500 transition-all duration-300 pointer-events-none"></div>
+              <div className="absolute inset-0 rounded-[2rem] border-[3px] border-transparent group-hover:border-indigo-100 transition-all duration-300 pointer-events-none"></div>
             </div>
           ))}
         </div>
@@ -214,10 +213,10 @@ const FeaturedProduct = () => {
         <div className="text-center mt-12">
           <button
             onClick={() => router.push("/all-products")}
-            className="bg-white text-gray-900 border-2 border-gray-300 px-8 py-4 rounded-xl font-semibold hover:border-blue-600 hover:text-blue-600 transition-all duration-300 flex items-center gap-3 mx-auto hover:shadow-lg"
+            className="bg-white text-gray-900 border border-gray-200 px-8 py-3.5 rounded-full font-bold hover:border-gray-900 hover:shadow-md transition-all duration-300 flex items-center gap-3 mx-auto"
           >
             View All Products
-            <FaArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" />
+            <FaArrowRight className="w-4 h-4 transition-transform duration-200" />
           </button>
         </div>
       </div>

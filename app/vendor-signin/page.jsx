@@ -9,8 +9,7 @@ import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import { encryptData } from "@/lib/encryption";
 import { apiUrl, API_CONFIG } from "@/configs/api";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { customToast } from "@/lib/customToast";
 import { useAppContext } from "@/context/AppContext";
 
 import { Suspense } from "react";
@@ -55,11 +54,11 @@ const VendorSigninContent = () => {
 
       localStorage.setItem("user", encryptedUser);
       fetchUserData(); // Call fetchUserData to update global state
-      toast.success("Vendor signin successful!"); // Changed toast message
-      router.push(redirect || "/vendor-dashboard"); // Redirect to seller dashboard after signin
+      customToast.success("Vendor Signin successful!"); 
+      router.push(redirect || "/vendor-dashboard"); 
     } catch (error) {
-      console.error("Error signing in as vendor:", error); // Changed error message
-      toast.error(
+      console.error("Error signing in as vendor:", error); 
+      customToast.error(
         error.response?.data?.message ||
           "An error occurred during vendor signin."
       );
@@ -70,7 +69,6 @@ const VendorSigninContent = () => {
 
   return (
     <div className="flex justify-center items-center my-16">
-      <ToastContainer />
       <form
         onSubmit={handleSignin}
         className="flex flex-col gap-4 w-[90%] md:w-[450px] text-gray-700"
