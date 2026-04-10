@@ -127,9 +127,10 @@ const UpdateImages = () => {
     }
   };
 
-  if (pageLoading || authLoading) {
+  if (pageLoading) {
     return <Loading />;
   }
+
 
   return (
     <div className="max-w-4xl mx-auto">

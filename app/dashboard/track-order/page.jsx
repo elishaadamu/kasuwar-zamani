@@ -22,6 +22,7 @@ import {
   FaMoneyBillWave,
   FaExternalLinkAlt,
 } from "react-icons/fa";
+import Loading from "@/components/Loading";
 
 // Order Tracking Modal Component
 const OrderTrackingModal = ({ isOpen, onClose }) => {
@@ -253,10 +254,10 @@ const OrderTrackingModal = ({ isOpen, onClose }) => {
                     className="flex-1 bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition disabled:bg-blue-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {loading ? (
-                      <>
+                      <div className="flex items-center gap-2">
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        Tracking...
-                      </>
+                        <span>Tracking...</span>
+                      </div>
                     ) : (
                       <>
                         <FaSearch className="w-4 h-4" />
@@ -841,9 +842,7 @@ const OrderTracking = () => {
         {/* Orders Table */}
         <div className="bg-white shadow rounded-lg">
           {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            </div>
+            <Loading />
           ) : filteredOrders.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">

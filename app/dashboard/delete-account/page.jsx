@@ -8,7 +8,10 @@ import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
 import { decryptData } from "@/lib/encryption";
 
+import { useAppContext } from "@/context/AppContext";
+
 const DeleteAccountPage = () => {
+  const { logout } = useAppContext();
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
@@ -37,8 +40,7 @@ const DeleteAccountPage = () => {
         payload
       );
       toast.success("Account deleted successfully");
-      localStorage.removeItem("user");
-      router.push("/signup");
+      logout();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to delete account");
     } finally {

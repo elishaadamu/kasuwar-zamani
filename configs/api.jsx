@@ -22,7 +22,8 @@ axios.interceptors.response.use(
           currentPath !== "/delivery-signin"
         ) {
           localStorage.removeItem("user");
-          window.location.href = "/";
+          // Dispatch a custom event instead of hard redirect
+          window.dispatchEvent(new CustomEvent("session-expired"));
         } else {
           // On home/signin pages, just clear the stored user data silently
           localStorage.removeItem("user");

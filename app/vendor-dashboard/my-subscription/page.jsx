@@ -4,7 +4,6 @@ import React, { useState, useEffect, useContext } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { apiUrl, API_CONFIG } from "@/configs/api";
-import { AppContext } from "@/context/AppContext";
 import {
   FaStar,
   FaBoxOpen,
@@ -13,9 +12,11 @@ import {
   FaTimesCircle,
 } from "react-icons/fa";
 import Link from "next/link";
+import { useAppContext } from "@/context/AppContext";
+import Loading from "@/components/Loading";
 
 const MySubscriptionPage = () => {
-  const { userData, authLoading } = useContext(AppContext);
+  const { userData, authLoading } = useAppContext();
   const [subscription, setSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -83,12 +84,8 @@ const MySubscriptionPage = () => {
     });
   };
 
-  if (loading || authLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
+  if (loading) {
+    return <Loading />;
   }
 
   if (error) {

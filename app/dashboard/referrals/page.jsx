@@ -17,6 +17,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import { decryptData } from "@/lib/encryption";
 import { apiUrl, API_CONFIG } from "@/configs/api";
+import Loading from "@/components/Loading";
 
 const ReferralPage = () => {
   const { userData } = useAppContext();
@@ -190,9 +191,7 @@ const ReferralPage = () => {
         </div>
 
         {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          </div>
+          <Loading />
         ) : (
           <>
             {/* Stats Cards */}

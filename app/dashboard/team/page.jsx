@@ -2,6 +2,7 @@
 import React, { Suspense } from "react";
 import MyTeamDashboardView from "@/components/MyTeamDashboardView";
 import { useSearchParams } from "next/navigation";
+import Loading from "@/components/Loading";
 
 const TeamDetailsContent = () => {
     const searchParams = useSearchParams();
@@ -12,7 +13,7 @@ const TeamDetailsContent = () => {
 
 const TeamDetailsPage = () => {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<Loading />}>
             <TeamDetailsContent />
         </Suspense>
     );

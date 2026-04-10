@@ -1,8 +1,8 @@
 import React from "react";
 
-const Loading = () => {
+const Loading = ({ fullScreen = false }) => {
   return (
-    <div className="flex justify-center items-center h-[70vh] bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className={`flex flex-col justify-center items-center ${fullScreen ? "fixed inset-0 z-[9999]" : "min-h-[80vh] flex-1"} w-full bg-gradient-to-br from-slate-50 via-blue-100 to-indigo-50`}>
       <div className="relative">
         {/* Outer glow effect */}
         <div className="absolute inset-0 blur-2xl opacity-40 animate-pulse">

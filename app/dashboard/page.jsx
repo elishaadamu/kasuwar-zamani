@@ -5,51 +5,23 @@ import axios from "axios";
 import { decryptData } from "@/lib/encryption";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import { useAppContext } from "@/context/AppContext";
-import {
-  FaHome,
-  FaCommentDots,
-  FaTruck,
-  FaBoxOpen,
-  FaUser,
-  FaPlus,
-  FaWallet,
-  FaCreditCard,
-  FaShoppingCart,
-  FaUniversity as FaBank,
-  FaUserCircle,
-} from "react-icons/fa";
-import { toast } from "react-toastify";
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  TimeScale,
-} from "chart.js";
+import Loading from "@/components/Loading";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title, TimeScale } from "chart.js";
 import { Pie, Line } from "react-chartjs-2";
 import "chartjs-adapter-date-fns";
 import { startOfWeek, startOfMonth, format, subMonths } from "date-fns";
+import { useRouter } from "next/navigation";
+import Script from "next/script";
+import { FaHome, FaCommentDots, FaTruck, FaBoxOpen, FaUser, FaPlus, FaWallet, FaCreditCard, FaShoppingCart, FaUniversity as FaBank, FaUserCircle, FaChevronRight, FaArrowUp, FaArrowDown, FaCog } from "react-icons/fa";
 
-ChartJS.register(
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  TimeScale
-);
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title, TimeScale);
 
 const DashboardHome = () => {
   const { userData: contextUserData, authLoading } = useAppContext();
-  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState({
     userName: "",
     totalOrders: 0,
@@ -59,958 +31,358 @@ const DashboardHome = () => {
   });
   const [walletBalance, setWalletBalance] = useState(null);
   const [userData, setUserData] = useState(null);
-  const [accountDetails, setAccountDetails] = useState(null);
   const [showFundModal, setShowFundModal] = useState(false);
   const [amount, setAmount] = useState("");
   const [nin, setNin] = useState("");
   const [showCreateAccount, setShowCreateAccount] = useState(false);
-  const [timePeriod, setTimePeriod] = useState("monthly"); // 'monthly' or 'weekly'
+  const [timePeriod, setTimePeriod] = useState("monthly");
 
-  const fetchWalletBalance = async () => {
+  const fetchWalletBalance = async (uid) => {
     try {
-      const encryptedUser = localStorage.getItem("user");
-      if (encryptedUser) {
-        const decryptedUserData = decryptData(encryptedUser);
-        const walletResponse = await axios.get(
-          apiUrl(
-            API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance +
-              decryptedUserData.id +
-              "/balance"
-          ),
-          { withCredentials: true }
-        );
-        console.log("Wallet", walletResponse);
-        setWalletBalance(walletResponse.data.data);
-      }
+      const walletResponse = await axios.get(apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance + uid + "/balance"), { withCredentials: true });
+      setWalletBalance(walletResponse.data.data);
     } catch (error) {
       console.error("Error fetching wallet balance:", error);
       setWalletBalance(null);
     }
   };
 
-  const orderStatusCounts = useMemo(() => {
-    return dashboardData.orders.reduce(
-      (acc, order) => {
-        acc[order.status] = (acc[order.status] || 0) + 1;
-        return acc;
-      },
-      {
-        pending: 0,
-        paid: 0,
-        confirmed: 0,
-        processing: 0,
-        shipped: 0,
-        delivered: 0,
-        cancelled: 0,
-      }
-    );
-  }, [dashboardData.orders]);
-
-  const chartData = useMemo(() => {
-    const hasOrders = dashboardData.orders.length > 0;
-    const data = hasOrders
-      ? [
-          orderStatusCounts.pending,
-          orderStatusCounts.paid,
-          orderStatusCounts.shipped,
-          orderStatusCounts.delivered,
-          orderStatusCounts.cancelled,
-        ]
-      : [5, 3, 2, 8, 1]; // Demo data
-
-    return {
-      labels: ["Pending", "Paid", "Shipped", "Delivered", "Cancelled"],
-      datasets: [
-        {
-          label: "Order Status",
-          data: data,
-          backgroundColor: [
-            "#FBBF24",
-            "#3B82F6",
-            "#8B5CF6",
-            "#10B981",
-            "#EF4444",
-          ],
-          borderColor: ["#F59E0B", "#2563EB", "#7C3AED", "#059669", "#DC2626"],
-          borderWidth: 1,
-        },
-      ],
-    };
-  }, [orderStatusCounts, dashboardData.orders]);
-
-  const lineChartData = useMemo(() => {
-    const hasOrders = dashboardData.orders.length > 0;
-    const now = new Date();
-    let labels = [];
-    let dataPoints = [];
-
-    if (timePeriod === "monthly") {
-      labels = Array.from({ length: 12 }, (_, i) =>
-        format(subMonths(now, 11 - i), "MMM yyyy")
-      );
-      if (hasOrders) {
-        const monthlyData = new Map(labels.map((label) => [label, 0]));
-        dashboardData.orders.forEach((order) => {
-          const orderMonth = format(new Date(order.createdAt), "MMM yyyy");
-          if (monthlyData.has(orderMonth)) {
-            monthlyData.set(orderMonth, monthlyData.get(orderMonth) + 1);
-          }
-        });
-        dataPoints = Array.from(monthlyData.values());
-      } else {
-        // Demo data for monthly view
-        dataPoints = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-      }
-    } else {
-      // Weekly
-      labels = Array.from({ length: 12 }, (_, i) =>
-        startOfWeek(subMonths(now, (11 - i) / 4))
-      ).map((date) => `W/C ${format(date, "MMM d")}`);
-      if (hasOrders) {
-        const weeklyData = new Map(labels.map((label) => [label, 0]));
-        dashboardData.orders.forEach((order) => {
-          const weekLabel = `W/C ${format(
-            startOfWeek(new Date(order.createdAt)),
-            "MMM d"
-          )}`;
-          if (weeklyData.has(weekLabel)) {
-            weeklyData.set(weekLabel, weeklyData.get(weekLabel) + 1);
-          }
-        });
-        dataPoints = Array.from(weeklyData.values());
-      } else {
-        // Demo data for weekly view
-        dataPoints = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-      }
-    }
-
-    return {
-      labels,
-      datasets: [
-        {
-          label: "Number of Orders",
-          data: dataPoints,
-          borderColor: "rgb(59, 130, 246)",
-          backgroundColor: "rgba(59, 130, 246, 0.5)",
-          tension: 0.3,
-        },
-      ],
-    };
-  }, [dashboardData.orders, timePeriod]);
-
   useEffect(() => {
     const fetchDashboardData = async () => {
+      if (authLoading) return;
+      const encryptedUser = localStorage.getItem("user");
+      if (!encryptedUser) {
+        router.push("/signin");
+        return;
+      }
       setLoading(true);
       try {
-        const encryptedUser = localStorage.getItem("user");
-        if (encryptedUser) {
-          const decryptedUserData = decryptData(encryptedUser);
-          setUserData(decryptedUserData);
-          setDashboardData((prev) => ({
-            ...prev,
-            userName: decryptedUserData.firstName,
-          }));
+        const decryptedUserData = decryptData(encryptedUser);
+        setUserData(decryptedUserData);
+        setDashboardData((prev) => ({ ...prev, userName: decryptedUserData.firstName }));
 
-          const [ordersResponse, productsResponse] = await Promise.all([
-            axios.get(
-              apiUrl(API_CONFIG.ENDPOINTS.ORDER.GET_ALL + decryptedUserData.id),
-              { withCredentials: true }
-            ),
-            // For customers, we don't need to fetch products.
-            // If you need other customer-specific data, add the call here.
-            Promise.resolve({ data: [] }), // Resolves immediately
-          ]);
-
-          if (ordersResponse.data.orders) {
-            const orders = ordersResponse.data.orders;
-            setDashboardData((prev) => ({
-              ...prev,
-              orders: orders,
-              recentOrders: orders.slice(0, 5),
-            }));
-          }
-
-          if (productsResponse.data) {
-            setDashboardData((prev) => ({
-              ...prev,
-              totalProducts: productsResponse.data.length,
-            }));
-          }
-
-          await fetchWalletBalance();
+        const ordersResponse = await axios.get(apiUrl(API_CONFIG.ENDPOINTS.ORDER.GET_ALL + decryptedUserData.id), { withCredentials: true });
+        if (ordersResponse.data.orders) {
+          const orders = ordersResponse.data.orders;
+          setDashboardData((prev) => ({ ...prev, orders: orders, recentOrders: orders.slice(0, 5) }));
         }
+        await fetchWalletBalance(decryptedUserData.id);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchDashboardData();
-  }, []);
+  }, [authLoading]);
 
-  const handlePayment = async () => {
-    if (!amount || amount < 100) {
-      toast.error("Please enter an amount of at least ₦100");
-      return;
+  const orderStatusCounts = useMemo(() => {
+    return dashboardData.orders.reduce((acc, order) => {
+      acc[order.status] = (acc[order.status] || 0) + 1;
+      return acc;
+    }, { pending: 0, paid: 0, confirmed: 0, processing: 0, shipped: 0, delivered: 0, cancelled: 0 });
+  }, [dashboardData.orders]);
+
+  const chartData = useMemo(() => ({
+    labels: ["Pending", "Paid", "Shipped", "Delivered", "Canceled"],
+    datasets: [{
+      data: [orderStatusCounts.pending, orderStatusCounts.paid, orderStatusCounts.shipped, orderStatusCounts.delivered, orderStatusCounts.cancelled],
+      backgroundColor: ["#FBBF24", "#3B82F6", "#8B5CF6", "#10B981", "#EF4444"],
+      hoverOffset: 20,
+      borderWidth: 0,
+    }],
+  }), [orderStatusCounts]);
+
+  const lineChartData = useMemo(() => {
+    const now = new Date();
+    let labels = Array.from({ length: 12 }, (_, i) => format(subMonths(now, 11 - i), "MMM"));
+    let dataPoints = labels.map(() => Math.floor(Math.random() * 10)); // Default demo data
+    
+    if (dashboardData.orders.length > 0) {
+      const monthlyData = new Map(labels.map(l => [l, 0]));
+      dashboardData.orders.forEach(o => {
+        const m = format(new Date(o.createdAt), "MMM");
+        if (monthlyData.has(m)) monthlyData.set(m, monthlyData.get(m) + 1);
+      });
+      dataPoints = Array.from(monthlyData.values());
     }
 
-    const PaystackPop = (await import("@paystack/inline-js")).default;
-    const paystack = new PaystackPop();
-    paystack.newTransaction({
-      key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
-      email: userData?.email,
-      amount: amount * 100,
-      ref: new Date().getTime().toString(),
-      metadata: {
-        userId: userData?.id,
-      },
-      onSuccess: (transaction) => {
-        onSuccess(transaction);
-      },
-      onCancel: () => {
-        onClose();
-      },
-    });
-  };
+    return {
+      labels,
+      datasets: [{
+        label: "Orders",
+        data: dataPoints,
+        borderColor: "#3B82F6",
+        backgroundColor: "rgba(59, 130, 246, 0.1)",
+        fill: true,
+        tension: 0.4,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+      }],
+    };
+  }, [dashboardData.orders]);
 
-  const onSuccess = async (transaction) => {
-    setLoading(true);
-    try {
-      toast.success("Wallet funded successfully!");
-      setAmount("");
-      setShowFundModal(false);
-      await fetchWalletBalance();
-    } catch (error) {
-      console.error("Error processing payment:", error);
-      toast.error("Failed to process payment. Please contact support.");
-    } finally {
-      setLoading(false);
+  const handlePayment = () => {
+    if (!amount || amount < 100) { toast.error("Minimum ₦100 required"); return; }
+    
+    // Use the script that was loaded via Next/Script
+    if (window.PaystackPop) {
+      new window.PaystackPop().newTransaction({
+        key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
+        email: userData?.email,
+        amount: amount * 100,
+        onSuccess: async () => {
+          toast.success("Wallet funded!");
+          setShowFundModal(false);
+          await fetchWalletBalance(userData.id);
+        },
+      });
+    } else {
+      toast.error("Payment secure layer is initializing. Please retry in a moment.");
     }
-  };
-
-  const onClose = () => {
-    toast.info("Payment cancelled");
-    setShowFundModal(false);
   };
 
   const handleCreateAccount = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const payload = { nin };
-
     try {
-      await axios.post(
-        apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.CREATE + userData.id),
-        payload,
-        { withCredentials: true }
-      );
-      toast.success("Account created successfully!");
+      await axios.post(apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.CREATE + userData.id), { nin }, { withCredentials: true });
+      toast.success("Account created!");
       setShowCreateAccount(false);
-      await fetchWalletBalance();
+      await fetchWalletBalance(userData.id);
     } catch (error) {
-      console.error("Error creating account:", error);
       toast.error(error.response?.data?.message || "Failed to create account.");
     } finally {
       setLoading(false);
     }
   };
 
+  if (loading || authLoading) return <Loading fullScreen={false} />;
+
   return (
-    <div className="max-w-6xl mx-auto pb-20 md:pb-0 px-4">
-      {loading ? (
-        <div className="flex justify-center items-center min-h-64">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
+    <div className="max-w-7xl mx-auto px-4 pb-24 md:pb-12 bg-white">
+      <ToastContainer />
+      <Script 
+        src="https://js.paystack.co/v2/inline.js" 
+        strategy="lazyOnload"
+      />
+      
+      {/* Premium Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-2 h-8 bg-blue-600 rounded-full"></div>
+            <h1 className="text-4xl font-black text-gray-900 tracking-tight">Kasuwar Center</h1>
+          </div>
+          <p className="text-gray-500 font-medium text-lg">Good day, {dashboardData.userName}. Your commerce dashboard is ready.</p>
         </div>
-      ) : (
-        <>
-          {/* Welcome Section - Compact */}
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Welcome back, {dashboardData.userName}!
-            </h1>
-            <p className="mt-1 text-gray-600 text-sm">
-              Here's what's happening with your account today.
-            </p>
-          </div>
+        <div className="flex gap-3">
+          <Link href="/" className="bg-gray-900 text-white px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-black transition-all shadow-xl shadow-gray-200">Start Shopping</Link>
+          <button onClick={() => router.push('/dashboard/personal-details')} className="bg-gray-50 text-gray-900 p-4 rounded-2xl hover:bg-gray-100 transition-all border border-gray-100"><FaCog className="w-5 h-5" /></button>
+        </div>
+      </div>
 
-          {/* Quick Actions */}
-          <div className="mb-6">
-            <h2 className="text-base font-semibold text-gray-800 mb-3">
-              Quick Actions
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              <Link
-                href="/"
-                className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow flex flex-col items-center justify-center text-center"
-              >
-                <FaShoppingCart className="w-6 h-6 text-blue-600 mb-2" />
-                <span className="text-sm font-medium text-gray-700">
-                  Shop Now
-                </span>
-              </Link>
-              <Link
-                href="/dashboard/track-order"
-                className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow flex flex-col items-center justify-center text-center"
-              >
-                <FaTruck className="w-6 h-6 text-green-600 mb-2" />
-                <span className="text-sm font-medium text-gray-700">
-                  Track Order
-                </span>
-              </Link>
-              <Link
-                href="/dashboard/request-delivery"
-                className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow flex flex-col items-center justify-center text-center"
-              >
-                <FaBoxOpen className="w-6 h-6 text-purple-600 mb-2" />
-                <span className="text-sm font-medium text-gray-700">
-                  Delivery
-                </span>
-              </Link>
-              <Link
-                href="/dashboard/inbox-support"
-                className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow flex flex-col items-center justify-center text-center"
-              >
-                <FaCommentDots className="w-6 h-6 text-yellow-600 mb-2" />
-                <span className="text-sm font-medium text-gray-700">Chat</span>
-              </Link>
-              <Link
-                href="/dashboard/personal-details"
-                className="bg-white p-4 rounded-lg shadow hover:shadow-md transition-shadow flex flex-col items-center justify-center text-center"
-              >
-                <FaUser className="w-6 h-6 text-red-600 mb-2" />
-                <span className="text-sm font-medium text-gray-700">Me</span>
-              </Link>
+      {/* Financial Hub - Futuristic Card */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        <div className="lg:col-span-2 bg-gray-900 rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 relative overflow-hidden group shadow-2xl shadow-blue-900/20">
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px] -mr-40 -mt-40 transition-transform duration-1000 group-hover:scale-110"></div>
+          <div className="relative z-10 flex flex-col md:flex-row justify-between gap-8 md:gap-12">
+            <div className="flex-1">
+              <p className="text-blue-400 font-black text-[10px] uppercase tracking-[0.4em] mb-4">Master Balance</p>
+              <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter mb-8 md:mb-10 truncate">₦{walletBalance?.balance?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || "0.00"}</h2>
+              <div className="flex gap-4">
+                <button onClick={() => setShowFundModal(true)} className="bg-white text-gray-900 px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl">Top Up</button>
+                <Link href="/dashboard/transaction-history" className="bg-white/10 text-white border border-white/20 px-8 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white/20 transition-all backdrop-blur-sm flex items-center gap-2">History <FaChevronRight className="w-2.5 h-2.5" /></Link>
+              </div>
             </div>
-          </div>
-
-          {/* Wallet & Account Section - Compact */}
-          <div className="mb-6">
-            <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-xl shadow-lg p-4 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-blue-500 rounded-full opacity-20 -mr-20 -mt-20"></div>
-
-              <div className="relative z-10">
-                {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4">
-                  <div className="mb-3 sm:mb-0">
-                    <h2 className="text-lg font-bold flex items-center gap-2">
-                      <FaWallet className="w-5 h-5" />
-                      Your Wallet
-                    </h2>
-                    <p className="text-blue-100 text-sm mt-1">
-                      Manage your funds and account details
-                    </p>
+            {walletBalance?.wallet ? (
+              <div className="w-full md:w-72 bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-sm self-start">
+                <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Settlement Account</p>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-[9px] text-gray-500 font-bold uppercase">Bank Name</p>
+                    <p className="text-white font-bold text-sm tracking-tight">{walletBalance.wallet.virtualBanktName}</p>
                   </div>
-                  <button
-                    onClick={() => setShowFundModal(true)}
-                    className="bg-white text-blue-600 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-50 transition"
-                  >
-                    Fund Wallet
-                  </button>
-                </div>
-
-                {/* Balance Section */}
-                <div className="bg-white/20 backdrop-blur-sm rounded-lg p-4 mb-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between">
-                    <div>
-                      <p className="text-blue-100 text-xs">Current Balance</p>
-                      <h1 className="text-2xl font-bold mt-1">
-                        ₦
-                        {walletBalance?.balance?.toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }) || "0.00"}
-                      </h1>
-                    </div>
-                    <Link href="/dashboard/transaction-history">
-                      {" "}
-                      <button className="bg-white/20 text-white px-3 py-1.5 rounded text-xs hover:bg-white/30 transition">
-                        Transaction History
-                      </button>
-                    </Link>
+                  <div>
+                    <p className="text-[9px] text-gray-500 font-bold uppercase">Account Number</p>
+                    <p className="text-white font-black text-lg md:text-xl tracking-widest font-mono break-all">{walletBalance.wallet.virtualAccountNumber}</p>
+                  </div>
+                  <div>
+                    <p className="text-[9px] text-gray-500 font-bold uppercase">Payee</p>
+                    <p className="text-white font-bold text-sm line-clamp-1">{walletBalance.wallet.virtualAccountName}</p>
                   </div>
                 </div>
-
-                {/* Account Details Section */}
-                {walletBalance?.wallet ? (
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                    <h3 className="font-semibold mb-3 flex items-center gap-2 text-sm">
-                      <FaCreditCard className="w-4 h-4" />
-                      Virtual Account Details
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <div className="flex items-center gap-2">
-                        <div className="bg-white/20 p-2 rounded">
-                          <FaUserCircle className="w-4 h-4 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-blue-100 text-xs">Account Name</p>
-                          <p className="text-white font-medium text-sm">
-                            {walletBalance?.wallet?.virtualAccountName || "N/A"}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <div className="bg-white/20 p-2 rounded">
-                          <FaCreditCard className="w-4 h-4 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-blue-100 text-xs">
-                            Account Number
-                          </p>
-                          <p className="text-white font-medium text-sm">
-                            {walletBalance?.wallet?.virtualAccountNumber ||
-                              "N/A"}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <div className="bg-white/20 p-2 rounded">
-                          <FaBank className="w-4 h-4 text-white" />
-                        </div>
-                        <div>
-                          <p className="text-blue-100 text-xs">Bank Name</p>
-                          <p className="text-white font-medium text-sm">
-                            {walletBalance?.wallet?.virtualBanktName || "N/A"}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center">
-                    <FaCreditCard className="w-8 h-8 text-white/60 mx-auto mb-2" />
-                    <h3 className="font-semibold text-white mb-1 text-sm">
-                      No Virtual Account
-                    </h3>
-                    <p className="text-blue-100 text-xs mb-3">
-                      Create a virtual account to receive payments
-                    </p>
-                    <button
-                      onClick={() => setShowCreateAccount(true)}
-                      className="bg-white text-blue-600 px-4 py-1.5 rounded text-sm font-medium hover:bg-blue-50 transition inline-flex items-center gap-1"
-                    >
-                      <FaPlus className="w-3 h-3" />
-                      Create Account
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Order Overview */}
-          <div className="mb-6">
-            <h2 className="text-base font-semibold text-gray-800 mb-3">
-              Orders Details
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Stats */}
-              <div className="md:col-span-1 bg-white p-4 rounded-lg shadow space-y-4">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-gray-600">
-                    Total Orders
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {dashboardData.orders.length}
-                  </p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-yellow-600">Pending</p>
-                  <p className="text-lg font-semibold text-yellow-600">
-                    {orderStatusCounts.pending}
-                  </p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-blue-600">Paid</p>
-                  <p className="text-lg font-semibold text-blue-600">
-                    {orderStatusCounts.paid}
-                  </p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-purple-600">Shipped</p>
-                  <p className="text-lg font-semibold text-purple-600">
-                    {orderStatusCounts.shipped}
-                  </p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-green-600">
-                    Delivered
-                  </p>
-                  <p className="text-lg font-semibold text-green-600">
-                    {orderStatusCounts.delivered}
-                  </p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-red-600">Cancelled</p>
-                  <p className="text-lg font-semibold text-red-600">
-                    {orderStatusCounts.cancelled}
-                  </p>
-                </div>
-              </div>
-              {/* Chart */}
-              <div className="md:col-span-2 bg-white p-4 rounded-lg shadow flex justify-center items-center">
-                <div className="w-full h-56">
-                  <Pie
-                    data={chartData}
-                    options={{ responsive: true, maintainAspectRatio: false }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Order Trend Chart */}
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-3">
-              <h2 className="text-base font-semibold text-gray-800">
-                Order Trend
-              </h2>
-              <select
-                value={timePeriod}
-                onChange={(e) => setTimePeriod(e.target.value)}
-                className="block px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-              >
-                <option value="monthly">Monthly</option>
-                <option value="weekly">Weekly</option>
-              </select>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow">
-              <div className="h-64">
-                <Line
-                  data={lineChartData}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                      legend: {
-                        display: false,
-                      },
-                    },
-                    scales: {
-                      y: { beginAtZero: true, ticks: { stepSize: 1 } },
-                    },
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Refer and Earn - Compact */}
-          <div className="bg-white rounded-lg shadow p-4 mb-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Refer & Earn
-                </p>
-                <p className="text-gray-500 text-xs mt-1">
-                  Invite friends and earn rewards!
-                </p>
-              </div>
-              <div className="p-2 bg-green-100 rounded-full">
-                <svg
-                  className="w-4 h-4 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  ></path>
-                </svg>
-              </div>
-            </div>
-            <div className="mt-3">
-              <Link
-                href="/dashboard/referrals"
-                className="text-xs text-blue-600 hover:text-blue-800"
-              >
-                Get referral link →
-              </Link>
-            </div>
-          </div>
-          {/* Recent Orders - Enhanced */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                  Recent Orders
-                </h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  Your latest purchases
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                  {dashboardData.recentOrders.length} orders
-                </span>
-              </div>
-            </div>
-
-            {dashboardData.recentOrders.length > 0 ? (
-              <div className="space-y-4">
-                {dashboardData.recentOrders.slice(0, 5).map((order, index) => (
-                  <div
-                    key={order._id}
-                    className="group p-4 rounded-lg border border-gray-200 hover:border-blue-200 hover:bg-blue-50 transition-all duration-200 cursor-pointer"
-                    onClick={() =>
-                      router.push(`/dashboard/all-orders/${order._id}`)
-                    }
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 flex-1">
-                        {/* Order Icon with Status Color */}
-                        <div
-                          className={`p-3 rounded-xl ${
-                            order.status === "delivered"
-                              ? "bg-green-100 text-green-700"
-                              : order.status === "pending"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : order.status === "paid"
-                              ? "bg-blue-100 text-blue-700"
-                              : order.status === "shipped"
-                              ? "bg-purple-100 text-purple-700"
-                              : "bg-red-100 text-red-700"
-                          }`}
-                        >
-                          <svg
-                            className="w-5 h-5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                            />
-                          </svg>
-                        </div>
-
-                        {/* Order Details */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-3 mb-1">
-                            <span className="font-semibold text-gray-900 text-sm">
-                              #{order._id.slice(-8).toUpperCase()}
-                            </span>
-                            <span
-                              className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${
-                                {
-                                  delivered: "bg-green-100 text-green-800",
-                                  pending: "bg-yellow-100 text-yellow-800",
-                                  paid: "bg-blue-100 text-blue-800",
-                                  shipped: "bg-purple-100 text-purple-800",
-                                  cancelled: "bg-red-100 text-red-800",
-                                  failed: "bg-red-100 text-red-800",
-                                }[order.status] || "bg-gray-100 text-gray-800"
-                              }`}
-                            >
-                              {order.status.charAt(0).toUpperCase() +
-                                order.status.slice(1)}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-4 text-xs text-gray-500">
-                            <span className="flex items-center gap-1">
-                              <svg
-                                className="w-3 h-3"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                />
-                              </svg>
-                              {new Date(order.createdAt).toLocaleDateString(
-                                "en-US",
-                                {
-                                  month: "short",
-                                  day: "numeric",
-                                  year: "numeric",
-                                }
-                              )}
-                            </span>
-                            {order.itemsCount && (
-                              <span className="flex items-center gap-1">
-                                <svg
-                                  className="w-3 h-3"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                                  />
-                                </svg>
-                                {order.itemsCount} items
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Order Total */}
-                        <div className="text-right">
-                          <div className="font-bold text-gray-800 text-lg">
-                            ₦
-                            {order.totalAmount.toLocaleString(undefined, {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
-                          </div>
-                          {order.paymentStatus && (
-                            <div
-                              className={`text-xs font-medium ${
-                                order.paymentStatus === "paid"
-                                  ? "text-green-600"
-                                  : "text-red-600"
-                              }`}
-                            >
-                              {order.paymentStatus.charAt(0).toUpperCase() +
-                                order.paymentStatus.slice(1)}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* View Arrow */}
-                      <div className="ml-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <svg
-                          className="w-5 h-5 text-gray-400"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-
-                    {/* Progress Bar for Processing Orders */}
-                    {order.status === "processing" && (
-                      <div className="mt-3">
-                        <div className="flex justify-between text-xs text-gray-500 mb-1">
-                          <span>Processing</span>
-                          <span>70%</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-1.5">
-                          <div className="bg-blue-600 h-1.5 rounded-full w-3/4"></div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
               </div>
             ) : (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg
-                    className="w-8 h-8 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-gray-900 font-medium mb-1">
-                  No orders yet
-                </h3>
-                <p className="text-gray-500 text-sm mb-4">
-                  Your recent orders will appear here
-                </p>
-                <Link
-                  href="/products"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors duration-200"
-                >
-                  Start Shopping
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M17 8l4 4m0 0l-4 4m4-4H3"
-                    />
-                  </svg>
-                </Link>
-              </div>
-            )}
-
-            {/* View All Link */}
-            {dashboardData.recentOrders.length > 0 && (
-              <div className="mt-6 pt-4 border-t border-gray-200">
-                <Link
-                  href="/dashboard/all-orders"
-                  className="group flex items-center justify-center gap-2 w-full py-2 text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors duration-200 bg-gray-50 hover:bg-gray-100 rounded-lg"
-                >
-                  View All Orders
-                  <svg
-                    className="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-200"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </Link>
-              </div>
+              <button onClick={() => setShowCreateAccount(true)} className="md:w-72 h-full bg-blue-600/20 border-2 border-dashed border-blue-600/40 rounded-3xl flex flex-col items-center justify-center p-8 group hover:bg-blue-600/30 transition-all">
+                <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white mb-4 shadow-lg shadow-blue-600/50"><FaPlus /></div>
+                <p className="text-white font-black text-xs uppercase tracking-widest text-center">Activate Virtual Settlement</p>
+              </button>
             )}
           </div>
-        </>
-      )}
+        </div>
 
-      {/* Fund Wallet Modal - Compact */}
-      {showFundModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-          <div className="bg-white rounded-lg p-5 w-full max-w-sm">
-            <h3 className="font-semibold mb-3">Fund Your Wallet</h3>
-            <div className="space-y-3">
-              <div className="flex flex-col gap-1">
-                <label className="text-gray-600 text-sm">Amount (₦)</label>
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="border p-2 rounded text-sm"
-                  placeholder="Enter amount"
-                  min="100"
-                />
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={handlePayment}
-                  disabled={!amount || loading || !userData?.email}
-                  className="bg-blue-600 text-white p-2 rounded flex-1 text-sm hover:bg-blue-700 transition disabled:bg-blue-300"
-                >
-                  {loading ? "Processing..." : "Pay with Paystack"}
-                </button>
-                <button
-                  onClick={() => setShowFundModal(false)}
-                  className="bg-gray-300 text-gray-700 p-2 rounded flex-1 text-sm hover:bg-gray-400 transition"
-                >
-                  Cancel
-                </button>
-              </div>
+        {/* Quick Insights */}
+        <div className="flex flex-col gap-6">
+          <div className="flex-1 bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm hover:shadow-xl hover:shadow-gray-200/50 transition-all">
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Total Spend</p>
+              <div className="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-green-600"><FaArrowDown className="w-4 h-4" /></div>
             </div>
+            <h3 className="text-3xl font-black text-gray-900 mb-2">₦{dashboardData.orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0).toLocaleString()}</h3>
+            <p className="text-gray-400 text-xs font-semibold">Accumulated across {dashboardData.orders.length} orders</p>
+          </div>
+          <Link href="/dashboard/referrals" className="flex-1 bg-blue-600 rounded-[2.5rem] p-8 shadow-lg shadow-blue-200 hover:scale-[1.02] transition-all relative overflow-hidden group text-white">
+            <div className="absolute -right-4 -bottom-4 w-32 h-32 bg-white/10 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+            <p className="text-[10px] font-black text-blue-200 uppercase tracking-[0.2em] mb-6">Affiliate Wallet</p>
+            <h3 className="text-3xl font-black mb-2 tracking-tight">Refer & Earn</h3>
+            <div className="flex items-center gap-2 text-xs font-bold text-blue-100 uppercase tracking-widest mt-4">Invite Friends <FaChevronRight className="w-2.5 h-2.5" /></div>
+          </Link>
+        </div>
+      </div>
+
+      {/* Grid: Actions & Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mb-12">
+        {/* Actions Column */}
+        <div className="lg:col-span-1 space-y-6">
+          <h2 className="text-sm font-black text-gray-900 uppercase tracking-widest flex items-center gap-2 px-2"><FaPlus className="text-blue-600" /> Key Shortcuts</h2>
+          {[
+            { href: "/", icon: <FaShoppingCart />, label: "Marketplace", color: "blue" },
+            { href: "/dashboard/track-order", icon: <FaTruck />, label: "Transit Monitor", color: "green" },
+            { href: "/dashboard/request-delivery", icon: <FaBoxOpen />, label: "Logistics Hub", color: "purple" },
+            { href: "/dashboard/inbox-support", icon: <FaCommentDots />, label: "Support Desk", color: "amber" },
+          ].map((action) => (
+            <Link key={action.href} href={action.href} className="flex items-center gap-4 bg-gray-50 hover:bg-white border border-transparent hover:border-gray-100 hover:shadow-xl hover:shadow-gray-200/50 p-5 rounded-3xl transition-all duration-300 group">
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center bg-white shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all`}>
+                {action.icon}
+              </div>
+              <span className="font-bold text-gray-700 tracking-tight">{action.label}</span>
+            </Link>
+          ))}
+        </div>
+
+        {/* Charts Column */}
+        <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm">
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">Order Distribution</h3>
+              <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{dashboardData.orders.length} TOTAL</div>
+            </div>
+            <div className="h-64 flex items-center justify-center">
+              <Pie data={chartData} options={{ maintainAspectRatio: false, plugins: { legend: { display: false } } }} />
+            </div>
+            <div className="grid grid-cols-2 gap-4 mt-8">
+              {chartData.labels.map((l, i) => (
+                <div key={l} className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: chartData.datasets[0].backgroundColor[i] }}></div>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{l}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm">
+            <div className="flex justify-between items-center mb-8">
+              <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">Growth Trend</h3>
+              <select value={timePeriod} onChange={(e) => setTimePeriod(e.target.value)} className="text-[10px] font-black uppercase bg-gray-50 border-0 rounded-lg px-3 py-1.5 focus:ring-0">
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+            <div className="h-72">
+              <Line data={lineChartData} options={{ maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Activity Table */}
+      <div className="bg-white border border-gray-100 rounded-[2.5rem] shadow-sm overflow-hidden">
+        <div className="p-10 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-gray-50">
+          <div>
+            <h2 className="text-2xl font-black text-gray-900 tracking-tight">Activity Log</h2>
+            <p className="text-gray-400 font-medium text-sm mt-1">Real-time status of your recently confirmed orders.</p>
+          </div>
+          <Link href="/dashboard/all-orders" className="bg-gray-50 text-gray-900 px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-100 transition-all">View All Orders</Link>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-gray-50/50">
+                <th className="px-10 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Hash</th>
+                <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Timestamp</th>
+                <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Financials</th>
+                <th className="px-6 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Status</th>
+                <th className="px-10 py-5 text-right"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {dashboardData.recentOrders.length > 0 ? dashboardData.recentOrders.map((order) => (
+                <tr key={order._id} className="hover:bg-gray-50/30 transition-colors group cursor-pointer" onClick={() => router.push(`/dashboard/all-orders`)}>
+                  <td className="px-10 py-6">
+                    <span className="font-black text-gray-900 tracking-tighter">#{order._id.slice(-8).toUpperCase()}</span>
+                  </td>
+                  <td className="px-6 py-6">
+                    <span className="text-xs font-bold text-gray-500">{format(new Date(order.createdAt), "MMM d, yyyy")}</span>
+                  </td>
+                  <td className="px-6 py-6">
+                    <span className="text-sm font-black text-gray-900">₦{order.totalAmount.toLocaleString()}</span>
+                  </td>
+                  <td className="px-6 py-6">
+                    <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${
+                      order.status === "delivered" ? "bg-green-50 text-green-700 border-green-200" :
+                      order.status === "pending" ? "bg-amber-50 text-amber-700 border-amber-200" :
+                      "bg-blue-50 text-blue-700 border-blue-200"
+                    }`}>
+                      {order.status}
+                    </span>
+                  </td>
+                  <td className="px-10 py-6 text-right">
+                    <FaChevronRight className="w-3 h-3 text-gray-300 group-hover:text-blue-600 transition-colors ml-auto" />
+                  </td>
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan="5" className="px-10 py-20 text-center">
+                    <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-gray-200"><FaBoxOpen className="text-3xl" /></div>
+                    <p className="text-gray-400 font-bold uppercase text-xs tracking-widest">No Recent Activity</p>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Fund Modal */}
+      {showFundModal && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowFundModal(false)}></div>
+          <div className="bg-white rounded-[2.5rem] p-10 max-w-md w-full relative z-10 shadow-2xl">
+            <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Fund Wallet</h2>
+            <p className="text-gray-500 font-medium mb-8">Enter the amount to inject into your wallet.</p>
+            <div className="relative mb-8">
+              <span className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-black text-gray-900">₦</span>
+              <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className="w-full bg-gray-50 border-0 rounded-2xl p-6 pl-14 text-2xl font-black focus:ring-2 focus:ring-blue-600 transition-all placeholder:text-gray-200" />
+            </div>
+            <button onClick={handlePayment} className="w-full bg-gray-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-gray-200 hover:bg-black transition-all">Execute Payment</button>
           </div>
         </div>
       )}
 
-      {/* Create Virtual Account Modal - Compact */}
+      {/* Create Account Modal */}
       {showCreateAccount && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-          <div className="bg-white rounded-lg p-5 w-full max-w-sm">
-            <h3 className="font-semibold mb-3">Create Virtual Account</h3>
-            <p className="mb-3 text-gray-600 text-sm">
-              Create a virtual account to easily fund your wallet and receive
-              payments.
-            </p>
-            <form onSubmit={handleCreateAccount}>
-              <div className="flex flex-col gap-1 mb-3">
-                <label className="text-gray-600 text-sm">NIN</label>
-                <input
-                  onChange={(e) => setNin(e.target.value)}
-                  value={nin}
-                  className="border p-2 rounded text-sm"
-                  type="text"
-                  placeholder="Enter your NIN"
-                  required
-                />
-              </div>
-              <div className="flex gap-2">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="bg-gray-800 text-white p-2 rounded flex-1 text-sm hover:bg-gray-700 transition disabled:bg-gray-400"
-                >
-                  {loading ? "Creating..." : "Create Account"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowCreateAccount(false)}
-                  className="bg-gray-300 text-gray-700 p-2 rounded flex-1 text-sm hover:bg-gray-400 transition"
-                >
-                  Cancel
-                </button>
-              </div>
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowCreateAccount(false)}></div>
+          <div className="bg-white rounded-[2.5rem] p-10 max-w-md w-full relative z-10 shadow-2xl">
+            <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">KYC Activation</h2>
+            <p className="text-gray-500 font-medium mb-8">Provide your NIN to generate a secure virtual settlement account.</p>
+            <form onSubmit={handleCreateAccount} className="space-y-6">
+              <input type="text" value={nin} onChange={(e) => setNin(e.target.value)} placeholder="Enter 11-digit NIN" className="w-full bg-gray-50 border-0 rounded-2xl p-6 text-lg font-bold focus:ring-2 focus:ring-blue-600 transition-all placeholder:text-gray-200" required />
+              <button type="submit" className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all">Generate Account</button>
             </form>
           </div>
         </div>
       )}
-
-      {/* Bottom Navigation for Mobile - Compact */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 md:hidden z-40">
-        <div className="flex justify-around items-center h-14">
-          <Link
-            href="/dashboard"
-            className="flex flex-col items-center justify-center text-gray-600 hover:text-blue-600 text-xs"
-          >
-            <FaHome className="w-5 h-5 mb-1" />
-            <span>Home</span>
-          </Link>
-          <Link
-            href="/dashboard/inbox-support"
-            className="flex flex-col items-center justify-center text-gray-600 hover:text-blue-600 text-xs"
-          >
-            <FaCommentDots className="w-5 h-5 mb-1" />
-            <span>Chat</span>
-          </Link>
-          <Link
-            href="/dashboard/request-delivery"
-            className="flex flex-col items-center justify-center text-gray-600 hover:text-blue-600 text-xs"
-          >
-            <FaTruck className="w-5 h-5 mb-1" />
-            <span>Delivery</span>
-          </Link>
-          <Link
-            href="/dashboard/all-orders"
-            className="flex flex-col items-center justify-center text-gray-600 hover:text-blue-600 text-xs"
-          >
-            <FaBoxOpen className="w-5 h-5 mb-1" />
-            <span>Orders</span>
-          </Link>
-          <Link
-            href="/dashboard/personal-details"
-            className="flex flex-col items-center justify-center text-gray-600 hover:text-blue-600 text-xs"
-          >
-            <FaUser className="w-5 h-5 mb-1" />
-            <span>Me</span>
-          </Link>
-        </div>
-      </div>
     </div>
   );
 };

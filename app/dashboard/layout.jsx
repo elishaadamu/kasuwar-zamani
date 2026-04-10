@@ -10,8 +10,11 @@ import { apiUrl, API_CONFIG } from "@/configs/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "@/components/dashboard/Sidebar";
+import { useAppContext } from "@/context/AppContext";
+import Loading from "@/components/Loading";
 
 const DashboardLayout = ({ children }) => {
+  const { logout } = useAppContext();
   const router = useRouter();
   const pathname = usePathname();
   const [openOrders, setOpenOrders] = useState(false);
@@ -38,9 +41,10 @@ const DashboardLayout = ({ children }) => {
   }, [router, pathname]);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    router.push("/");
+    logout();
   };
+
+  if (!isUserChecked) return <Loading fullScreen={true} />;
 
   return (
     <div className="min-h-screen bg-gray-100">

@@ -6,6 +6,7 @@ import { useAppContext } from "@/context/AppContext"
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { FiSearch, FiMessageCircle, FiArrowLeft, FiUser } from 'react-icons/fi'
+import Loading from '@/components/Loading'
 
 export default function ChatListPage() {
   const router = useRouter()
@@ -86,11 +87,7 @@ export default function ChatListPage() {
 
   // Show loading or nothing while checking auth
   if (!userData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
-      </div>
-    )
+    return <Loading />
   }
 
   const getOtherPartyName = (conversation) => {
@@ -186,19 +183,7 @@ export default function ChatListPage() {
       {/* Chat List */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
-          <div className="space-y-4">
-            {[1, 2, 3, 4].map(i => (
-              <div key={i} className="bg-white rounded-2xl shadow-sm p-6 animate-pulse">
-                <div className="flex items-center space-x-4">
-                  <div className="w-14 h-14 bg-gray-200 rounded-full"></div>
-                  <div className="flex-1 space-y-3">
-                    <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                    <div className="h-3 bg-gray-200 rounded w-3/4"></div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <Loading />
         ) : filteredConversations.length === 0 ? (
           <div className="text-center py-20">
             <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">

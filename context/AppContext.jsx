@@ -29,6 +29,7 @@ export const AppContextProvider = (props) => {
   const isLoggedIn = !!userData; // Derive isLoggedIn from userData
   const [states] = useState(statesData.state || []);
   const [lgas, setLgas] = useState([]);
+  const [showSessionExpired, setShowSessionExpired] = useState(false);
 
   const [cartItems, setCartItems] = useState(() => {
     if (typeof window !== "undefined") {
@@ -140,7 +141,6 @@ export const AppContextProvider = (props) => {
     }
   };
   const logout = () => {
-    // Clear user-specific localStorage keys before removing user data
     if (typeof window !== "undefined" && userData) {
       const userId = userData._id || userData.id;
       if (userId) {
@@ -149,18 +149,26 @@ export const AppContextProvider = (props) => {
       }
     }
     localStorage.removeItem("user");
-    axios.post(
-      apiUrl(API_CONFIG.ENDPOINTS.AUTH.LOGOUT),
-      {},
-      { withCredentials: true }
-    );
+    axios.post(apiUrl(API_CONFIG.ENDPOINTS.AUTH.LOGOUT), {}, { withCredentials: true });
     setUserData(null);
-    setCartItems({}); // Clear cart on logout
-    setWishlistItems([]); // Clear wishlist on logout
-    setFollowingList([]); // Clear following list on logout
-    // It's better to show toast notifications in the component that calls logout.
-    router.push("/"); // Redirect to the homepage
+    setCartItems({});
+    setWishlistItems([]);
+    setFollowingList([]);
+    setShowSessionExpired(false);
+    window.location.href = "/"; // Force a full reload to clear all states
   };
+
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      setShowSessionExpired(true);
+      // Automatically clear data but keep the modal visible
+      localStorage.removeItem("user");
+      setUserData(null);
+    };
+
+    window.addEventListener("session-expired", handleSessionExpired);
+    return () => window.removeEventListener("session-expired", handleSessionExpired);
+  }, []);
 
   const fetchLgas = (stateName) => {
     if (!stateName) return;
@@ -437,6 +445,28 @@ export const AppContextProvider = (props) => {
   };
 
   return (
-    <AppContext.Provider value={value}>{props.children}</AppContext.Provider>
+    <AppContext.Provider value={value}>
+      {props.children}
+      {showSessionExpired && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { setShowSessionExpired(false); router.push("/signin"); }}></div>
+          <div className="bg-white rounded-[2.5rem] p-10 max-w-md w-full relative z-10 shadow-2xl text-center">
+            <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-500">
+              <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h2 className="text-3xl font-black text-gray-900 mb-3 tracking-tight">Session Expired</h2>
+            <p className="text-gray-500 font-medium mb-8 leading-relaxed">Your session has timed out for security reasons. Please sign in again to continue managing your account.</p>
+            <button
+              onClick={() => { setShowSessionExpired(false); router.push("/signin"); }}
+              className="w-full bg-gray-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-gray-200 hover:bg-black transition-all"
+            >
+              Back to Sign In
+            </button>
+          </div>
+        </div>
+      )}
+    </AppContext.Provider>
   );
 };

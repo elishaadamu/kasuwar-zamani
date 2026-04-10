@@ -218,10 +218,10 @@ const PersonalDetails = () => {
     }
   };
 
-  if (pageLoading || authLoading) {
-    // Show loading if auth is still in progress
+  if (pageLoading) {
     return <Loading />;
   }
+
 
   return (
     <div className="max-w-4xl mx-auto">

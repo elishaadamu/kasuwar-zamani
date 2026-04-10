@@ -10,6 +10,8 @@ import { apiUrl, API_CONFIG } from "@/configs/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "@/components/delivery-dashboard/Sidebar";
+import { useAppContext } from "@/context/AppContext";
+import Loading from "@/components/Loading";
 
 const WalletNotification = ({ onDismiss }) => (
   <div className="fixed top-4 right-4 w-1/2 md:w-[350px] bg-yellow-200 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-lg shadow-lg z-50 flex justify-between items-center">
@@ -46,6 +48,7 @@ const WalletNotification = ({ onDismiss }) => (
 );
 
 const DashboardLayout = ({ children }) => {
+  const { logout } = useAppContext();
   const router = useRouter();
   const pathname = usePathname();
   const [openSettings, setOpenSettings] = useState(false);
@@ -84,14 +87,14 @@ const DashboardLayout = ({ children }) => {
   }, [userData]);
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    console.log("Logging out and redirecting to homepage...");
-    router.push("/");
+    logout();
   };
 
   const handleDismissNotification = () => {
     setShowWalletNotification(false);
   };
+
+  if (!userData) return <Loading fullScreen={true} />;
 
   return (
     <div className="min-h-screen bg-gray-100">

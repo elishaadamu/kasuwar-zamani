@@ -4,6 +4,7 @@ import axios from "axios";
 import { decryptData } from "@/lib/encryption";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import { message } from "antd";
+import Loading from "@/components/Loading";
 
 const WithdrawalRequestPage = () => {
   const [withdrawals, setWithdrawals] = useState([]);
@@ -211,7 +212,7 @@ const WithdrawalRequestPage = () => {
       <section className="mb-8">
         <h2 className="text-xl font-medium mb-3">Withdrawal History</h2>
         {loadingWithdrawals ? (
-          <div className="p-6 text-center">Loading withdrawals...</div>
+          <Loading />
         ) : withdrawals.length === 0 ? (
           <div className="p-4 bg-white shadow rounded">
             No withdrawal records found.

@@ -6,11 +6,12 @@ import axios from "axios";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { AppContext } from "@/context/AppContext";
+import { useAppContext } from "@/context/AppContext";
+import Loading from "@/components/Loading";
 
 const SubscriptionPaymentContent = () => {
   const router = useRouter();
-  const { userData, isLoggedIn, authLoading } = useContext(AppContext);
+  const { userData, isLoggedIn, authLoading } = useAppContext();
   const searchParams = useSearchParams();
   const [subscriptionPlan, setSubscriptionPlan] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,9 +22,6 @@ const SubscriptionPaymentContent = () => {
 
   useEffect(() => {
     // Wait for the initial authentication check to complete
-    if (authLoading) {
-      return;
-    }
 
     if (!isLoggedIn || userData?.role !== "vendor") {
       toast.error("Access Denied. Only vendors can subscribe. Redirecting...", {
@@ -112,7 +110,7 @@ const SubscriptionPaymentContent = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <Loading />
           <p className="mt-4 text-gray-600">Verifying access...</p>
         </div>
         <ToastContainer
@@ -128,7 +126,7 @@ const SubscriptionPaymentContent = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <Loading />
           <p className="mt-4 text-gray-600">Loading payment details...</p>
         </div>
       </div>
@@ -266,7 +264,7 @@ const SubscriptionPaymentContent = () => {
 
 const SubscriptionPayment = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loading />}>
       <SubscriptionPaymentContent />
     </Suspense>
   );

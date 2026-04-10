@@ -4,6 +4,7 @@ import axios from "axios";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import { ToastContainer, toast } from "react-toastify";
 import { useAppContext } from "@/context/AppContext";
+import Script from "next/script";
 import "react-toastify/dist/ReactToastify.css";
 
 const Wallet = () => {
@@ -13,21 +14,25 @@ const Wallet = () => {
   const [amount, setAmount] = useState("");
   const { userData, authLoading } = useAppContext();
 
-  const handlePayment = async () => {
-    const PaystackPop = (await import("@paystack/inline-js")).default;
-    const paystack = new PaystackPop();
-    paystack.newTransaction({
-      key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
-      email: user?.email,
-      amount: amount * 100, // Convert to kobo
-      ref: new Date().getTime().toString(),
-      onSuccess: (transaction) => {
-        onSuccess(transaction);
-      },
-      onCancel: () => {
-        onClose();
-      },
-    });
+  const handlePayment = () => {
+    if (!amount || amount < 100) { toast.error("Minimum ₦100 required"); return; }
+    
+    if (window.PaystackPop) {
+      new window.PaystackPop().newTransaction({
+        key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
+        email: user?.email,
+        amount: amount * 100, // Convert to kobo
+        ref: new Date().getTime().toString(),
+        onSuccess: (transaction) => {
+          onSuccess(transaction);
+        },
+        onCancel: () => {
+          onClose();
+        },
+      });
+    } else {
+      toast.error("Payment layer is initializing. Please retry in a moment.");
+    }
   };
 
   useEffect(() => {
@@ -85,6 +90,10 @@ const Wallet = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
       <ToastContainer />
+      <Script 
+        src="https://js.paystack.co/v2/inline.js" 
+        strategy="lazyOnload"
+      />
       {loading || authLoading ? (
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
       ) : accountDetails ? (

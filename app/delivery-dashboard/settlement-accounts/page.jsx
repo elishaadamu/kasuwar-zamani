@@ -15,13 +15,7 @@ const SettlementAccounts = () => {
   const bankAccount = userData?.user;
   console.log(userData);
 
-  if (authLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
-      </div>
-    );
-  }
+
 
   if (!userData) {
     router.push("/delivery-signin");

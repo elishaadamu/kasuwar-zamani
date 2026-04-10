@@ -16,6 +16,8 @@ const outfit = Outfit({
   variable: "--font-outfit",
 });
 
+import ClientLayout from "@/components/ClientLayout";
+
 export default function RootLayout({ children }) {
   const pathname = usePathname();
   const isSpecialRoute =
@@ -36,9 +38,9 @@ export default function RootLayout({ children }) {
       <body className={`${outfit.variable} antialiased text-gray-700 font-sans`}>
         <ToastContainer />
         <AppContextProvider>
-          {!isSpecialRoute && <Navbar />} {/* Conditionally render Navbar */}
-          {children}
-          {!isSpecialRoute && <Footer />} {/* Conditionally render Footer */}
+          <ClientLayout isSpecialRoute={isSpecialRoute}>
+            {children}
+          </ClientLayout>
         </AppContextProvider>
         
         <Script src="https://cdn.botpress.cloud/webchat/v3.5/inject.js" strategy="lazyOnload"></Script>

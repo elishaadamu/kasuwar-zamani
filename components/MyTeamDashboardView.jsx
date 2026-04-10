@@ -6,6 +6,7 @@ import { useAppContext } from "@/context/AppContext";
 import { FaUserTie, FaUsers, FaSpinner, FaLayerGroup, FaUserPlus, FaTimes, FaExchangeAlt, FaWallet, FaChartLine, FaPlusCircle, FaChevronRight, FaArrowRight, FaBox, FaStore, FaUserCheck, FaTruck, FaClipboardList, FaBriefcase, FaIdBadge } from "react-icons/fa";
 import { useRouter, usePathname } from "next/navigation";
 import { toast } from "react-toastify";
+import Loading from "@/components/Loading";
 
 const MetricCard = ({ icon, title, value, bg }) => (
     <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex items-center gap-4 hover:shadow-md transition-shadow">
@@ -530,11 +531,7 @@ const MyTeamDashboardView = ({ teamId }) => {
     };
 
     if (loading) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <FaSpinner className="animate-spin text-4xl text-blue-600" />
-            </div>
-        );
+        return <Loading />;
     }
 
     if (!dashboardData) {

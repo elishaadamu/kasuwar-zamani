@@ -6,6 +6,7 @@ import { useAppContext } from "@/context/AppContext"
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { FiArrowLeft, FiSend, FiMessageCircle } from 'react-icons/fi'
+import Loading from "@/components/Loading";
 
 export default function ChatPage() {
   const params = useParams()
@@ -96,22 +97,11 @@ export default function ChatPage() {
 
   // Show loading or nothing while checking auth
   if (!userData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
-      </div>
-    )
+    return <Loading />;
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto"></div>
-          <p className="mt-4 text-gray-600 font-medium">Loading conversation...</p>
-        </div>
-      </div>
-    )
+    return <Loading />;
   }
 
   if (!conversation) {

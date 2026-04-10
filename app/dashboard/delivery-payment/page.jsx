@@ -5,6 +5,7 @@ import { decryptData } from "@/lib/encryption";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import PinInput from "@/components/PinInput";
 import { message } from "antd";
+import Loading from "@/components/Loading";
 
 const DeliveryPaymentPage = () => {
   const [requests, setRequests] = useState([]);
@@ -180,7 +181,7 @@ const DeliveryPaymentPage = () => {
       </h1>
 
       {loading ? (
-        <div className="p-8 text-center">Loading...</div>
+        <Loading />
       ) : fetchError ? (
         <div className="p-4 text-red-600">{fetchError}</div>
       ) : requests.length === 0 ? (

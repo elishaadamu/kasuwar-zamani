@@ -1,130 +1,96 @@
 "use client";
-import React, { useState, useEffect, useContext } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import axios from "axios";
-import { apiUrl, API_CONFIG } from "@/configs/api";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import React, { useState, useEffect } from "react";
 import { useAppContext } from "@/context/AppContext";
-import { AiFillBank } from "react-icons/ai";
+import { useRouter, usePathname } from "next/navigation";
+import axios from "axios";
+import { API_CONFIG, apiUrl } from "@/configs/api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Loading from "@/components/Loading";
+import Link from "next/link";
+import {
+  FaHome,
+  FaCommentDots,
+  FaTruck,
+  FaBoxOpen,
+  FaUser,
+  FaWallet,
+  FaTasks,
+  FaHistory,
+  FaCheckCircle,
+  FaClock,
+  FaChevronRight,
+  FaMapMarkerAlt,
+  FaArrowRight,
+} from "react-icons/fa";
 
 const DashboardHome = () => {
   const { userData, authLoading } = useAppContext();
   const router = useRouter();
+  const pathname = usePathname();
   const [dashboardData, setDashboardData] = useState({
     userName: "",
     newTasks: [],
     ongoingTasks: [],
     completedTasks: [],
+    totalOrders: 0,
   });
   const [loading, setLoading] = useState(true);
   const [walletBalance, setWalletBalance] = useState(0);
   const [hasWallet, setHasWallet] = useState(false);
   const [activeTab, setActiveTab] = useState("new");
 
-  // Support two possible shapes: either userData is the user object or it has a `user` property
   const currentUser = userData?.user ?? userData;
 
   useEffect(() => {
-    // Only attempt to fetch when we have a user id available
-    if (!currentUser?._id) return;
-
-    setLoading(true);
-    const fetchBalance = async () => {
-      try {
-        const response = await axios.get(
-          apiUrl(
-            `${API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance}${currentUser._id}/balance`
-          ),
-          {
-            withCredentials: true,
-          }
-        );
-        console.log(response);
-        setWalletBalance(response.data.data.balance);
-        setHasWallet(true);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBalance();
-  }, [currentUser]);
-
-  useEffect(() => {
     const fetchDashboardData = async () => {
-      if (authLoading) return; // Wait for user data to be loaded
-
+      if (authLoading) return;
       if (!userData) {
         router.push("/delivery-signin");
         return;
       }
-
       setLoading(true);
       try {
-        // Fetch tasks and wallet balance in parallel
         const [tasksResponse, walletResponse] = await Promise.all([
-          axios.get(
-            apiUrl(
-              `${API_CONFIG.ENDPOINTS.DELIVERY.GET_TASKS_BY_DELIVERY_PERSON}/${currentUser._id}`
-            )
-          ),
-          axios.get(
-            apiUrl(
-              `${API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance}${currentUser._id}/balance`
-            )
-          ),
+          axios.get(apiUrl(`${API_CONFIG.ENDPOINTS.DELIVERY.GET_TASKS_BY_DELIVERY_PERSON}/${currentUser._id}`)),
+          axios.get(apiUrl(`${API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance}${currentUser._id}/balance`)),
         ]);
-
+        
         const tasks = tasksResponse.data.data || [];
-        if (walletResponse.data.data.balance !== undefined) {
+        if (walletResponse.data.data) {
           setWalletBalance(walletResponse.data.data.balance);
           setHasWallet(true);
         }
 
         setDashboardData({
-          userName: userData.firstName,
+          userName: currentUser.firstName,
           newTasks: tasks.filter((task) => task.status === "pending"),
-          ongoingTasks: tasks.filter(
-            (task) =>
-              task.status === "assigned" || task.status === "on delivery"
-          ),
-          completedTasks: tasks.filter(
-            (task) => task.status === "completed" || task.status === "canceled"
-          ),
+          ongoingTasks: tasks.filter((task) => task.status === "assigned" || task.status === "on delivery"),
+          completedTasks: tasks.filter((task) => task.status === "completed" || task.status === "canceled"),
+          totalOrders: tasks.length,
         });
       } catch (error) {
-        console.error("Error fetching dashboard data:", error);
-        if (error.response?.status === 404) {
-          setHasWallet(false);
-        } else {
-          toast.error("Failed to load dashboard data.");
-        }
+        if (error.response?.status === 404) setHasWallet(false);
+        else console.error("Failed to load dashboard data.", error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchDashboardData();
-  }, [userData, authLoading, router]);
+  }, [userData, authLoading, router, currentUser?._id]);
 
   const handleCreateWallet = async () => {
     setLoading(true);
     try {
       if (!currentUser?._id) {
-        toast.error("Unable to create wallet: user not found.");
+        toast.error("Unable to create wallet.");
         return;
       }
-
-      const response = await axios.post(
-        apiUrl(API_CONFIG.ENDPOINTS.DELIVERY.CREATE_WALLET + currentUser._id)
-      );
-      console.log(response);
+      await axios.post(apiUrl(API_CONFIG.ENDPOINTS.DELIVERY.CREATE_WALLET + currentUser._id));
       toast.success("Wallet created successfully!");
+      setHasWallet(true);
+      window.location.reload();
     } catch (error) {
-      console.log(error);
       toast.error(error.response?.data?.message || "Failed to create wallet.");
     } finally {
       setLoading(false);
@@ -133,428 +99,253 @@ const DashboardHome = () => {
 
   const handleTaskUpdate = async (taskId, status) => {
     try {
-      await axios.put(
-        apiUrl(`${API_CONFIG.ENDPOINTS.DELIVERY.UPDATE_TASK_STATUS}/${taskId}`),
-        { status }
-      );
+      await axios.put(apiUrl(`${API_CONFIG.ENDPOINTS.DELIVERY.UPDATE_TASK_STATUS}/${taskId}`), { status });
       toast.success(`Task status updated to ${status}`);
-      // Refetch data to update UI
-      // A more optimized approach would be to update the state locally
-      const refetchTasks = async () => {
-        const tasksResponse = await axios.get(
-          apiUrl(
-            `${API_CONFIG.ENDPOINTS.DELIVERY.GET_TASKS_BY_DELIVERY_PERSON}/${userData.id}`
-          )
-        );
-        const tasks = tasksResponse.data.data || [];
-        setDashboardData((prev) => ({
-          ...prev,
-          newTasks: tasks.filter((task) => task.status === "pending"),
-          ongoingTasks: tasks.filter(
-            (task) =>
-              task.status === "assigned" || task.status === "on delivery"
-          ),
-          completedTasks: tasks.filter(
-            (task) => task.status === "completed" || task.status === "canceled"
-          ),
-        }));
-      };
-      refetchTasks();
+      router.refresh(); // Or fetch data again
     } catch (error) {
-      console.error("Error updating task status:", error);
       toast.error("Failed to update task status.");
     }
   };
 
   const renderTaskCard = (task) => (
-    <div key={task._id} className="bg-gray-50 p-4 rounded-lg border">
-      <div className="flex justify-between items-start">
-        <div>
-          <p className="font-bold text-lg">
-            Delivery ID: #{task._id.slice(-6)}
-          </p>
-          <p className="text-sm text-gray-500">Type: {task.deliveryType}</p>
-        </div>
-        <p className="font-bold text-lg text-green-600">
-          ₦
-          {task.price.toLocaleString(undefined, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          })}
-        </p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-        <div>
-          <h4 className="font-semibold">Pickup</h4>
-          <p>{task.pickupAddress.address}</p>
-          <p className="text-sm text-gray-600">
-            {task.pickupAddress.lga}, {task.pickupAddress.state}
-          </p>
-          <p className="text-sm text-gray-500">
-            Notable Location: {task.pickupAddress.notableLocation}
-          </p>
-        </div>
-        <div>
-          <h4 className="font-semibold">Drop-off</h4>
-          <p>{task.dropoffAddress.address}</p>
-          <p className="text-sm text-gray-600">
-            {task.dropoffAddress.lga}, {task.dropoffAddress.state}
-          </p>
-          <p className="text-sm text-gray-500">
-            Notable Location: {task.dropoffAddress.notableLocation}
-          </p>
-        </div>
-      </div>
-      {(task.status === "assigned" || task.status === "on delivery") &&
-        task.customerDetails && (
-          <div className="mt-4 pt-4 border-t">
-            <h4 className="font-semibold">Customer Details</h4>
-            <p>Name: {task.customerDetails.name}</p>
-            <p>Contact: {task.customerDetails.phone}</p>
+    <div key={task._id} className="group bg-white rounded-[2rem] border border-gray-100 p-6 hover:shadow-2xl hover:shadow-blue-900/5 transition-all duration-500 mb-4 overflow-hidden relative">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-gray-50 rounded-full -mr-16 -mt-16 group-hover:bg-blue-50 transition-colors"></div>
+      
+      <div className="flex justify-between items-start gap-4 mb-6 relative z-10">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 bg-gray-900 text-white rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 duration-500">
+            <FaBoxOpen className="w-6 h-6" />
           </div>
-        )}
-      <div className="mt-4 flex gap-2 flex-wrap">
+          <div>
+            <h4 className="text-lg font-black text-gray-900 tracking-tight">#{task._id.slice(-8).toUpperCase()}</h4>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="text-[10px] uppercase font-black text-blue-600 tracking-wider bg-blue-50 px-2.5 py-1 rounded-lg">{(task.deliveryType || 'Standard').toUpperCase()}</span>
+              <span className={`text-[10px] uppercase font-black tracking-wider px-2.5 py-1 rounded-lg ${task.status === 'on delivery' ? 'bg-indigo-50 text-indigo-600' : 'bg-gray-50 text-gray-400'}`}>
+                {task.status}
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="text-right">
+          <p className="text-[10px] font-black text-gray-300 uppercase tracking-widest mb-1">Earning</p>
+          <p className="text-2xl font-black text-gray-900 tracking-tight">₦{(task.price || 0).toLocaleString()}</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 relative z-10">
+        <div className="space-y-2">
+          <p className="text-[10px] uppercase font-black text-gray-400 tracking-[0.2em] flex items-center gap-2">
+            <div className="w-2 h-2 bg-blue-500 rounded-full"></div> Pickup
+          </p>
+          <p className="text-sm font-bold text-gray-700 leading-relaxed">{task.pickupAddress?.address}, {task.pickupAddress?.lga}</p>
+        </div>
+        <div className="space-y-2">
+          <p className="text-[10px] uppercase font-black text-gray-400 tracking-[0.2em] flex items-center gap-2">
+            <div className="w-2 h-2 bg-emerald-500 rounded-full"></div> Destination
+          </p>
+          <p className="text-sm font-bold text-gray-700 leading-relaxed">{task.dropoffAddress?.address}, {task.dropoffAddress?.lga}</p>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap gap-3 pt-6 border-t border-gray-50 relative z-10">
         {task.status === "pending" && (
           <>
-            <button
-              onClick={() => handleTaskUpdate(task._id, "assigned")}
-              className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
-            >
-              Accept
-            </button>
-            <button
-              onClick={() => handleTaskUpdate(task._id, "rejected")}
-              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-            >
-              Reject
-            </button>
+            <button onClick={() => handleTaskUpdate(task._id, "assigned")} className="flex-1 bg-blue-600 text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95">Accept Assignment</button>
+            <button onClick={() => handleTaskUpdate(task._id, "rejected")} className="px-8 bg-gray-50 text-gray-500 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest hover:bg-red-50 hover:text-red-600 transition-all">Decline</button>
           </>
         )}
         {task.status === "assigned" && (
-          <button
-            onClick={() => handleTaskUpdate(task._id, "on delivery")}
-            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-          >
-            Start Delivery
-          </button>
+          <button onClick={() => handleTaskUpdate(task._id, "on delivery")} className="w-full bg-indigo-600 text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95">Initiate Journey</button>
         )}
         {task.status === "on delivery" && (
-          <button
-            onClick={() => handleTaskUpdate(task._id, "completed")}
-            className="bg-purple-500 text-white px-3 py-1 rounded hover:bg-purple-600"
-          >
-            Mark as Completed
-          </button>
+          <button onClick={() => handleTaskUpdate(task._id, "completed")} className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-emerald-100 hover:bg-emerald-700 transition-all active:scale-95">Mark as Delivered</button>
         )}
-        {task.status !== "completed" && task.status !== "canceled" && (
-          <button
-            onClick={() => handleTaskUpdate(task._id, "canceled")}
-            className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600"
-          >
-            Cancel Task
-          </button>
-        )}
-        <span
-          className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-            task.status === "completed"
-              ? "bg-green-100 text-green-800"
-              : task.status === "pending"
-              ? "bg-yellow-100 text-yellow-800"
-              : "bg-gray-100 text-gray-800"
-          }`}
-        >
-          {task.status}
-        </span>
       </div>
     </div>
   );
 
-  const renderTasks = (tasks) => {
-    if (tasks.length === 0) {
-      return (
-        <p className="text-gray-500 text-center py-8">
-          No tasks in this category.
-        </p>
-      );
-    }
-    return <div className="space-y-4">{tasks.map(renderTaskCard)}</div>;
-  };
+  if (loading || authLoading) return <Loading fullScreen={false} />;
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32 pt-4">
       <ToastContainer />
-      {loading || authLoading ? (
-        <div className="flex justify-center items-center min-h-screen">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+
+      {/* Modern Header */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+        <div>
+          <span className="text-blue-600 font-black text-[10px] uppercase tracking-[0.4em] mb-2 block">
+            Logistics Command Center
+          </span>
+          <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">
+            Bonjour, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">{dashboardData.userName}</span>
+          </h1>
+          <p className="mt-3 text-gray-500 font-medium text-lg">
+            Awaiting your next move. {dashboardData.newTasks.length} opportunities ready.
+          </p>
         </div>
-      ) : (
-        <>
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Welcome back, {currentUser?.firstName || ""}!
-            </h1>
-            <p className="mt-2 text-gray-600">
-              Here's what's happening with your deliveries today.
+        <div className="flex items-center gap-4">
+           <div className="bg-gray-100 p-4 rounded-3xl flex items-center gap-3">
+             <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+             <span className="text-xs font-black text-gray-700 uppercase tracking-widest">Active Status</span>
+           </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* Earnings & Stats Hub */}
+        <div className="lg:col-span-2 space-y-8">
+          
+          {hasWallet ? (
+            <div className="bg-gray-900 rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 relative overflow-hidden group shadow-2xl shadow-blue-900/20 text-white">
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px] -mr-40 -mt-20 group-hover:scale-110 transition-transform duration-1000"></div>
+              
+              <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-10">
+                <div className="flex-1">
+                  <p className="text-blue-400 font-black text-[10px] uppercase tracking-[0.3em] mb-4">Total Revenue Pot</p>
+                  <h2 className="text-4xl md:text-7xl font-black tracking-tighter mb-10 flex items-baseline gap-2 truncate">
+                    <span className="text-blue-500 text-3xl">₦</span>
+                    {walletBalance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                  </h2>
+                  <div className="flex gap-4">
+                    <button onClick={() => router.push('/delivery-dashboard/wallet')} className="bg-white text-gray-900 px-10 py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-xl hover:scale-105 active:scale-95 transition-all">Withdraw</button>
+                    <button onClick={() => router.push('/delivery-dashboard/withdrawal-history')} className="bg-white/10 text-white border border-white/20 px-8 py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] backdrop-blur-sm hover:bg-white/20 transition-all">History</button>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/5 border border-white/10 p-5 md:p-6 rounded-[2rem] md:rounded-[2.5rem] backdrop-blur-md">
+                    <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Ongoing</p>
+                    <p className="text-3xl font-black">{dashboardData.ongoingTasks.length}</p>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 p-5 md:p-6 rounded-[2rem] md:rounded-[2.5rem] backdrop-blur-md">
+                    <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Success</p>
+                    <p className="text-3xl font-black">{dashboardData.completedTasks.length}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-gray-50 rounded-[3rem] p-16 text-center border-2 border-dashed border-gray-200">
+               <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl shadow-gray-200/50">
+                <FaWallet className="w-10 h-10 text-blue-500" />
+              </div>
+              <h3 className="text-3xl font-black text-gray-900 mb-2">Initialize Wallet</h3>
+              <p className="text-gray-500 font-medium max-w-sm mx-auto mb-10 leading-relaxed text-lg">Setup your secure digital wallet to start receiving payments for successful deliveries instantly.</p>
+              <button onClick={handleCreateWallet} className="bg-gray-900 text-white px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.3em] shadow-2xl hover:bg-black transition-all">Create Account</button>
+            </div>
+          )}
+
+          {/* Activity Section */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between px-2">
+              <div className="flex bg-gray-100 p-1.5 rounded-2xl w-fit">
+                {["new", "ongoing", "completed"].map((tab) => (
+                  <button
+                    key={tab}
+                    onClick={() => setActiveTab(tab)}
+                    className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
+                      activeTab === tab 
+                        ? "bg-white text-gray-900 shadow-md" 
+                        : "text-gray-400 hover:text-gray-600"
+                    }`}
+                  >
+                    {tab === "new" ? "New Invites" : tab === "ongoing" ? "Active Journeys" : "History"}
+                  </button>
+                ))}
+              </div>
+              <Link href="/delivery-dashboard/delivery" className="hidden md:flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-blue-600 hover:gap-3 transition-all">
+                All Assignments <FaArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
+
+            <div className="min-h-[400px]">
+              {activeTab === "new" && (dashboardData.newTasks.length > 0 ? dashboardData.newTasks.map(renderTaskCard) : <EmptyState icon={<FaTasks />} title="Quiet Dispatch" description="Currently no new delivery requests in your zone." />)}
+              {activeTab === "ongoing" && (dashboardData.ongoingTasks.length > 0 ? dashboardData.ongoingTasks.map(renderTaskCard) : <EmptyState icon={<FaTruck />} title="No Active Routes" description="Ready for your next journey? Check New Invites!" />)}
+              {activeTab === "completed" && (dashboardData.completedTasks.length > 0 ? dashboardData.completedTasks.map(renderTaskCard) : <EmptyState icon={<FaHistory />} title="Clean Slate" description="Your delivery history will manifest here." />)}
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar Controls */}
+        <div className="space-y-8">
+          
+          {/* Support & Profile Quick Access */}
+          <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-sm">
+            <h3 className="text-xl font-black text-gray-900 tracking-tight mb-8">Quick Actions</h3>
+            <div className="space-y-4">
+              <Link href="/delivery-dashboard/personal-details" className="group flex items-center justify-between p-5 bg-gray-50 rounded-3xl hover:bg-blue-50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-gray-900 shadow-sm group-hover:text-blue-600 transition-colors">
+                    <FaUser />
+                  </div>
+                  <div>
+                    <p className="text-sm font-black text-gray-900">Profile</p>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Update Details</p>
+                  </div>
+                </div>
+                <FaChevronRight className="w-3 h-3 text-gray-300 group-hover:translate-x-1 transition-transform" />
+              </Link>
+
+              <Link href="/delivery-dashboard/support" className="group flex items-center justify-between p-5 bg-gray-50 rounded-3xl hover:bg-indigo-50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-gray-900 shadow-sm group-hover:text-indigo-600 transition-colors">
+                    <FaCommentDots />
+                  </div>
+                  <div>
+                    <p className="text-sm font-black text-gray-900">Support</p>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Help Center</p>
+                  </div>
+                </div>
+                <FaChevronRight className="w-3 h-3 text-gray-300 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </div>
+
+          {/* Delivery Tips / Promo */}
+          <div className="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-[2.5rem] p-8 text-white relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10"></div>
+            <FaClock className="text-blue-300/30 text-6xl absolute -bottom-4 -right-4 rotate-12 group-hover:scale-110 transition-transform duration-700" />
+            
+            <h4 className="text-2xl font-black tracking-tighter mb-4 relative z-10">Maximize Your <br/> Earnings</h4>
+            <p className="text-blue-100/80 text-sm font-medium leading-relaxed mb-8 relative z-10">
+              Peak hours are currently active. Deliveries in your area are yielding 20% higher service fees.
             </p>
+            <button className="bg-white text-blue-700 px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:shadow-xl transition relative z-10">View Hotzones</button>
           </div>
 
-          {/* Wallet Card Section */}
-          <div className="mb-8">
-            {/* Wallet Balance */}
-            {hasWallet ? (
-              <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-2xl shadow-lg p-6 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500 rounded-full opacity-20 -mr-10 -mt-10"></div>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <p className="text-sm opacity-80 flex items-center gap-2">
-                      <AiFillBank />
-                      <span>Bank</span>
-                    </p>
-                    <h2 className="text-lg font-semibold">
-                      {currentUser?.bankName || "N/A"}
-                    </h2>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm opacity-80">Wallet Balance</p>
-                    <h1 className="text-3xl font-bold">
-                      ₦
-                      {walletBalance?.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }) || "0.00"}
-                    </h1>
-                  </div>
-                </div>
-                <div className="mt-4 border-t border-blue-400/40 pt-4 flex justify-between text-sm">
-                  <div>
-                    <p className="opacity-80">Account Name</p>
-                    <p className="font-medium">
-                      {currentUser?.accountName || "N/A"}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="opacity-80">Account Number</p>
-                    <p className="font-medium">
-                      {currentUser?.accountNumber || "N/A"}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="bg-white rounded-lg shadow-md p-6 flex flex-col justify-center items-center">
-                <p className="text-center text-gray-600 mb-4">
-                  You don't have a wallet yet. Create one to get started.
-                </p>
-                <button
-                  onClick={handleCreateWallet}
-                  disabled={loading}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:bg-blue-300"
-                >
-                  {loading ? "Creating..." : "Create Wallet"}
-                </button>
-              </div>
-            )}
-          </div>
+        </div>
+      </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Total Orders
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {dashboardData.totalOrders}
-                  </p>
-                </div>
-                <div className="p-3 bg-gray-100 rounded-full">
-                  <svg
-                    className="w-6 h-6 text-gray-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                    ></path>
-                  </svg>
-                </div>
+      {/* Persistent Bottom Nav Mobile */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-gray-900/95 backdrop-blur-2xl rounded-[2.5rem] border border-white/10 shadow-2xl md:hidden z-50 p-2">
+        <div className="flex justify-between items-center h-16 px-4">
+          {[
+            { href: "/delivery-dashboard", icon: <FaHome />, active: pathname === "/delivery-dashboard" },
+            { href: "/delivery-dashboard/delivery", icon: <FaTasks />, active: pathname === "/delivery-dashboard/delivery" },
+            { href: "/delivery-dashboard/wallet", icon: <FaWallet />, active: pathname === "/delivery-dashboard/wallet" },
+            { href: "/delivery-dashboard/personal-details", icon: <FaUser />, active: pathname === "/delivery-dashboard/personal-details" }
+          ].map((item, idx) => (
+            <Link key={idx} href={item.href} className="flex-1 flex justify-center">
+              <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all ${item.active ? "bg-blue-600 text-white shadow-lg shadow-blue-500/40" : "text-gray-500 hover:text-gray-300"}`}>
+                <span className="text-xl">{item.icon}</span>
               </div>
-              <div className="mt-4">
-                <Link
-                  href="/dashboard/orders/all"
-                  className="text-sm text-gray-600 hover:text-gray-900"
-                >
-                  View all orders →
-                </Link>
-              </div>
-            </div>
-            {/* New Tasks */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">New Tasks</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {dashboardData.newTasks.length}
-                  </p>
-                </div>
-                <div className="p-3 bg-yellow-100 rounded-full">
-                  <svg
-                    className="w-6 h-6 text-yellow-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    ></path>
-                  </svg>
-                </div>
-              </div>
-              <div className="mt-4">
-                <button
-                  onClick={() => setActiveTab("new")}
-                  className="text-sm text-gray-600 hover:text-gray-900"
-                >
-                  View new tasks →
-                </button>
-              </div>
-            </div>
-
-            {/* Ongoing Deliveries */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">
-                    Ongoing Deliveries
-                  </p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {dashboardData.ongoingTasks.length}
-                  </p>
-                </div>
-                <div className="p-3 bg-blue-100 rounded-full">
-                  <svg
-                    className="w-6 h-6 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M13 10V3L4 14h7v7l9-11h-7z"
-                    />
-                  </svg>
-                </div>
-              </div>
-              <div className="mt-4">
-                <button
-                  onClick={() => setActiveTab("ongoing")}
-                  className="text-sm text-gray-600 hover:text-gray-900"
-                >
-                  View ongoing deliveries →
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Delivery Tasks Section */}
-          <div className="bg-white rounded-lg shadow-md p-6">
-            <div className="border-b border-gray-200">
-              <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-                <button
-                  onClick={() => setActiveTab("new")}
-                  className={`${
-                    activeTab === "new"
-                      ? "border-blue-500 text-blue-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-                >
-                  New Tasks
-                </button>
-                <button
-                  onClick={() => setActiveTab("ongoing")}
-                  className={`${
-                    activeTab === "ongoing"
-                      ? "border-blue-500 text-blue-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-                >
-                  Ongoing
-                </button>
-                <button
-                  onClick={() => setActiveTab("completed")}
-                  className={`${
-                    activeTab === "completed"
-                      ? "border-blue-500 text-blue-600"
-                      : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                  } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
-                >
-                  History
-                </button>
-              </nav>
-            </div>
-            <div className="mt-6">
-              {activeTab === "new" && renderTasks(dashboardData.newTasks)}
-              {activeTab === "ongoing" &&
-                renderTasks(dashboardData.ongoingTasks)}
-              {activeTab === "completed" &&
-                renderTasks(dashboardData.completedTasks)}
-            </div>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-            <Link
-              href="/delivery-dashboard/withdraw"
-              className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-            >
-              <h3 className="text-lg font-medium text-gray-900">
-                Wallet & Withdrawals
-              </h3>
-              <p className="text-gray-600 mt-2">
-                Fund wallet or request a withdrawal
-              </p>
             </Link>
-            <Link
-              href="/delivery-dashboard/personal-details"
-              className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-            >
-              <h3 className="text-lg font-medium text-gray-900">
-                Update Profile
-              </h3>
-              <p className="text-gray-600 mt-2">Manage your personal details</p>
-            </Link>
-            <Link
-              href="/delivery-dashboard/settlement-accounts"
-              className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-            >
-              <h3 className="text-lg font-medium text-gray-900">
-                Settlement Account
-              </h3>
-              <p className="text-gray-600 mt-2">View your bank details</p>
-            </Link>
-            <Link
-              href="/delivery-dashboard/withdrawal-history"
-              className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
-            >
-              <h3 className="text-lg font-medium text-gray-900">
-                Withdrawal History
-              </h3>
-              <p className="text-gray-600 mt-2">View your past withdrawals</p>
-            </Link>
-          </div>
-        </>
-      )}
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
+
+const EmptyState = ({ icon, title, description }) => (
+  <div className="py-20 text-center bg-gray-50/50 rounded-[3rem] border border-dashed border-gray-100">
+    <div className="w-20 h-20 bg-white rounded-[1.5rem] flex items-center justify-center mx-auto mb-6 text-gray-200 shadow-sm">
+      <span className="text-3xl">{icon}</span>
+    </div>
+    <h3 className="text-xl font-black text-gray-900 mb-2 tracking-tight">{title}</h3>
+    <p className="text-gray-400 font-medium max-w-[200px] mx-auto text-xs leading-relaxed">{description}</p>
+  </div>
+);
 
 export default DashboardHome;

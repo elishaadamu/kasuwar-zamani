@@ -599,112 +599,83 @@ const Navbar = () => {
             </div>
           )}
 
-          <div
-            className="relative"
-            onMouseEnter={() => setAccountOpen(true)}
-            onMouseLeave={() => setAccountOpen(false)}
-          >
-            <Image
-              src={assets.user_icon}
-              alt="user"
-              className="w-6 h-6 md:w-10 md:h-10 cursor-pointer md:mt-[-5px] md:ml-[-10px]"
-            />
-            <div
-              className={`absolute top-full mt-3 right-0 w-48 bg-white border rounded-lg shadow-lg z-30 transform transition-all duration-200 ease-in-out origin-top-right ${
-                accountOpen
-                  ? "opacity-100 scale-100 visible"
-                  : "opacity-0 scale-95 invisible"
-              }`}
-            >
-              {isLoggedIn ? (
-                <>
-                  {userData?.role === "delivery" ? (
-                    <>
-                      <Link
-                        href="/delivery-dashboard"
-                        className={`block px-4 py-2 ${
-                          pathname === "/delivery-dashboard"
-                            ? "bg-gray-100 text-blue-600"
-                            : "hover:bg-gray-100"
-                        }`}
-                      >
-                        Dashboard
-                      </Link>
-                      <Link
-                        href="/delivery-dashboard/withdraw"
-                        className={`block px-4 py-2 ${
-                          pathname === "/delivery-dashboard/withdraw"
-                            ? "bg-gray-100 text-blue-600"
-                            : "hover:bg-gray-100"
-                        }`}
-                      >
-                        Withdraw
-                      </Link>
-                    </>
-                  ) : userData?.role === "vendor" ? (
-                    <>
-                      <Link
-                        href="/vendor-dashboard"
-                        className={`block px-4 py-2 ${
-                          pathname === "/vendor-dashboard"
-                            ? "bg-gray-100 text-blue-600"
-                            : "hover:bg-gray-100"
-                        }`}
-                      >
-                        Vendor Dashboard
-                      </Link>
-                      <Link
-                        href="/vendor-dashboard/all-orders"
-                        className={`block px-4 py-2 ${
-                          pathname === "/vendor-dashboard/all-orders"
-                            ? "bg-gray-100 text-blue-600"
-                            : "hover:bg-gray-100"
-                        }`}
-                      >
-                        My Orders
-                      </Link>
-                    </>
-                  ) : (
-                    <>
+          <div className="relative">
+            {isLoggedIn ? (
+              <div
+                onMouseEnter={() => setAccountOpen(true)}
+                onMouseLeave={() => setAccountOpen(false)}
+              >
+                <Image
+                  src={assets.user_icon}
+                  alt="user"
+                  className="w-8 h-8 md:w-10 md:h-10 cursor-pointer object-contain"
+                />
+                <div
+                  className={`absolute top-full mt-3 right-0 w-48 bg-white border border-gray-100 rounded-2xl shadow-2xl z-30 transform transition-all duration-300 ease-in-out origin-top-right ${
+                    accountOpen
+                      ? "opacity-100 scale-100 visible translate-y-0"
+                      : "opacity-0 scale-95 invisible -translate-y-2"
+                  }`}
+                >
+                  <div className="p-2">
+                    {userData?.role === "delivery" ? (
+                      <>
+                        <Link
+                          href="/delivery-dashboard"
+                          className={`block px-4 py-2.5 rounded-xl text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all ${
+                            pathname === "/delivery-dashboard" ? "bg-blue-50 text-blue-600" : ""
+                          }`}
+                        >
+                          Dashboard
+                        </Link>
+                      </>
+                    ) : userData?.role === "vendor" ? (
+                      <>
+                        <Link
+                          href="/vendor-dashboard"
+                          className={`block px-4 py-2.5 rounded-xl text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all ${
+                            pathname === "/vendor-dashboard" ? "bg-blue-50 text-blue-600" : ""
+                          }`}
+                        >
+                          Vendor Dashboard
+                        </Link>
+                      </>
+                    ) : (
                       <Link
                         href="/dashboard"
-                        className={`block px-4 py-2 ${
-                          pathname === "/dashboard"
-                            ? "bg-gray-100 text-blue-600"
-                            : "hover:bg-gray-100"
+                        className={`block px-4 py-2.5 rounded-xl text-sm font-bold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all ${
+                          pathname === "/dashboard" ? "bg-blue-50 text-blue-600" : ""
                         }`}
                       >
-                        Dashboard
+                        User Dashboard
                       </Link>
-                    </>
-                  )}
-                  <button
-                    onClick={() => {
-                      logout();
-                      setAccountOpen(false);
-                    }}
-                    className="block w-full text-left px-4 py-2 hover:bg-gray-100"
-                  >
-                    Logout
-                  </button>
-                </>
-              ) : (
-                <>
-                  <Link
-                    href="/signin"
-                    className="block px-4 py-2 hover:bg-gray-100"
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/signup"
-                    className="block px-4 py-2 hover:bg-gray-100"
-                  >
-                    Sign Up
-                  </Link>
-                </>
-              )}
-            </div>
+                    )}
+                    <div className="h-px bg-gray-100 my-2" />
+                    <button
+                      onClick={logout}
+                      className="flex items-center w-full px-4 py-2.5 rounded-xl text-sm font-bold text-red-600 hover:bg-red-50 transition-all"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/signin"
+                  className="px-6 py-2 rounded-full text-sm font-bold text-gray-700 hover:bg-gray-100 transition-all"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/signup"
+                  className="px-6 py-2 bg-blue-600 text-white rounded-full text-sm font-bold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all active:scale-95"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
           </div>
         </ul>
 

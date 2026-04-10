@@ -5,6 +5,7 @@ import { decryptData } from "@/lib/encryption";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Script from "next/script";
 
 const Wallet = () => {
   const [nin, setNin] = useState("");
@@ -15,21 +16,25 @@ const Wallet = () => {
   const [showFundModal, setShowFundModal] = useState(false);
   const [walletBalance, setWalletBalance] = useState(0);
 
-  const handlePayment = async () => {
-    const PaystackPop = (await import("@paystack/inline-js")).default;
-    const paystack = new PaystackPop();
-    paystack.newTransaction({
-      key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
-      email: user?.email,
-      amount: amount * 100, // Convert to kobo
-      ref: new Date().getTime().toString(),
-      onSuccess: (transaction) => {
-        onSuccess(transaction);
-      },
-      onCancel: () => {
-        onClose();
-      },
-    });
+  const handlePayment = () => {
+    if (!amount || amount < 100) { toast.error("Minimum ₦100 required"); return; }
+    
+    if (window.PaystackPop) {
+      new window.PaystackPop().newTransaction({
+        key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
+        email: user?.email,
+        amount: amount * 100, // Convert to kobo
+        ref: new Date().getTime().toString(),
+        onSuccess: (transaction) => {
+          onSuccess(transaction);
+        },
+        onCancel: () => {
+          onClose();
+        },
+      });
+    } else {
+      toast.error("Payment layer is initializing. Please retry in a moment.");
+    }
   };
 
   useEffect(() => {
@@ -139,6 +144,10 @@ const Wallet = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
       <ToastContainer />
+      <Script 
+        src="https://js.paystack.co/v2/inline.js" 
+        strategy="lazyOnload"
+      />
       <h1 className="text-4xl font-bold mb-4">Wallet</h1>
 
       {loading && <p>Loading...</p>}
