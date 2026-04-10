@@ -11,6 +11,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaTimes,
+  FaSlidersH,
 } from "react-icons/fa";
 
 const ITEMS_PER_PAGE = 12;
@@ -23,6 +24,7 @@ const AllProducts = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [currentPage, setCurrentPage] = useState(1);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   useEffect(() => {
     const fetchCategory = async () => {
@@ -110,214 +112,297 @@ const AllProducts = () => {
   const hasActiveFilters =
     searchQuery.trim() || selectedCategory !== "all" || sortBy !== "newest";
 
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedCategory("all");
+    setSortBy("newest");
+  };
+
   if (!products || productsLoading || categoriesLoading) {
     return <Loading />;
   }
 
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="border-b border-gray-100 bg-white sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-          {/* Title + Search row */}
-          <div className="flex items-center justify-between py-4 gap-4">
-            <div className="flex items-center gap-3 min-w-0">
-              <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight whitespace-nowrap">
-                All Products
-              </h1>
-              <span className="hidden sm:inline-flex items-center px-2.5 py-1 bg-gray-100 rounded-lg text-xs font-bold text-gray-500">
-                {filteredProducts.length}
-              </span>
-            </div>
-
-            {/* Search */}
-            <div className="relative w-full max-w-xs">
-              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-xs" />
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-8 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm font-medium text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 focus:bg-white transition-all"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  <FaTimes className="text-xs" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Filters row */}
-          <div className="flex items-center gap-3 pb-3 overflow-x-auto scrollbar-hide">
-            {/* Category pills */}
+  // Sidebar filter content (shared between desktop and mobile)
+  const FilterContent = () => (
+    <div className="flex flex-col gap-6">
+      {/* Search */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">Search</label>
+        <div className="relative">
+          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-9 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-400 focus:bg-white transition-all"
+          />
+          {searchQuery && (
             <button
-              onClick={() => setSelectedCategory("all")}
-              className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${
-                selectedCategory === "all"
-                  ? "bg-gray-900 text-white border-gray-900"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:text-gray-800"
-              }`}
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
             >
-              All
+              <FaTimes className="text-xs" />
             </button>
-            {validCategories.map((cat) => (
+          )}
+        </div>
+      </div>
+
+      {/* Categories */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-3">Categories</label>
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={() => setSelectedCategory("all")}
+            className={`text-left px-3 py-2 rounded-lg text-sm transition-all ${
+              selectedCategory === "all"
+                ? "bg-indigo-50 text-indigo-700 font-semibold"
+                : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+            }`}
+          >
+            All Categories
+            <span className="float-right text-xs text-gray-400 mt-0.5">{products.length}</span>
+          </button>
+          {validCategories.map((cat) => {
+            const count = products.filter((p) => p.category === cat.name).length;
+            return (
               <button
                 key={cat._id}
                 onClick={() => setSelectedCategory(cat.name)}
-                className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${
+                className={`text-left px-3 py-2 rounded-lg text-sm transition-all ${
                   selectedCategory === cat.name
-                    ? "bg-gray-900 text-white border-gray-900"
-                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:text-gray-800"
+                    ? "bg-indigo-50 text-indigo-700 font-semibold"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`}
               >
                 {cat.name}
+                <span className="float-right text-xs text-gray-400 mt-0.5">{count}</span>
               </button>
-            ))}
+            );
+          })}
+        </div>
+      </div>
 
-            {/* Separator */}
-            <div className="w-px h-5 bg-gray-200 flex-shrink-0 mx-1" />
-
-            {/* Sort pills */}
-            {[
-              { key: "newest", label: "New" },
-              { key: "price-low", label: "Low ₦" },
-              { key: "price-high", label: "High ₦" },
-              { key: "name", label: "A-Z" },
-            ].map((option) => (
-              <button
-                key={option.key}
-                onClick={() => setSortBy(option.key)}
-                className={`flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${
+      {/* Sort By */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-3">Sort By</label>
+        <div className="flex flex-col gap-1">
+          {[
+            { key: "newest", label: "Newest First" },
+            { key: "price-low", label: "Price: Low to High" },
+            { key: "price-high", label: "Price: High to Low" },
+            { key: "name", label: "Name: A - Z" },
+          ].map((option) => (
+            <button
+              key={option.key}
+              onClick={() => setSortBy(option.key)}
+              className={`text-left px-3 py-2 rounded-lg text-sm transition-all flex items-center gap-2 ${
+                sortBy === option.key
+                  ? "bg-indigo-50 text-indigo-700 font-semibold"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              }`}
+            >
+              <span
+                className={`w-3.5 h-3.5 rounded-full border-2 flex-shrink-0 transition-all ${
                   sortBy === option.key
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:text-gray-700"
+                    ? "border-indigo-600 bg-indigo-600 shadow-sm shadow-indigo-300"
+                    : "border-gray-300"
                 }`}
               >
-                {option.label}
-              </button>
-            ))}
+                {sortBy === option.key && (
+                  <span className="block w-1.5 h-1.5 bg-white rounded-full m-auto mt-[2px]"></span>
+                )}
+              </span>
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-            {/* Clear filters */}
-            {hasActiveFilters && (
-              <button
-                onClick={() => {
-                  setSearchQuery("");
-                  setSelectedCategory("all");
-                  setSortBy("newest");
-                }}
-                className="flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold text-red-500 border border-red-200 hover:bg-red-50 transition-all flex items-center gap-1"
-              >
-                <FaTimes className="text-[9px]" />
-                Clear
-              </button>
+      {/* Clear Filters */}
+      {hasActiveFilters && (
+        <button
+          onClick={clearFilters}
+          className="w-full py-2.5 rounded-xl text-sm font-semibold text-red-500 border border-red-200 hover:bg-red-50 transition-all flex items-center justify-center gap-2"
+        >
+          <FaTimes className="text-xs" />
+          Clear All Filters
+        </button>
+      )}
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-[#f8fafc] relative">
+      {/* Grid background */}
+      <div
+        className="absolute inset-0 z-0 pointer-events-none"
+        style={{
+          backgroundImage: `linear-gradient(to right, rgba(0,0,0,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(0,0,0,0.03) 1px, transparent 1px)`,
+          backgroundSize: `40px 40px`,
+        }}
+      ></div>
+
+      <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Page Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
+              All Products
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Showing {filteredProducts.length} product{filteredProducts.length !== 1 ? "s" : ""}
+              {selectedCategory !== "all" && ` in ${selectedCategory}`}
+            </p>
+          </div>
+
+          {/* Mobile filter toggle */}
+          <button
+            onClick={() => setMobileFilterOpen(true)}
+            className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-semibold text-gray-700 hover:border-gray-300 transition-all"
+          >
+            <FaSlidersH className="text-sm" />
+            Filters
+          </button>
+        </div>
+
+        {/* Main Layout: Sidebar + Grid */}
+        <div className="flex gap-8">
+          {/* Desktop Sidebar */}
+          <aside className="hidden lg:block w-[260px] flex-shrink-0">
+            <div className="sticky top-24 bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <h3 className="text-base font-bold text-gray-900 mb-5 flex items-center gap-2">
+                <FaSlidersH className="text-sm text-indigo-500" />
+                Filters
+              </h3>
+              <FilterContent />
+            </div>
+          </aside>
+
+          {/* Products Grid */}
+          <div className="flex-1 min-w-0">
+            {paginatedProducts.length > 0 ? (
+              <>
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-3 gap-4 sm:gap-5 md:gap-6 mb-12">
+                  {paginatedProducts.map((product) => (
+                    <ProductCard key={product._id} product={product} />
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-1.5">
+                    <button
+                      disabled={currentPage === 1}
+                      onClick={() => goToPage(currentPage - 1)}
+                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-400 hover:text-gray-900 hover:border-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                    >
+                      <FaChevronLeft className="text-xs" />
+                    </button>
+
+                    {getPageNumbers()[0] > 1 && (
+                      <>
+                        <button
+                          onClick={() => goToPage(1)}
+                          className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all"
+                        >
+                          1
+                        </button>
+                        {getPageNumbers()[0] > 2 && (
+                          <span className="text-gray-300 text-sm px-0.5">…</span>
+                        )}
+                      </>
+                    )}
+
+                    {getPageNumbers().map((pageNum) => (
+                      <button
+                        key={pageNum}
+                        onClick={() => goToPage(pageNum)}
+                        className={`w-10 h-10 flex items-center justify-center rounded-xl text-sm font-bold transition-all ${
+                          currentPage === pageNum
+                            ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/30"
+                            : "bg-white border border-gray-200 text-gray-500 hover:bg-gray-50"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    ))}
+
+                    {getPageNumbers()[getPageNumbers().length - 1] < totalPages && (
+                      <>
+                        {getPageNumbers()[getPageNumbers().length - 1] <
+                          totalPages - 1 && (
+                          <span className="text-gray-300 text-sm px-0.5">…</span>
+                        )}
+                        <button
+                          onClick={() => goToPage(totalPages)}
+                          className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-sm font-bold text-gray-500 hover:bg-gray-50 transition-all"
+                        >
+                          {totalPages}
+                        </button>
+                      </>
+                    )}
+
+                    <button
+                      disabled={currentPage === totalPages}
+                      onClick={() => goToPage(currentPage + 1)}
+                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-400 hover:text-gray-900 hover:border-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                    >
+                      <FaChevronRight className="text-xs" />
+                    </button>
+                  </div>
+                )}
+              </>
+            ) : (
+              /* Empty State */
+              <div className="py-20 flex flex-col items-center text-center">
+                <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mb-6 border border-gray-100 shadow-sm">
+                  <FaSearch className="text-2xl text-gray-300" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  No products found
+                </h3>
+                <p className="text-gray-400 text-sm max-w-xs leading-relaxed mb-6">
+                  Try adjusting your search or filtering by a different category.
+                </p>
+                <button
+                  onClick={clearFilters}
+                  className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold text-sm hover:bg-indigo-700 transition-all active:scale-95"
+                >
+                  Reset Filters
+                </button>
+              </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Product Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6 pb-20">
-        {paginatedProducts.length > 0 ? (
-          <>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-5 mb-12">
-              {paginatedProducts.map((product) => (
-                <ProductCard key={product._id} product={product} />
-              ))}
+      {/* Mobile Filter Drawer */}
+      {mobileFilterOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setMobileFilterOpen(false)}
+          ></div>
+          {/* Drawer */}
+          <div className="absolute left-0 top-0 h-full w-[300px] max-w-[85vw] bg-white shadow-2xl p-6 overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <FaSlidersH className="text-sm text-indigo-500" />
+                Filters
+              </h3>
+              <button
+                onClick={() => setMobileFilterOpen(false)}
+                className="p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <FaTimes className="text-sm" />
+              </button>
             </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="flex items-center justify-center gap-1.5">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() => goToPage(currentPage - 1)}
-                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-400 hover:text-gray-900 hover:border-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                >
-                  <FaChevronLeft className="text-[10px]" />
-                </button>
-
-                {getPageNumbers()[0] > 1 && (
-                  <>
-                    <button
-                      onClick={() => goToPage(1)}
-                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-xs font-bold text-gray-500 hover:bg-gray-50 transition-all"
-                    >
-                      1
-                    </button>
-                    {getPageNumbers()[0] > 2 && (
-                      <span className="text-gray-300 text-xs px-0.5">…</span>
-                    )}
-                  </>
-                )}
-
-                {getPageNumbers().map((pageNum) => (
-                  <button
-                    key={pageNum}
-                    onClick={() => goToPage(pageNum)}
-                    className={`w-10 h-10 flex items-center justify-center rounded-xl text-xs font-bold transition-all ${
-                      currentPage === pageNum
-                        ? "bg-gray-900 text-white shadow-sm"
-                        : "bg-white border border-gray-200 text-gray-500 hover:bg-gray-50"
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                ))}
-
-                {getPageNumbers()[getPageNumbers().length - 1] < totalPages && (
-                  <>
-                    {getPageNumbers()[getPageNumbers().length - 1] <
-                      totalPages - 1 && (
-                      <span className="text-gray-300 text-xs px-0.5">…</span>
-                    )}
-                    <button
-                      onClick={() => goToPage(totalPages)}
-                      className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-xs font-bold text-gray-500 hover:bg-gray-50 transition-all"
-                    >
-                      {totalPages}
-                    </button>
-                  </>
-                )}
-
-                <button
-                  disabled={currentPage === totalPages}
-                  onClick={() => goToPage(currentPage + 1)}
-                  className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-400 hover:text-gray-900 hover:border-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
-                >
-                  <FaChevronRight className="text-[10px]" />
-                </button>
-              </div>
-            )}
-          </>
-        ) : (
-          /* Empty State */
-          <div className="py-20 flex flex-col items-center text-center">
-            <div className="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-6 border border-gray-100">
-              <FaSearch className="text-2xl text-gray-300" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
-              No products found
-            </h3>
-            <p className="text-gray-400 text-sm max-w-xs leading-relaxed mb-6">
-              Try adjusting your search or filtering by a different category.
-            </p>
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setSelectedCategory("all");
-                setSortBy("newest");
-              }}
-              className="px-6 py-2.5 bg-gray-900 text-white rounded-xl font-semibold text-sm hover:bg-gray-800 transition-all active:scale-95"
-            >
-              Reset Filters
-            </button>
+            <FilterContent />
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

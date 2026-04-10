@@ -94,11 +94,10 @@ const SubscriptionPlans = () => {
             return (
               <div
                 key={plan._id}
-                className={`relative rounded-2xl p-6 sm:p-8 shadow-lg transition-transform duration-300 ${
-                  isPopular
+                className={`relative rounded-2xl p-6 sm:p-8 shadow-lg transition-transform duration-300 ${isPopular
                     ? "bg-blue-600 text-white scale-105"
                     : "bg-white text-gray-900 hover:scale-105"
-                }`}
+                  }`}
               >
                 {isPopular && (
                   <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
@@ -112,9 +111,8 @@ const SubscriptionPlans = () => {
                   {plan.package}
                 </h3>
                 <p
-                  className={`text-center mt-2 text-sm ${
-                    isPopular ? "text-blue-200" : "text-gray-500"
-                  }`}
+                  className={`text-center mt-2 text-sm ${isPopular ? "text-blue-200" : "text-gray-500"
+                    }`}
                 >
                   {plan.description}
                 </p>
@@ -124,9 +122,8 @@ const SubscriptionPlans = () => {
                     ₦{plan.price.toLocaleString()}
                   </span>
                   <span
-                    className={`text-base sm:text-lg ml-1 ${
-                      isPopular ? "text-blue-200" : "text-gray-500"
-                    }`}
+                    className={`text-base sm:text-lg ml-1 ${isPopular ? "text-blue-200" : "text-gray-500"
+                      }`}
                   >
                     / {plan.duration} days
                   </span>
@@ -156,13 +153,11 @@ const SubscriptionPlans = () => {
 
                 <button
                   onClick={() => handleSelectPlan(plan)}
-                  className={`w-full mt-8 py-3 px-6 rounded-lg font-semibold text-center transition-colors duration-300 ${
-                    isPopular
+                  className={`w-full mt-8 py-3 px-6 rounded-lg font-semibold text-center transition-colors duration-300 ${isPopular
                       ? "bg-white text-blue-600 hover:bg-blue-100"
                       : "bg-blue-600 text-white hover:bg-blue-700"
-                  } focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-                    isPopular ? "focus:ring-white" : "focus:ring-blue-500"
-                  }`}
+                    } focus:outline-none focus:ring-2 focus:ring-offset-2 ${isPopular ? "focus:ring-white" : "focus:ring-blue-500"
+                    }`}
                 >
                   Select Plan
                 </button>

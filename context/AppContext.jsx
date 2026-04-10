@@ -2,6 +2,7 @@
 import { decryptData } from "@/lib/encryption";
 import { useRouter, usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import axios from "axios";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import statesData from "@/lib/states.json";
@@ -145,7 +146,7 @@ export const AppContextProvider = (props) => {
     // Determine the correct redirect path based on user role before clearing data
     const role = userData?.user?.role || userData?.role;
     let redirectPath = "/";
-    
+
     if (role === "user") {
       redirectPath = "/signin";
     } else if (role === "admin") {
@@ -479,8 +480,8 @@ export const AppContextProvider = (props) => {
   return (
     <AppContext.Provider value={value}>
       {props.children}
-      {showSessionExpired && (
-        <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
+      {showSessionExpired && typeof document !== "undefined" && createPortal(
+        <div style={{ position: "fixed", inset: 0, zIndex: 2147483647 }} className="flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { setShowSessionExpired(false); router.push("/signin"); }}></div>
           <div className="bg-white rounded-[2.5rem] p-10 max-w-md w-full relative z-10 shadow-2xl text-center">
             <div className="w-20 h-20 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-6 text-amber-500">
@@ -497,7 +498,8 @@ export const AppContextProvider = (props) => {
               Back to Sign In
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </AppContext.Provider>
   );

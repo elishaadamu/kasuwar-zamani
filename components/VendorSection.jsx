@@ -17,9 +17,11 @@ const VendorSection = () => {
 
   const sliderSettings = {
     dots: true,
-    infinite: false,
+    infinite: true,
     speed: 500,
-    slidesToShow: 1.15,
+    autoplay: true,
+    autoplaySpeed: 5000,
+    slidesToShow: 2,
     slidesToScroll: 1,
     arrows: true,
 
@@ -27,7 +29,7 @@ const VendorSection = () => {
       {
         breakpoint: 1024,
         settings: {
-          slidesToShow: 1.15,
+          slidesToShow: 2,
           slidesToScroll: 1,
         },
       },
@@ -128,9 +130,8 @@ const VendorSection = () => {
         .slick-next:hover,
         .slick-prev:focus,
         .slick-next:focus {
-          background: #3b82f6 !important;
-          box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.2) !important;
-          transform: translateY(-2px) !important;
+          background: #4f46e5 !important;
+          box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4), 0 4px 6px -2px rgba(79, 70, 229, 0.2) !important;
           outline: none;
         }
 
@@ -149,8 +150,8 @@ const VendorSection = () => {
           display: inline-block;
           width: 11px;
           height: 11px;
-          border-top: 2.5px solid #3b82f6;
-          border-right: 2.5px solid #3b82f6;
+          border-top: 2.5px solid #4f46e5;
+          border-right: 2.5px solid #4f46e5;
           opacity: 1 !important;
           transition: all 0.2s ease;
         }
