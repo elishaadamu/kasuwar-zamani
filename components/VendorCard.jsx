@@ -158,19 +158,19 @@ const VendorCard = ({
 
           {/* Stats bottom row */}
           <div className="flex items-center justify-between text-gray-500 mt-auto px-2">
-            <div className="flex flex-col items-center">
-              <span className="text-[22px] font-semibold text-gray-900">{followerCount}</span>
-              <span className="text-[11px] uppercase tracking-widest font-semibold text-gray-400 mt-0.5">Followers</span>
+            <div className="flex flex-col items-center w-1/3 text-center">
+              <span className="text-[18px] sm:text-[22px] font-semibold text-gray-900">{followerCount}</span>
+              <span className="text-[9px] sm:text-[10px] uppercase tracking-wider font-semibold text-gray-400 mt-0.5 truncate w-full">Followers</span>
             </div>
-            <div className="w-px h-8 bg-gray-100"></div>
-            <div className="flex flex-col items-center">
-              <span className="text-[22px] font-semibold text-gray-900">{productCount ?? 0}</span>
-              <span className="text-[11px] uppercase tracking-widest font-semibold text-gray-400 mt-0.5">Items</span>
+            <div className="w-px h-8 bg-gray-100 shrink-0"></div>
+            <div className="flex flex-col items-center w-1/3 text-center">
+              <span className="text-[18px] sm:text-[22px] font-semibold text-gray-900">{productCount ?? 0}</span>
+              <span className="text-[9px] sm:text-[10px] uppercase tracking-wider font-semibold text-gray-400 mt-0.5 truncate w-full">Items</span>
             </div>
-            <div className="w-px h-8 bg-gray-100"></div>
-            <div className="flex flex-col items-center">
-              <span className="text-[22px] font-semibold text-gray-900">{totalReviews ?? 0}</span>
-              <span className="text-[11px] uppercase tracking-widest font-semibold text-gray-400 mt-0.5">Reviews</span>
+            <div className="w-px h-8 bg-gray-100 shrink-0"></div>
+            <div className="flex flex-col items-center w-1/3 text-center">
+              <span className="text-[18px] sm:text-[22px] font-semibold text-gray-900">{totalReviews ?? 0}</span>
+              <span className="text-[9px] sm:text-[10px] uppercase tracking-wider font-semibold text-gray-400 mt-0.5 truncate w-full">Reviews</span>
             </div>
           </div>
 

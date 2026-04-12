@@ -26,7 +26,7 @@ const HomeProducts = () => {
           </button>
         )}
       </div>
-      <div className="home-products grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 items-center justify-items-center gap-6 mt-2 pb-14 w-full">
+      <div className="home-products grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 items-center justify-items-center gap-6 mt-2 pb-14 w-full">
         {products.slice(0, 8).map((product, index) => (
           <ProductCard key={product._id || index} product={product} />
         ))}

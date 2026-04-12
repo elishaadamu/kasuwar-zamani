@@ -43,9 +43,9 @@ const NewsletterModal = () => {
 
   const handleClose = () => {
     setIsOpen(false);
-    // Show again 1 minute after being dismissed
+    // Show again 1 hour after being dismissed
     if (localStorage.getItem("newsletter_subscribed") !== "true") {
-      localStorage.setItem("newsletter_next_show_time", (Date.now() + 60000).toString());
+      localStorage.setItem("newsletter_next_show_time", (Date.now() + 3600000).toString());
     }
   };
 

@@ -21,28 +21,20 @@ const VendorSection = () => {
     speed: 500,
     autoplay: true,
     autoplaySpeed: 5000,
-    slidesToShow: 2,
+    slidesToShow: 1, // Default strictly 1 for mobile/SSR safety
     slidesToScroll: 1,
     arrows: true,
 
     responsive: [
       {
-        breakpoint: 1024,
+        breakpoint: 5000, // Desktop strictly 2
         settings: {
           slidesToShow: 2,
           slidesToScroll: 1,
+          arrows: true,
         },
       },
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 1.15,
-          slidesToScroll: 1,
-          // centerMode: true,
-          // centerPadding: "12.5%", // shows a portion of the next card
-          arrows: false,
-        },
-      },
+
     ],
   };
 
@@ -81,6 +73,7 @@ const VendorSection = () => {
             gap: 10px;
           }
         }
+
 
         /* Premium Custom slick-dots */
         .slick-dots {
@@ -136,11 +129,11 @@ const VendorSection = () => {
         }
 
         .slick-prev {
-          left: -15px;
+          left: -20px !important;
         }
         
         .slick-next {
-          right: 5px; /* Kept slightly in so it doesn't overlap the partially visible slide */
+          right: -20px !important;
         }
 
         /* Chevron drawing using border */

@@ -96,7 +96,7 @@ const DashboardHome = () => {
     const now = new Date();
     let labels = Array.from({ length: 12 }, (_, i) => format(subMonths(now, 11 - i), "MMM"));
     let dataPoints = labels.map(() => Math.floor(Math.random() * 10)); // Default demo data
-    
+
     if (dashboardData.orders.length > 0) {
       const monthlyData = new Map(labels.map(l => [l, 0]));
       dashboardData.orders.forEach(o => {
@@ -123,7 +123,7 @@ const DashboardHome = () => {
 
   const handlePayment = () => {
     if (!amount || amount < 100) { customToast.warn("Minimum ₦100 required"); return; }
-    
+
     // Use the script that was loaded via Next/Script
     if (window.PaystackPop) {
       new window.PaystackPop().newTransaction({
@@ -160,17 +160,17 @@ const DashboardHome = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 pb-24 md:pb-12 bg-white">
-      <Script 
-        src="https://js.paystack.co/v2/inline.js" 
+      <Script
+        src="https://js.paystack.co/v2/inline.js"
         strategy="lazyOnload"
       />
-      
+
       {/* Premium Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <div>
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 my-6">
             <div className="w-2 h-8 bg-blue-600 rounded-full"></div>
-            <h1 className="text-4xl font-black text-gray-900 tracking-tight">Kasuwar Center</h1>
+            <h1 className="text-3xl font-black text-gray-900 tracking-tight">Customer Dashboard</h1>
           </div>
           <p className="text-gray-500 font-medium text-lg">Good day, {dashboardData.userName}. Your commerce dashboard is ready.</p>
         </div>
@@ -326,11 +326,10 @@ const DashboardHome = () => {
                     <span className="text-sm font-black text-gray-900">₦{order.totalAmount.toLocaleString()}</span>
                   </td>
                   <td className="px-6 py-6">
-                    <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${
-                      order.status === "delivered" ? "bg-green-50 text-green-700 border-green-200" :
+                    <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border ${order.status === "delivered" ? "bg-green-50 text-green-700 border-green-200" :
                       order.status === "pending" ? "bg-amber-50 text-amber-700 border-amber-200" :
-                      "bg-blue-50 text-blue-700 border-blue-200"
-                    }`}>
+                        "bg-blue-50 text-blue-700 border-blue-200"
+                      }`}>
                       {order.status}
                     </span>
                   </td>

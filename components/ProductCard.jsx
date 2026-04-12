@@ -82,21 +82,28 @@ const ProductCard = ({ product }) => {
 
       {/* Product Info */}
       <div className="flex flex-col gap-2 p-4">
-        <h3 className="truncate text-sm font-medium text-gray-900">
+        <h3 className="line-clamp-1 text-lg font-bold text-gray-900">
           {product.name}
         </h3>
+
+        {/* Product description content */}
+        {product.description && (
+          <p className="line-clamp-2 text-xs font-medium text-gray-500 leading-relaxed mb-1">
+            {product.description}
+          </p>
+        )}
 
         {/* Price + Rating */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-lg font-bold text-gray-900">
+            <span className="text-xl font-black text-gray-900">
               {currency}
               {hasOffer
                 ? product.offerPrice?.toLocaleString()
                 : product.price?.toLocaleString()}
             </span>
             {hasOffer && (
-              <span className="text-sm text-gray-400 line-through">
+              <span className="text-sm text-gray-400 font-medium line-through">
                 {currency}
                 {product.price?.toLocaleString()}
               </span>
