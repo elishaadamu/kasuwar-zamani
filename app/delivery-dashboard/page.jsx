@@ -70,7 +70,6 @@ const DashboardHome = () => {
         });
       } catch (error) {
         if (error.response?.status === 404) setHasWallet(false);
-        else 
       } finally {
         setLoading(false);
       }
