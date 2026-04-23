@@ -21,6 +21,7 @@ import {
   FaUser,
   FaArrowRight,
   FaHistory,
+  FaTimes,
 } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -40,6 +41,8 @@ import {
 import { Pie, Line } from "react-chartjs-2";
 import "chartjs-adapter-date-fns";
 import { startOfWeek, format, subMonths } from "date-fns";
+import Script from "next/script";
+import { customToast } from "@/lib/customToast";
 
 ChartJS.register(
   ArcElement,
@@ -209,6 +212,52 @@ const VendorDashboard = () => {
     fetchAllData();
   }, [router]);
 
+  const fetchWalletBalance = async (uid) => {
+    try {
+      const walletRes = await axios.get(apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance + uid + "/balance"), { withCredentials: true });
+      if (walletRes.data.data) {
+        setAccountDetails(walletRes.data.data);
+        setWalletBalance(walletRes.data.data);
+      }
+    } catch (error) {
+    }
+  };
+
+  const handlePayment = () => {
+    if (!amount || amount < 100) { customToast.warn("Minimum ₦100 required"); return; }
+
+    if (window.PaystackPop) {
+      new window.PaystackPop().newTransaction({
+        key: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY,
+        email: userData?.email,
+        amount: amount * 100,
+        onSuccess: async () => {
+          customToast.success("Success", "Wallet funded successfully!");
+          setShowFundModal(false);
+          setAmount("");
+          await fetchWalletBalance(userData.id);
+        },
+      });
+    } else {
+      customToast.info("Redirecting", "Payment secure layer is initializing. Please retry in a moment.");
+    }
+  };
+
+  const handleCreateAccount = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await axios.post(apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.CREATE + userData.id), { nin }, { withCredentials: true });
+      customToast.success("Account activated!");
+      setShowCreateAccount(false);
+      await fetchWalletBalance(userData.id);
+    } catch (error) {
+      customToast.error(error.response?.data?.message || "Failed to activate account.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (loading || authLoading) return <Loading fullScreen={false} />;
 
   return (
@@ -258,36 +307,54 @@ const VendorDashboard = () => {
                 </div>
               </div>
 
-              {/* Compact 2x2 Details Grid */}
-              <div className="grid grid-cols-2 gap-3 mb-5">
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm">
-                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Acc No</p>
-                  <p className="text-sm font-bold">{accountDetails?.wallet?.virtualAccountNumber || "Setting up..."}</p>
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm">
-                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Name</p>
-                  <p className="text-sm font-bold truncate">{accountDetails?.wallet?.virtualAccountName || `${userData?.firstName || ""} ${userData?.lastName || ""}`}</p>
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm">
-                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Bank</p>
-                  <p className="text-sm font-bold truncate">{accountDetails?.wallet?.virtualBanktName || "Kasuwar Pay"}</p>
-                </div>
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm">
-                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Status</p>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-                    <p className="text-sm font-bold">Active</p>
+              {/* Compact 2x2 Details Grid or Activation */}
+              {accountDetails?.wallet ? (
+                <div className="grid grid-cols-2 gap-3 mb-5">
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm">
+                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Acc No</p>
+                    <p className="text-sm font-bold">{accountDetails?.wallet?.virtualAccountNumber}</p>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm">
+                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Name</p>
+                    <p className="text-sm font-bold truncate">{accountDetails?.wallet?.virtualAccountName || `${userData?.firstName || ""} ${userData?.lastName || ""}`}</p>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm">
+                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Bank</p>
+                    <p className="text-sm font-bold truncate">{accountDetails?.wallet?.virtualBanktName}</p>
+                  </div>
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm">
+                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Status</p>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                      <p className="text-sm font-bold">Active</p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <button 
+                  onClick={() => setShowCreateAccount(true)}
+                  className="w-full bg-blue-600/10 border-2 border-dashed border-blue-600/30 rounded-2xl p-6 mb-5 group hover:bg-blue-600/20 transition-all flex flex-col items-center gap-2"
+                >
+                  <div className="w-8 h-8 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/40 group-hover:scale-110 transition-transform">
+                    <FaPlus className="w-3 h-3" />
+                  </div>
+                  <span className="text-[10px] font-black text-white uppercase tracking-widest">Activate Virtual Settlement</span>
+                </button>
+              )}
 
               {/* Compact Buttons */}
-              <div className="flex gap-3">
-                <Link href="/vendor-dashboard/withdrawal-request" className="flex-1 bg-white text-gray-900 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest text-center hover:scale-[1.02] active:scale-95 transition-all shadow-lg">
-                  Request Payout
+              <div className="grid grid-cols-3 gap-2">
+                <button 
+                  onClick={() => setShowFundModal(true)}
+                  className="bg-blue-600 text-white py-3 rounded-xl font-black text-[9px] uppercase tracking-widest text-center hover:bg-blue-700 transition-all shadow-lg"
+                >
+                  Add Fund
+                </button>
+                <Link href="/vendor-dashboard/withdrawal-request" className="bg-white text-gray-900 py-3 rounded-xl font-black text-[9px] uppercase tracking-widest text-center hover:scale-[1.02] active:scale-95 transition-all shadow-lg">
+                  Payout
                 </Link>
-                <Link href="/vendor-dashboard/transaction-history" className="flex-1 bg-white/10 text-white border border-white/20 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest text-center hover:bg-white/20 transition-all backdrop-blur-sm">
-                  View History
+                <Link href="/vendor-dashboard/transaction-history" className="bg-white/10 text-white border border-white/20 py-3 rounded-xl font-black text-[9px] uppercase tracking-widest text-center hover:bg-white/20 transition-all backdrop-blur-sm">
+                  History
                 </Link>
               </div>
             </div>
@@ -436,6 +503,54 @@ const VendorDashboard = () => {
           </Link>
         </div>
       </div>
+      
+      {/* Fund Modal */}
+      {showFundModal && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowFundModal(false)}></div>
+          <div className="bg-white rounded-[2.5rem] p-10 max-w-md w-full relative z-10 shadow-2xl">
+            <button 
+              onClick={() => setShowFundModal(false)}
+              className="absolute top-8 right-8 text-gray-400 hover:text-gray-900 transition-colors"
+            >
+              <FaTimes className="w-5 h-5" />
+            </button>
+            <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Fund Wallet</h2>
+            <p className="text-gray-500 font-medium mb-8">Enter the amount to fund your vendor wallet.</p>
+            <div className="relative mb-8">
+              <span className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl font-black text-gray-900">₦</span>
+              <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className="w-full bg-gray-50 border-0 rounded-2xl p-6 pl-14 text-2xl font-black focus:ring-2 focus:ring-blue-600 transition-all placeholder:text-gray-200" />
+            </div>
+            <button onClick={handlePayment} className="w-full bg-gray-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-gray-200 hover:bg-black transition-all">Execute Payment</button>
+          </div>
+        </div>
+      )}
+
+      {/* Create Account Modal */}
+      {showCreateAccount && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowCreateAccount(false)}></div>
+          <div className="bg-white rounded-[2.5rem] p-10 max-w-md w-full relative z-10 shadow-2xl">
+            <button 
+              onClick={() => setShowCreateAccount(false)}
+              className="absolute top-8 right-8 text-gray-400 hover:text-gray-900 transition-colors"
+            >
+              <FaTimes className="w-5 h-5" />
+            </button>
+            <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">KYC Activation</h2>
+            <p className="text-gray-500 font-medium mb-8">Provide your NIN to generate a secure virtual settlement account.</p>
+            <form onSubmit={handleCreateAccount} className="space-y-6">
+              <input type="text" value={nin} onChange={(e) => setNin(e.target.value)} placeholder="Enter 11-digit NIN" className="w-full bg-gray-50 border-0 rounded-2xl p-6 text-lg font-bold focus:ring-2 focus:ring-blue-600 transition-all placeholder:text-gray-200" required />
+              <button type="submit" className="w-full bg-blue-600 text-white py-5 rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all">Generate Account</button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      <Script
+        src="https://js.paystack.co/v2/inline.js"
+        strategy="lazyOnload"
+      />
     </div>
   );
 };

@@ -13,7 +13,7 @@ import "chartjs-adapter-date-fns";
 import { startOfWeek, startOfMonth, format, subMonths } from "date-fns";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
-import { FaHome, FaCommentDots, FaTruck, FaBoxOpen, FaUser, FaPlus, FaWallet, FaCreditCard, FaShoppingCart, FaUniversity as FaBank, FaUserCircle, FaChevronRight, FaArrowUp, FaArrowDown, FaCog } from "react-icons/fa";
+import { FaHome, FaCommentDots, FaTruck, FaBoxOpen, FaUser, FaPlus, FaWallet, FaCreditCard, FaShoppingCart, FaUniversity as FaBank, FaUserCircle, FaChevronRight, FaArrowUp, FaArrowDown, FaCog, FaTimes } from "react-icons/fa";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, Title, TimeScale);
 
@@ -353,6 +353,12 @@ const DashboardHome = () => {
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowFundModal(false)}></div>
           <div className="bg-white rounded-[2.5rem] p-10 max-w-md w-full relative z-10 shadow-2xl">
+            <button 
+              onClick={() => setShowFundModal(false)}
+              className="absolute top-8 right-8 text-gray-400 hover:text-gray-900 transition-colors"
+            >
+              <FaTimes className="w-5 h-5" />
+            </button>
             <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">Fund Wallet</h2>
             <p className="text-gray-500 font-medium mb-8">Enter the amount to inject into your wallet.</p>
             <div className="relative mb-8">
@@ -369,6 +375,12 @@ const DashboardHome = () => {
         <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowCreateAccount(false)}></div>
           <div className="bg-white rounded-[2.5rem] p-10 max-w-md w-full relative z-10 shadow-2xl">
+            <button 
+              onClick={() => setShowCreateAccount(false)}
+              className="absolute top-8 right-8 text-gray-400 hover:text-gray-900 transition-colors"
+            >
+              <FaTimes className="w-5 h-5" />
+            </button>
             <h2 className="text-3xl font-black text-gray-900 mb-2 tracking-tight">KYC Activation</h2>
             <p className="text-gray-500 font-medium mb-8">Provide your NIN to generate a secure virtual settlement account.</p>
             <form onSubmit={handleCreateAccount} className="space-y-6">
