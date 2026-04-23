@@ -96,12 +96,12 @@ const VendorDashboard = () => {
     const hasOrders = dashboardData.orders.length > 0;
     const data = hasOrders
       ? [
-          orderStatusCounts.pending,
-          orderStatusCounts.paid,
-          orderStatusCounts.shipped,
-          orderStatusCounts.delivered,
-          orderStatusCounts.cancelled,
-        ]
+        orderStatusCounts.pending,
+        orderStatusCounts.paid,
+        orderStatusCounts.shipped,
+        orderStatusCounts.delivered,
+        orderStatusCounts.cancelled,
+      ]
       : [12, 19, 3, 5, 2]; // Demo data
 
     return {
@@ -201,7 +201,6 @@ const VendorDashboard = () => {
           setWalletBalance(walletRes.data.data);
         }
       } catch (error) {
-        console.error("Dashboard fetch error:", error);
       } finally {
         setLoading(false);
       }
@@ -215,7 +214,7 @@ const VendorDashboard = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-32 pt-4">
       <ToastContainer />
-      
+
       {/* Header - Glass Aesthetic */}
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
         <div>
@@ -236,51 +235,58 @@ const VendorDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* Left Column: Stats & Performance */}
         <div className="lg:col-span-2 space-y-8">
-          
+
           {/* Main Financial Hub - Dark Mode Style */}
-          <div className="bg-gray-900 rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-10 relative overflow-hidden text-white shadow-2xl shadow-blue-900/20 group">
-            <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-600/20 rounded-full blur-[100px] -mr-40 -mt-20 group-hover:scale-110 transition-transform duration-1000"></div>
-            
+          <div className="bg-gray-900 rounded-[2rem] p-5 md:p-7 relative overflow-hidden text-white shadow-2xl shadow-blue-900/20 group">
+            <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-600/15 rounded-full blur-[80px] -mr-32 -mt-16 group-hover:scale-110 transition-transform duration-1000"></div>
+
             <div className="relative z-10">
-              <div className="flex justify-between items-start mb-12">
+              {/* Balance Row */}
+              <div className="flex justify-between items-center mb-5">
                 <div>
-                  <p className="text-blue-400 font-black text-[10px] uppercase tracking-[0.3em] mb-1">Available Profit</p>
-                  <h2 className="text-4xl md:text-6xl font-black tracking-tighter flex items-baseline gap-2 truncate">
-                    <span className="text-blue-500 text-3xl">₦</span>
+                  <p className="text-blue-400 font-black text-[9px] uppercase tracking-[0.3em] mb-0.5">Wallet Balance</p>
+                  <h2 className="text-3xl md:text-4xl font-black tracking-tighter flex items-baseline gap-1.5">
+                    <span className="text-blue-500 text-2xl">₦</span>
                     {accountDetails?.balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                   </h2>
                 </div>
-                <div className="bg-white/10 p-4 rounded-3xl backdrop-blur-md">
-                  <FaWallet className="w-6 h-6 text-blue-400" />
+                <div className="bg-white/10 p-3 rounded-2xl backdrop-blur-md">
+                  <FaWallet className="w-5 h-5 text-blue-400" />
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <div className="bg-white/5 border border-white/10 rounded-3xl p-5 backdrop-blur-sm">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Account Num</p>
-                  <p className="text-lg font-bold">{accountDetails?.wallet?.virtualAccountNumber || "Setting up..."}</p>
+              {/* Compact 2x2 Details Grid */}
+              <div className="grid grid-cols-2 gap-3 mb-5">
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Acc No</p>
+                  <p className="text-sm font-bold">{accountDetails?.wallet?.virtualAccountNumber || "Setting up..."}</p>
                 </div>
-                <div className="bg-white/5 border border-white/10 rounded-3xl p-5 backdrop-blur-sm">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Bank Name</p>
-                  <p className="text-lg font-bold truncate">{accountDetails?.wallet?.virtualBanktName || "Kasuwar Pay"}</p>
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Name</p>
+                  <p className="text-sm font-bold truncate">{accountDetails?.wallet?.virtualAccountName || `${userData?.firstName || ""} ${userData?.lastName || ""}`}</p>
                 </div>
-                <div className="bg-white/5 border border-white/10 rounded-3xl p-5 backdrop-blur-sm">
-                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Status</p>
-                  <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <p className="text-lg font-bold">Active</p>
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Bank</p>
+                  <p className="text-sm font-bold truncate">{accountDetails?.wallet?.virtualBanktName || "Kasuwar Pay"}</p>
+                </div>
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm">
+                  <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Status</p>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                    <p className="text-sm font-bold">Active</p>
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-wrap gap-4">
-                <Link href="/vendor-dashboard/withdrawal-request" className="flex-1 min-w-[140px] bg-white text-gray-900 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest text-center hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-white/5">
+              {/* Compact Buttons */}
+              <div className="flex gap-3">
+                <Link href="/vendor-dashboard/withdrawal-request" className="flex-1 bg-white text-gray-900 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest text-center hover:scale-[1.02] active:scale-95 transition-all shadow-lg">
                   Request Payout
                 </Link>
-                <Link href="/vendor-dashboard/transaction-history" className="flex-1 min-w-[140px] bg-white/10 text-white border border-white/20 py-4 rounded-2xl font-black text-[11px] uppercase tracking-widest text-center hover:bg-white/20 transition-all backdrop-blur-sm">
+                <Link href="/vendor-dashboard/transaction-history" className="flex-1 bg-white/10 text-white border border-white/20 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest text-center hover:bg-white/20 transition-all backdrop-blur-sm">
                   View History
                 </Link>
               </div>
@@ -302,14 +308,14 @@ const VendorDashboard = () => {
               </div>
             </div>
             <div className="h-[300px] w-full">
-              <Line 
-                data={lineChartData} 
+              <Line
+                data={lineChartData}
                 options={{
                   responsive: true,
                   maintainAspectRatio: false,
                   plugins: { legend: { display: false }, tooltip: { backgroundColor: "#111827", padding: 12, titleFont: { size: 14, weight: "bold" } } },
                   scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { borderDash: [5, 5] } } }
-                }} 
+                }}
               />
             </div>
           </div>
@@ -317,13 +323,13 @@ const VendorDashboard = () => {
           {/* Quick Admin Operations */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { label: "New Product", icon: <FaPlus />, href: "/vendor-dashboard/products/add", color: "blue" },
-              { label: "Inventory", icon: <FaBoxOpen />, href: "/vendor-dashboard/all-products", color: "purple" },
-              { label: "Shipments", icon: <FaTruck />, href: "/vendor-dashboard/all-orders", color: "indigo" },
-              { label: "Support", icon: <FaCommentDots />, href: "/vendor-dashboard/inbox-support", color: "emerald" },
+              { label: "New Product", icon: <FaPlus />, href: "/vendor-dashboard/add-products", bgColor: "bg-blue-50", textColor: "text-blue-600" },
+              { label: "Delivery Requests", icon: <FaTruck />, href: "/vendor-dashboard/request-delivery", bgColor: "bg-indigo-50", textColor: "text-indigo-600" },
+              { label: "Inventory", icon: <FaBoxOpen />, href: "/vendor-dashboard/products-list", bgColor: "bg-purple-50", textColor: "text-purple-600" },
+              { label: "Orders", icon: <FaShoppingCart />, href: "/vendor-dashboard/all-orders", bgColor: "bg-emerald-50", textColor: "text-emerald-600" },
             ].map((btn) => (
               <Link key={btn.label} href={btn.href} className="group bg-white p-6 rounded-[2rem] border border-gray-100 hover:border-blue-100 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300">
-                <div className={`w-12 h-12 rounded-2xl bg-${btn.color}-50 text-${btn.color}-600 flex items-center justify-center mb-4 transition-transform group-hover:scale-110 group-hover:rotate-6`}>
+                <div className={`w-12 h-12 rounded-2xl ${btn.bgColor} ${btn.textColor} flex items-center justify-center mb-4 transition-transform group-hover:scale-110 group-hover:rotate-6`}>
                   {btn.icon}
                 </div>
                 <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-gray-900">{btn.label}</span>
@@ -334,18 +340,18 @@ const VendorDashboard = () => {
 
         {/* Right Column: Order distribution & Activity */}
         <div className="space-y-8">
-          
+
           {/* Status Breakdown - Circular Chart */}
           <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-sm">
             <h3 className="text-xl font-black text-gray-900 tracking-tight mb-8">Fulfillment Pulse</h3>
             <div className="relative h-64 flex items-center justify-center">
-              <Pie 
-                data={pieChartData} 
-                options={{ 
-                  responsive: true, 
-                  maintainAspectRatio: false, 
-                  plugins: { legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 6, font: { weight: "bold", size: 11 } } } } 
-                }} 
+              <Pie
+                data={pieChartData}
+                options={{
+                  responsive: true,
+                  maintainAspectRatio: false,
+                  plugins: { legend: { position: "bottom", labels: { usePointStyle: true, boxWidth: 6, font: { weight: "bold", size: 11 } } } }
+                }}
               />
             </div>
             <div className="grid grid-cols-2 gap-4 mt-8 pt-8 border-t border-gray-50">
@@ -366,7 +372,7 @@ const VendorDashboard = () => {
               <h3 className="text-xl font-black text-gray-900 tracking-tight">Recent Activity</h3>
               <Link href="/vendor-dashboard/all-orders" className="text-[10px] font-black uppercase tracking-widest text-blue-600">View All</Link>
             </div>
-            
+
             <div className="space-y-6">
               {dashboardData.recentOrders.length > 0 ? (
                 dashboardData.recentOrders.map((order) => (
@@ -419,10 +425,10 @@ const VendorDashboard = () => {
           <Link href="/vendor-dashboard/all-orders" className="text-gray-500 hover:text-white transition">
             <FaTruck className="w-5 h-5" />
           </Link>
-          <Link href="/vendor-dashboard/products/add" className="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center -mt-8 shadow-xl shadow-blue-600/30 border-4 border-white/5">
+          <Link href="/vendor-dashboard/add-products" className="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center -mt-8 shadow-xl shadow-blue-600/30 border-4 border-white/5">
             <FaPlus className="w-5 h-5" />
           </Link>
-          <Link href="/vendor-dashboard/all-products" className="text-gray-500 hover:text-white transition">
+          <Link href="/vendor-dashboard/products-list" className="text-gray-500 hover:text-white transition">
             <FaBoxOpen className="w-5 h-5" />
           </Link>
           <Link href="/vendor-dashboard/inbox-support" className="text-gray-500 hover:text-white transition">

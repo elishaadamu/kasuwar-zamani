@@ -160,7 +160,6 @@ const RequestDelivery = () => {
       receipientLGA: formData.receipientLGA,
     };
 
-    console.log("Payload:", payload);
 
     try {
       const response = await axios.post(
@@ -168,7 +167,6 @@ const RequestDelivery = () => {
         payload,
         { withCredentials: true }
       );
-      console.log("Submitting payload:", payload);
       toast.success(
         "Delivery request created successfully! Redirecting in 5 seconds..."
       );
@@ -176,7 +174,6 @@ const RequestDelivery = () => {
         router.push("/dashboard/delivery-payment");
       }, 5000);
     } catch (error) {
-      console.error("Error creating delivery request:", error);
       toast.error(
         error.response?.data?.message || "Failed to create delivery request."
       );

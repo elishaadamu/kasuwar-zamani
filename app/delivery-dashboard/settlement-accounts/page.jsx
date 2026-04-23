@@ -13,7 +13,6 @@ const SettlementAccounts = () => {
   const [loading, setLoading] = useState(true);
 
   const bankAccount = userData?.user;
-  console.log(userData);
 
 
 

@@ -301,7 +301,6 @@ const MyTeamDashboardView = ({ teamId }) => {
                 let response;
                 try {
                     response = await axios.get(apiUrl(API_CONFIG.ENDPOINTS.REGIONAL.GET_MY_TEAM_DASHBOARD), { withCredentials: true });
-                    console.log(response.data);
                 } catch (error) {
                     // Fallback to my-team endpoint for regular team members if dashboard is restricted
                     if (error.response?.status === 403 || error.response?.status === 401 || error.response?.status === 404 || error.response?.status === 400 || error.response?.status === 500) {

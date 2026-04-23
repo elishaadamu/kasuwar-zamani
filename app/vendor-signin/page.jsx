@@ -34,7 +34,6 @@ const VendorSigninContent = () => {
     e.preventDefault();
     setLoading(true);
     const payload = { phone, password }; // Added role: "vendor"
-    console.log(payload);
     try {
       const response = await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.VENDOR.SIGNIN),
@@ -57,7 +56,6 @@ const VendorSigninContent = () => {
       customToast.success("Vendor Signin successful!"); 
       router.push(redirect || "/vendor-dashboard"); 
     } catch (error) {
-      console.error("Error signing in as vendor:", error); 
       customToast.error(
         error.response?.data?.message ||
           "An error occurred during vendor signin."

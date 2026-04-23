@@ -564,7 +564,6 @@ const OrderTracking = () => {
         setOrders(response.data.orders);
       }
     } catch (error) {
-      console.error("Error fetching orders:", error);
       toast.error("Failed to load orders");
     } finally {
       setLoading(false);
@@ -635,7 +634,6 @@ const OrderTracking = () => {
       // Close modal if open
       setSelectedOrder(null);
     } catch (error) {
-      console.error("Error updating order status:", error);
       toast.error("Failed to update order status");
     } finally {
       setLoading(false);

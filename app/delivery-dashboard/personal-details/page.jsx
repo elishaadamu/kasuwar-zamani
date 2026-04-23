@@ -98,7 +98,6 @@ const PersonalDetails = () => {
     vehicleTypes: [],
   });
   const updatedUserData = userData?.user;
-  console.log(updatedUserData);
 
   useEffect(() => {
     if (authLoading) return; // Wait for authentication status to be determined
@@ -194,7 +193,6 @@ const PersonalDetails = () => {
         vehicleTypes: profile.vehicleTypes,
       };
 
-      console.log(payload);
 
       const response = await axios.put(
         `${apiUrl(API_CONFIG.ENDPOINTS.DELIVERY.UPDATE)}/${
@@ -211,7 +209,6 @@ const PersonalDetails = () => {
         setIsEditing(false);
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
       toast.error(error.response?.data?.message || "Failed to update profile");
     } finally {
       setLoading(false);

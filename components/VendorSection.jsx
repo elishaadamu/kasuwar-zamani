@@ -4,6 +4,8 @@ import Link from "next/link";
 import VendorCard from "./VendorCard";
 import axios from "axios";
 import Slider from "react-slick";
+import { FaStore } from "react-icons/fa";
+import { useAppContext } from "@/context/AppContext";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import Loading from "./Loading";
 
@@ -14,6 +16,7 @@ import "slick-carousel/slick/slick-theme.css";
 const VendorSection = () => {
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { isLoggedIn, authLoading } = useAppContext();
 
   const sliderSettings = {
     dots: true,
@@ -21,42 +24,48 @@ const VendorSection = () => {
     speed: 500,
     autoplay: true,
     autoplaySpeed: 5000,
-    slidesToShow: 1, // Default strictly 1 for mobile/SSR safety
+    slidesToShow: 2,
     slidesToScroll: 1,
     arrows: true,
 
     responsive: [
       {
-        breakpoint: 5000, // Desktop strictly 2
+        breakpoint: 768,
         settings: {
-          slidesToShow: 2,
+          slidesToShow: 1,
           slidesToScroll: 1,
           arrows: true,
         },
       },
-
     ],
   };
 
   useEffect(() => {
-    const fetchVendors = async () => {
-      try {
-        const response = await axios.get(
-          apiUrl(API_CONFIG.ENDPOINTS.VENDOR.GET_ALL),
-          { withCredentials: true }
-        );
-        const sortedVendors = (response.data || []).sort(
-          (a, b) => (b.averageRating || 0) - (a.averageRating || 0)
-        );
-        setVendors(sortedVendors);
-      } catch (error) {
-        console.error("Error fetching vendors:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchVendors();
-  }, []);
+    if (!authLoading && !isLoggedIn) {
+      setLoading(false);
+      return;
+    }
+
+    if (isLoggedIn) {
+      const fetchVendors = async () => {
+        try {
+          const response = await axios.get(
+            apiUrl(API_CONFIG.ENDPOINTS.VENDOR.GET_ALL),
+            { withCredentials: true }
+          );
+          const sortedVendors = (response.data || []).sort(
+            (a, b) => (b.averageRating || 0) - (a.averageRating || 0)
+          );
+          setVendors(sortedVendors);
+        } catch (error) {
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchVendors();
+    }
+  }, [isLoggedIn, authLoading]);
+
   return (
     // my-16 was a bit large for mobile, reducing it on smaller screens
     <div className="my-16">
@@ -183,8 +192,26 @@ const VendorSection = () => {
           View All Vendors <span className="group-hover:translate-x-1 transition-transform">→</span>
         </Link>
       </div>
-      {loading ? (
+      {loading || authLoading ? (
         <Loading />
+      ) : !isLoggedIn ? (
+        <div className="py-20 px-6 flex flex-col items-center text-center bg-gray-50 rounded-3xl border border-gray-100 shadow-inner">
+          <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mb-4 shadow-sm border border-gray-100">
+            <FaStore className="text-2xl text-indigo-400" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-900 mb-2">
+            Vendor Subscriptions
+          </h3>
+          <p className="text-gray-500 max-w-sm text-sm mb-6">
+            Sign in to your account to explore our premium vendors and start shopping for exclusive items.
+          </p>
+          <Link
+            href="/signin"
+            className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-500/20 transition-all text-sm"
+          >
+            Sign In to Explore
+          </Link>
+        </div>
       ) : (
         <Slider {...sliderSettings}>
           {vendors.slice(0, 4).map((vendor) => (

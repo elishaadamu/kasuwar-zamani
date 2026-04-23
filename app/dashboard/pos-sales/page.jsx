@@ -190,7 +190,6 @@ const POSSales = () => {
       const completedOrders = response.data?.orders || [];
       setPosOrders([...pendingOrders, ...completedOrders]);
     } catch (error) {
-       console.error("POS Fetch Error", error);
     } finally {
       setLoading(false);
     }

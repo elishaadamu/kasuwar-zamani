@@ -34,7 +34,6 @@ const DeleteAccountPage = () => {
       const encryptedUser = localStorage.getItem("user");
       const userData = decryptData(encryptedUser);
       const payload = { password, phone: phoneNumber };
-      console.log("Deleting account with payload:", payload);
       await axios.post(
         `${apiUrl(API_CONFIG.ENDPOINTS.PROFILE.DELETE)}${userData.id}`,
         payload

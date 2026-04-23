@@ -57,7 +57,6 @@ const GetFollowersPage = () => {
       setFilteredFollowers(followersData);
       setLastUpdated(new Date());
     } catch (err) {
-      console.error("Error fetching followers:", err);
       const errorMessage =
         err.response?.data?.message ||
         "Could not load your followers. Please try again later.";

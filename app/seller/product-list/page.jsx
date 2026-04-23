@@ -30,10 +30,8 @@ const ProductList = () => {
           withCredentials: true,
         }
       );
-      console.log("Product data:", response.data);
       setProducts(response.data || []);
     } catch (err) {
-      console.error("Failed to fetch products:", err);
       setError(
         err.response?.data?.message ||
           "Failed to fetch products. Please try again."
@@ -53,7 +51,6 @@ const ProductList = () => {
       );
       setCategories(response.data);
     } catch (err) {
-      console.error("Failed to fetch categories:", err);
     }
   };
 

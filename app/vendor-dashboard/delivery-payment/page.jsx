@@ -95,10 +95,8 @@ const DeliveryPaymentPage = () => {
         apiUrl(API_CONFIG.ENDPOINTS.DELIVERY.GET_USER_REQUESTS + userId),
         { withCredentials: true }
       );
-      console.log("Fetched requests:", res.data);
       setRequests(res.data.requests || []);
     } catch (error) {
-      console.error("Failed to fetch delivery requests", error);
       setFetchError(
         error?.response?.data?.message || error.message || "Failed to fetch"
       );
@@ -151,7 +149,7 @@ const DeliveryPaymentPage = () => {
         userId,
         pin: pin,
       };
-      console.log("Payload:", { ...payload, pin: pin }); // Log payload without showing the actual PIN
+       // Log payload without showing the actual PIN
       await axios.put(
         apiUrl(
           API_CONFIG.ENDPOINTS.DELIVERY.PAY_DELIVERY + selectedRequest._id
@@ -165,7 +163,6 @@ const DeliveryPaymentPage = () => {
       closeModal();
       fetchRequests();
     } catch (error) {
-      console.error("Payment failed", error);
       toast.error(error?.response?.data?.message || "Payment failed");
     } finally {
       setPaying(false);

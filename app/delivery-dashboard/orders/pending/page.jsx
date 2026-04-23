@@ -40,7 +40,6 @@ const PendingOrders = () => {
           },
         }
       );
-      console.log("Pending orders response:", response.data);
       setOrders(response.data.data || []);
     } catch (error) {
       toast.error("Failed to fetch pending orders.");

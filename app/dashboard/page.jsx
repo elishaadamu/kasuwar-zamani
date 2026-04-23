@@ -41,7 +41,6 @@ const DashboardHome = () => {
       const walletResponse = await axios.get(apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance + uid + "/balance"), { withCredentials: true });
       setWalletBalance(walletResponse.data.data);
     } catch (error) {
-      console.error("Error fetching wallet balance:", error);
       setWalletBalance(null);
     }
   };
@@ -67,7 +66,6 @@ const DashboardHome = () => {
         }
         await fetchWalletBalance(decryptedUserData.id);
       } catch (error) {
-        console.error("Error fetching dashboard data:", error);
       } finally {
         setLoading(false);
       }

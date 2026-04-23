@@ -34,14 +34,12 @@ const AddProduct = () => {
         const response = await axios.get(
           apiUrl(API_CONFIG.ENDPOINTS.CATEGORY.GET_ALL)
         );
-        console.log("Fetched categories:", response.data);
         setCategories(response.data.categories);
         if (response.data.length > 0) {
           setCategory(response.data[0].name); // Set default category
         }
       } catch (error) {
         toast.error("Failed to fetch categories.");
-        console.error("Error fetching categories:", error);
       }
     };
     fetchCategories();
@@ -94,7 +92,6 @@ const AddProduct = () => {
       toast.success("Product added successfully!");
       router.push("/seller/product-list");
     } catch (err) {
-      console.error("Error adding product:", err);
       toast.error(
         err.response?.data?.message ||
           "Failed to add product. Please try again."

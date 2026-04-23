@@ -67,7 +67,6 @@ const Sidebar = ({
           }
         }
       } catch (error) {
-        console.error("Sidebar Team Fetch Error:", error);
       }
     };
     fetchTeamData();

@@ -19,7 +19,6 @@ const fetchBanners = async () => {
     );
     return response.data.banners || [];
   } catch (error) {
-    console.error("Error fetching banners:", error);
     return [];
   }
 };

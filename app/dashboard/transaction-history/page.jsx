@@ -45,7 +45,6 @@ const TransactionHistoryPage = () => {
           ),
           { withCredentials: true }
         );
-        console.log("Fetched Transactions:", response.data);
         const transactionsData =
           response.data.data ||
           response.data.transactions ||
@@ -57,7 +56,6 @@ const TransactionHistoryPage = () => {
         calculateStats(transactionsData);
       } catch (error) {
         toast.error("Failed to fetch transaction history");
-        console.error("Error:", error);
       } finally {
         setLoading(false);
       }
@@ -76,7 +74,6 @@ const TransactionHistoryPage = () => {
         );
         setWalletBalance(response.data.data.balance || 0);
       } catch (error) {
-        console.error("Failed to fetch wallet balance", error);
       }
     };
 

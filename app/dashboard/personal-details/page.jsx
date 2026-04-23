@@ -196,7 +196,6 @@ const PersonalDetails = () => {
         setProfile((prev) => ({ ...prev, ...response.data.user }));
       }
     } catch (error) {
-      console.error("Error fetching profile:", error);
       customToast.error("Failed to load profile data");
     } finally {
       setLoading(false);
@@ -253,7 +252,6 @@ const PersonalDetails = () => {
         fetchProfile();
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
       customToast.error(error.response?.data?.message || "Failed to update profile");
     } finally {
       setLoading(false);

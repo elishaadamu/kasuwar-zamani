@@ -40,7 +40,6 @@ const useIdleTimeout = (
 
   const handleBroadcastMessage = useCallback((event) => {
     if (event.data === "user-activity") {
-      console.log("Activity in another tab, resetting idle timer.");
       resetTimer();
     }
   }, []);
@@ -85,7 +84,6 @@ const useIdleTimeout = (
     // Cleanup
     // Cleanup function
     const cleanup = () => {
-      console.log("Cleaning up idle timer.");
       clearTimeout(timeoutId.current);
       events.forEach((event) => {
         window.removeEventListener(event, handleActivity, { capture: true });
@@ -118,7 +116,6 @@ const HomeClient = ({ initialBanners }) => {
   const { logout, isLoggedIn, userData } = useAppContext();
 
   const handleIdle = useCallback(() => {
-    console.log("User is idle. Logging out.");
     logout();
   }, [logout]);
 

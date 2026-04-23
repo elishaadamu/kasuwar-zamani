@@ -72,7 +72,6 @@ const RequestDelivery = () => {
         setStates(response.data);
       } catch (error) {
         toast.error("Failed to fetch states.");
-        console.error("Error fetching states:", error);
       }
     };
     fetchStates();
@@ -167,14 +166,12 @@ const RequestDelivery = () => {
     try {
       // Replace with your actual API endpoint for creating a delivery request
       // const response = await axios.post(apiUrl(API_CONFIG.ENDPOINTS.DELIVERY.REQUEST), payload);
-      console.log("Submitting payload:", payload);
       toast.success("Delivery request created successfully!");
       // Optionally reset form or redirect
     } catch (error) {
       toast.error(
         error.response?.data?.message || "Failed to create delivery request."
       );
-      console.error("Error creating delivery request:", error);
     } finally {
       setLoading(false);
     }

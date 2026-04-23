@@ -38,7 +38,6 @@ const StateDropping = () => {
         setDeliveries(stateDropDeliveries);
       } catch (error) {
         toast.error("Failed to fetch state dropping deliveries");
-        console.error("Error:", error);
       } finally {
         setLoading(false);
       }
@@ -60,7 +59,6 @@ const StateDropping = () => {
       setDeliveries((prev) => prev.filter((d) => d._id !== deliveryId));
     } catch (error) {
       toast.error("Failed to update delivery status");
-      console.error("Error:", error);
     }
   };
 

@@ -37,7 +37,6 @@ const ActionMenu = ({ product, onDelete, onEdit, categories, states }) => {
   const confirmDelete = async () => {
     try {
       if (!userId) {
-        console.error("User not authenticated");
         customToast.error("Auth Error", "User not authenticated.");
         return;
       }
@@ -53,7 +52,6 @@ const ActionMenu = ({ product, onDelete, onEdit, categories, states }) => {
       setIsDeleteModalOpen(false);
       customToast.success("Deleted", "Product deleted successfully!");
     } catch (err) {
-      console.error("Failed to delete product:", err);
       customToast.error("Delete Failed", "Failed to delete product.");
     }
   };
@@ -63,7 +61,6 @@ const ActionMenu = ({ product, onDelete, onEdit, categories, states }) => {
     setIsSaving(true);
     try {
       if (!userId) {
-        console.error("User not authenticated");
         customToast.error("Auth Error", "User not authenticated.");
         return;
       }
@@ -81,7 +78,6 @@ const ActionMenu = ({ product, onDelete, onEdit, categories, states }) => {
       
       customToast.success("Updated", "Product has been updated!");
     } catch (err) {
-      console.error("Failed to update product:", err);
       customToast.error("Update Failed", "Failed to update product.");
     } finally {
       setIsSaving(false);

@@ -43,7 +43,6 @@ const OrderHistory = () => {
         const decryptedUser = decryptData(encryptedUser);
         setUser(decryptedUser);
       } catch (e) {
-        console.error("User decrypt error", e);
       }
     }
   }, []);
@@ -63,7 +62,6 @@ const OrderHistory = () => {
       );
       setOrders(response.data.orders || []);
     } catch (error) {
-      console.error("Failed to fetch orders.", error);
     } finally {
       setLoading(false);
     }

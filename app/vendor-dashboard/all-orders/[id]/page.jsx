@@ -44,7 +44,6 @@ const VendorOrderDetails = () => {
           toast.error("Order payload not found in your sector.");
         }
       } catch (error) {
-        console.error("Vendor Order Detail Fetch Error:", error);
         toast.error("Failed to synchronize with order pipeline.");
       } finally {
         setLoading(false);

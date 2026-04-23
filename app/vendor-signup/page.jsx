@@ -68,7 +68,6 @@ const VendorSignupForm = () => {
       referralCode: formData.appliedReferralCode,
       role: "vendor",
     };
-    console.log("Vendor signup payload with referral code:", payload);
 
     try {
       const response = await axios.post(
@@ -77,7 +76,6 @@ const VendorSignupForm = () => {
         { withCredentials: true }
       );
       const { user } = response.data;
-      console.log("Signup response:", response.data);
       // Encrypt and store user data
       const encryptedUser = encryptData(user);
       localStorage.setItem("user", encryptedUser);
@@ -86,7 +84,6 @@ const VendorSignupForm = () => {
       customToast.success("Vendor signup successful!");
       router.push("/vendor-dashboard"); // Redirect to seller dashboard after signup
     } catch (error) {
-      console.error("Error signing up as vendor:", error);
       customToast.error(
         error.response?.data?.message ||
           "An error occurred during vendor signup."

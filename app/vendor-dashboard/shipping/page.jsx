@@ -31,10 +31,8 @@ const ShippingPage = () => {
         `${apiUrl(API_CONFIG.ENDPOINTS.PROFILE.GET)}/${userData.id}`,
         { withCredentials: true }
       );
-      console.log("response", response.data.user);
       setAddresses(response.data.user || []);
     } catch (error) {
-      console.error("Error fetching addresses:", error);
       toast.error("Failed to fetch shipping addresses.");
     } finally {
       setPageLoading(false);
@@ -53,7 +51,6 @@ const ShippingPage = () => {
 
   const handleSaveAddress = async (addressData) => {
     setLoading(true);
-    console.log("payload", addressData);
     try {
       // Update existing address
       const response = await axios.put(
@@ -61,12 +58,10 @@ const ShippingPage = () => {
         addressData,
         { withCredentials: true }
       );
-      console.log("response", response);
       toast.success("Address updated successfully!");
       setIsModalOpen(false);
       fetchAddresses(); // Refresh the list
     } catch (error) {
-      console.error("Error saving address:", error);
       toast.error(error.response?.data?.message || "Failed to save address.");
     } finally {
       setLoading(false);

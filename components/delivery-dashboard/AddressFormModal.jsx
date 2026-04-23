@@ -34,7 +34,6 @@ const AddressFormModal = ({ isOpen, onClose, onSave, address, loading }) => {
         );
         setStates(response.data);
       } catch (error) {
-        console.error("Error fetching states:", error);
       }
     };
     getStatesFromApi();

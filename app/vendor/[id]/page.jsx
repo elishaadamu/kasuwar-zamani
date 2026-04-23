@@ -111,7 +111,6 @@ const VendorPage = () => {
             router.push("/404");
           }
         } catch (error) {
-          console.error("Error fetching vendor:", error);
         } finally {
           setLoading(false);
         }
@@ -137,7 +136,6 @@ const VendorPage = () => {
           );
           setVendorProducts(response.data || []);
         } catch (error) {
-          console.error("Error fetching vendor products:", error);
         }
       }
     };
@@ -191,7 +189,6 @@ const VendorPage = () => {
         }
       }
     } catch (error) {
-      console.error("Error in handleMessageClick:", error);
       customToast.error("Service Error", "An unexpected error occurred while starting chat.");
     } finally {
       setIsCreatingChat(false);
@@ -276,7 +273,6 @@ const VendorPage = () => {
         setComment("");
       }
     } catch (error) {
-      console.error("Error submitting review:", error.response?.data?.message);
       customToast.error("Submission Failed", error.response?.data?.message || "Failed to submit review.");
     } finally {
       setIsSubmitting(false);

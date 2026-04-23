@@ -5,6 +5,8 @@ import VendorCard from "@/components/VendorCard";
 import axios from "axios";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import Loading from "@/components/Loading";
+import { useAppContext } from "@/context/AppContext";
+import { useRouter } from "next/navigation";
 import {
   FaChevronLeft,
   FaChevronRight,
@@ -24,23 +26,31 @@ const AllVendorsPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("rating");
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const { isLoggedIn, authLoading } = useAppContext();
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchVendors = async () => {
-      try {
-        const response = await axios.get(
-          apiUrl(API_CONFIG.ENDPOINTS.VENDOR.GET_ALL)
-        );
-        setVendors(response.data || []);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching vendors:", error);
-        setLoading(false);
-      }
-    };
+    // If auth finishes and they aren't logged in, stop loading so we can show the prompt
+    if (!authLoading && !isLoggedIn) {
+      setLoading(false);
+      return;
+    }
 
-    fetchVendors();
-  }, []);
+    if (isLoggedIn) {
+      const fetchVendors = async () => {
+        try {
+          const response = await axios.get(
+            apiUrl(API_CONFIG.ENDPOINTS.VENDOR.GET_ALL)
+          );
+          setVendors(response.data || []);
+        } catch (error) {
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchVendors();
+    }
+  }, [isLoggedIn, authLoading]);
 
   const filteredAndSorted = useMemo(() => {
     let result = [...vendors];
@@ -101,7 +111,7 @@ const AllVendorsPage = () => {
     setSortBy("rating");
   };
 
-  if (loading) return <Loading />;
+  if (authLoading || loading) return <Loading />;
 
   // Sidebar filter content (shared between desktop and mobile)
   const FilterContent = () => (
@@ -303,9 +313,35 @@ const AllVendorsPage = () => {
             </div>
           </aside>
 
-          {/* Vendor Grid */}
+          {/* Vendor Grid Area */}
           <div className="flex-1 min-w-0">
-            {paginatedVendors.length > 0 ? (
+            {!isLoggedIn ? (
+              <div className="py-24 px-6 flex flex-col items-center text-center bg-white rounded-3xl border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] h-full justify-center">
+                <div className="w-24 h-24 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
+                  <FaStore className="text-4xl text-indigo-500" />
+                </div>
+                <h3 className="text-2xl font-black text-gray-900 mb-3 tracking-tight">
+                  Exclusive Vendor Access
+                </h3>
+                <p className="text-gray-500 max-w-md leading-relaxed mb-8 font-medium">
+                  To ensure the privacy and security of our trusted sellers, our vendor directory is exclusively available to registered users.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <button
+                    onClick={() => router.push("/signin")}
+                    className="px-8 py-3.5 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/30 transition-all active:scale-95"
+                  >
+                    Sign In to View
+                  </button>
+                  <button
+                    onClick={() => router.push("/signup")}
+                    className="px-8 py-3.5 bg-white text-gray-900 border border-gray-200 rounded-xl font-bold hover:bg-gray-50 transition-all active:scale-95"
+                  >
+                    Create Account
+                  </button>
+                </div>
+              </div>
+            ) : paginatedVendors.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-5 md:gap-6 mb-14">
                   {paginatedVendors.map((vendor) => (

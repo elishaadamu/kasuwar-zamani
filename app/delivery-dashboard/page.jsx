@@ -70,7 +70,7 @@ const DashboardHome = () => {
         });
       } catch (error) {
         if (error.response?.status === 404) setHasWallet(false);
-        else console.error("Failed to load dashboard data.", error);
+        else 
       } finally {
         setLoading(false);
       }

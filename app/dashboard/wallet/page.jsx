@@ -58,10 +58,8 @@ const Wallet = () => {
       const response = await axios.get(
         apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.GET + user.id)
       );
-      console.log("Details", response.data);
       setAccountDetails(response.data);
     } catch (error) {
-      console.error("Error fetching account details:", error);
       toast.error(error);
     } finally {
       setLoading(false);
@@ -81,7 +79,6 @@ const Wallet = () => {
       setAmount("");
       fetchAccountDetails(); // Refresh wallet balance
     } catch (error) {
-      console.error("Error processing payment:", error);
       toast.error("Failed to process payment. Please contact support.");
     } finally {
       setLoading(false);
@@ -96,7 +93,6 @@ const Wallet = () => {
     e.preventDefault();
     setLoading(true);
     const payload = { nin };
-    console.log(payload);
     try {
       await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.CREATE + user.id),
@@ -105,7 +101,6 @@ const Wallet = () => {
       toast.success("Account created successfully!");
       fetchAccountDetails();
     } catch (error) {
-      console.error("Error creating account:", error);
       toast.error(error.response?.data?.message || "Failed to create account.");
     } finally {
       setLoading(false);
@@ -124,11 +119,9 @@ const Wallet = () => {
                 "/balance"
             )
           );
-          console.log("Wallet Balance", walletResponse.data.data);
           setWalletBalance(walletResponse.data.data);
         }
       } catch (error) {
-        console.error("Error fetching wallet balance:", error);
       }
     };
 

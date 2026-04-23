@@ -139,7 +139,6 @@ const OrderSummary = ({ externalState }) => {
         );
         setDeliveryFees(response.data.deliveryFees || []);
       } catch (error) {
-        console.error("Failed to fetch shipping fees", error);
       }
     };
 
@@ -228,7 +227,6 @@ const OrderSummary = ({ externalState }) => {
       deliveryType: selectedShipping, // Express or Standard
     };
 
-    console.log(payload);
     if (!payload.vendorId) {
       Swal.fire({
         icon: "error",
@@ -297,7 +295,6 @@ const OrderSummary = ({ externalState }) => {
         router.push("/dashboard/all-orders");
       }
     } catch (error) {
-      console.error("Error creating order:", error);
       const errorMessage =
         error.response?.data?.message ||
         "Failed to place order. Please try again.";
@@ -328,7 +325,6 @@ const OrderSummary = ({ externalState }) => {
         payload,
         { withCredentials: true }
       );
-      console.log(response.data);
 
       const { discountAmount, finalAmount: apiFinalAmount } =
         response.data.coupon;
@@ -342,7 +338,6 @@ const OrderSummary = ({ externalState }) => {
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error("Error validating coupon:", error);
       const errorMessage =
         error.response?.data?.message ||
         "Failed to validate coupon. Please try again.";

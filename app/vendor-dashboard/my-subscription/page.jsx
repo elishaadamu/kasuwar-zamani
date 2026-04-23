@@ -63,7 +63,6 @@ const MySubscriptionPage = () => {
           setError("You do not have an active subscription.");
         }
       } catch (err) {
-        console.error("Error fetching subscription details:", err);
         const errorMessage =
           err.response?.data?.message ||
           "Failed to load subscription details. You may not have an active plan.";

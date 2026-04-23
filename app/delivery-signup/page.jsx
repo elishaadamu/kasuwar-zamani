@@ -64,7 +64,6 @@ const DeliverySignupPage = () => {
         setStates(response.data);
       } catch (error) {
         toast.error("Failed to fetch states.");
-        console.error("Error fetching states:", error);
       }
     };
     fetchStates();
@@ -84,7 +83,6 @@ const DeliverySignupPage = () => {
         setLgas(response.data);
       } catch (error) {
         toast.error("Failed to fetch LGAs for the selected state.");
-        console.error("Error fetching LGAs:", error);
       } finally {
         setLgaLoading(false);
       }
@@ -120,7 +118,6 @@ const DeliverySignupPage = () => {
     };
     reader.onerror = (error) => {
       toast.error("Failed to read file.");
-      console.error("Error reading file:", error);
     };
   };
 
@@ -192,7 +189,7 @@ const DeliverySignupPage = () => {
       accountName,
     };
 
-    console.log("Signup payload:", payload); // Debugging line
+     // Debugging line
     try {
       const response = await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.DELIVERY.CREATE), // Assuming a general signup endpoint
@@ -208,7 +205,6 @@ const DeliverySignupPage = () => {
       toast.success("Delivery person signup successful!");
       router.push("/delivery-signin"); // Redirect to delivery dashboard
     } catch (error) {
-      console.error("Error signing up as delivery person:", error);
       toast.error(
         error.response?.data?.message || "An error occurred during signup."
       );

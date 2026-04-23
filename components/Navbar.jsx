@@ -67,7 +67,6 @@ const Navbar = () => {
         );
         setCategories(response.data.categories || []);
       } catch (err) {
-        console.error("Failed to fetch categories:", err);
       } finally {
         setLoadingCategories(false);
       }
@@ -102,11 +101,9 @@ const Navbar = () => {
             ),
             { withCredentials: true }
           );
-          console.log(walletResponse.data);
           setWalletBalance(walletResponse.data.data);
         }
       } catch (error) {
-        console.error("Error fetching wallet balance:", error);
       }
     };
     fetchWalletBalance();

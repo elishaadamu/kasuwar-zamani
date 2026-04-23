@@ -40,7 +40,6 @@ const ApprovedOrders = () => {
           },
         }
       );
-      console.log("Approved orders response:", response.data);
       setOrders(response.data.orders || []);
     } catch (error) {
       toast.error("Failed to fetch approved orders.");

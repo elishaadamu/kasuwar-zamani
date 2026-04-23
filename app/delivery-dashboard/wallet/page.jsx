@@ -72,7 +72,6 @@ const Wallet = () => {
       setAmount("");
       fetchAccountDetails(); // Refresh wallet balance
     } catch (error) {
-      console.error("Error processing payment:", error);
       toast.error("Failed to process payment. Please contact support.");
     } finally {
       setLoading(false);

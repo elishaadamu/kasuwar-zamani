@@ -16,10 +16,8 @@ const CategorySidebar = () => {
           apiUrl(API_CONFIG.ENDPOINTS.CATEGORY.GET_ALL),
           { withCredentials: true }
         );
-        console.log(response.data);
         setCategories(response.data.categories);
       } catch (error) {
-        console.error("Failed to fetch categories:", error);
         // You could set an error state here to show a message in the UI
       } finally {
         setLoading(false);

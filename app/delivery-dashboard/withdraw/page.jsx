@@ -33,7 +33,6 @@ const Withdraw = () => {
       setWalletBalance(response.data.data.balance);
       setHasWallet(true);
     } catch (error) {
-      console.log("Error fetching balance:", error);
       // Don't show toast on balance fetch error to avoid being noisy
     }
   }, [currentUser]);
@@ -56,7 +55,6 @@ const Withdraw = () => {
       const withdrawalData = response.data.data || [];
       setWithdrawals(Array.isArray(withdrawalData) ? withdrawalData : []);
     } catch (error) {
-      console.error("Error fetching withdrawals:", error);
       toast.error("Failed to fetch withdrawal history");
     } finally {
       setLoading(false);
@@ -98,7 +96,6 @@ const Withdraw = () => {
         amount: amount,
         pin,
       };
-      console.log("Submitting withdrawal with payload:", payload);
       const response = await axios.post(
         apiUrl(
           API_CONFIG.ENDPOINTS.DELIVERY_WITHDRAWAL.CREATE + currentUser._id
@@ -112,7 +109,6 @@ const Withdraw = () => {
       fetchWithdrawals();
       // Consider refreshing user data from context if balance is not updated automatically
     } catch (error) {
-      console.error("Error submitting withdrawal:", error);
       toast.error(
         error.response?.data?.message || "Failed to submit withdrawal request."
       );

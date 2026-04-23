@@ -35,7 +35,6 @@ const DeliverySigninContent = () => {
     setLoading(true);
 
     const payload = { email, password };
-    console.log(payload);
     try {
       const response = await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.DELIVERY.LOGIN),
@@ -57,7 +56,6 @@ const DeliverySigninContent = () => {
       customToast.success("Delivery partner signin successful!");
       router.push(redirect || "/delivery-dashboard"); // Redirect to delivery dashboard after signin
     } catch (error) {
-      console.error("Error signing in as delivery partner:", error);
       customToast.error(
         error.response?.data?.message ||
           "An error occurred during delivery partner signin."

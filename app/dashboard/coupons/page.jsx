@@ -58,7 +58,6 @@ const CouponPage = () => {
           withCredentials: true,
         }
       );
-      console.log(response.data);
       // Map API response to frontend state structure
       const fetchedCoupons = response.data.coupons.map((coupon) => ({
         id: coupon._id,
@@ -69,7 +68,6 @@ const CouponPage = () => {
 
       setCoupons(fetchedCoupons);
     } catch (error) {
-      console.error("Error fetching coupons:", error);
       toast.error("Failed to load coupons.");
     } finally {
       setLoading(false);
@@ -106,7 +104,6 @@ const CouponPage = () => {
     navigator.clipboard.writeText(text).then(
       () => toast.success("Copied to clipboard!"),
       (err) => {
-        console.error("Failed to copy text: ", err);
         toast.error("Failed to copy.");
       }
     );

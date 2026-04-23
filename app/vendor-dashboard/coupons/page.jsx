@@ -70,7 +70,6 @@ const CouponPage = () => {
       const response = await axios.get(
         apiUrl(API_CONFIG.ENDPOINTS.COUPON.GET_ALL + userData.id)
       );
-      console.log(response.data);
       // Map API response to frontend state structure
       const fetchedCoupons = response.data.coupons.map((coupon) => ({
         id: coupon._id,
@@ -81,7 +80,6 @@ const CouponPage = () => {
 
       setCoupons(fetchedCoupons);
     } catch (error) {
-      console.error("Error fetching coupons:", error);
       toast.error("Failed to load coupons.");
     } finally {
       setLoading(false);
@@ -138,14 +136,12 @@ const CouponPage = () => {
         usageLimit: newCoupon.usageLimit,
         createdBy: userData.id,
       };
-      console.log(payload);
       await axios.post(apiUrl(API_CONFIG.ENDPOINTS.COUPON.CREATE), payload);
       fetchCoupons(userData.id); // Refetch to get the latest list
       toast.success("Coupon created successfully!");
       setShowCreateModal(false);
       resetNewCouponForm();
     } catch (error) {
-      console.error("Error creating coupon:", error);
       toast.error("Failed to create coupon.");
     }
   };
@@ -183,7 +179,6 @@ const CouponPage = () => {
       setShowEditModal(false);
       setSelectedCoupon(null);
     } catch (error) {
-      console.error("Error updating coupon:", error);
       toast.error("Failed to update coupon.");
     } finally {
       setLoading(false);
@@ -209,7 +204,6 @@ const CouponPage = () => {
           fetchCoupons(userData.id); // Refetch to update the list
           toast.success("Coupon deleted successfully!");
         } catch (error) {
-          console.error("Error deleting coupon:", error);
           toast.error("Failed to delete coupon.");
         } finally {
           setLoading(false);
@@ -230,7 +224,6 @@ const CouponPage = () => {
       fetchCoupons(userData.id); // Refetch to update the list
       toast.success("Coupon status updated!");
     } catch (error) {
-      console.error("Error updating coupon status:", error);
       toast.error("Failed to update coupon status.");
     }
   };
@@ -243,7 +236,6 @@ const CouponPage = () => {
     navigator.clipboard.writeText(text).then(
       () => toast.success("Copied to clipboard!"),
       (err) => {
-        console.error("Failed to copy text: ", err);
         toast.error("Failed to copy.");
       }
     );

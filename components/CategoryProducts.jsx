@@ -18,7 +18,6 @@ const CategoryProducts = () => {
         );
         setCategories(response.data.categories || []);
       } catch (error) {
-        console.error("Failed to fetch category:", error);
       }
     };
 

@@ -79,12 +79,10 @@ const Cart = () => {
         if (!error && newConversation) {
           router.push(`/chat/${newConversation.id}`);
         } else {
-          console.error('Error creating conversation:', error);
           message.error("Failed to start chat. Please try again.");
         }
       }
     } catch (error) {
-      console.error('Error in handleMessageClick:', error);
       message.error("An error occurred");
     } finally {
       setCreatingChatFor(null);
@@ -96,7 +94,6 @@ const Cart = () => {
       .map((itemId) => {
         const product = products.find((p) => p._id === itemId);
         if (product && cartItems[itemId] > 0) {
-          console.log("Exact Product", product);
           return { ...product, quantity: cartItems[itemId] };
         }
         return null;

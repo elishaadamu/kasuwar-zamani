@@ -63,7 +63,6 @@ const SigninPageContent = () => {
         router.push("/");
       }
     } catch (error) {
-      console.error("Error signing in:", error);
       customToast.error("Signin Failed", error.response?.data?.message || "An error occurred during signin.");
     } finally {
       setLoading(false);

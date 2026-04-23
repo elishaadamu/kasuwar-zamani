@@ -53,9 +53,7 @@ const fetchAddresses = async () => {
       `${apiUrl(API_CONFIG.ENDPOINTS.PROFILE.GET)}/${userData.id}`,
       { withCredentials: true }
     );
-    console.log("response", response.data.user);
   } catch (error) {
-    console.error("Error fetching addresses:", error);
     toast.error("Failed to fetch shipping addresses.");
   } finally {
     setPageLoading(false);
@@ -77,7 +75,6 @@ const UpdateImages = () => {
 
         if (encryptedUser) {
           const userData = decryptData(encryptedUser);
-          console.log("My details", userData);
           setPreviews({ avatar: userData.avatar, banner: userData.banner });
         }
       } finally {
@@ -126,9 +123,7 @@ const UpdateImages = () => {
 
       // To inspect FormData, you need to iterate over its entries.
       // A direct console.log(formData) will appear empty in most browsers.
-      console.log("Inspecting FormData contents:");
       for (let [key, value] of formData.entries()) {
-        console.log(`${key}:`, value);
       }
 
       await axios.put(
@@ -140,7 +135,6 @@ const UpdateImages = () => {
       toast.success("Images updated successfully!");
       // Optionally, you can refetch user data to update localStorage and UI
     } catch (error) {
-      console.error("Error updating profile:", error);
       toast.error(error.response?.data?.message || "Failed to update profile");
     } finally {
       setLoading(false);

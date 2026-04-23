@@ -22,7 +22,6 @@ const CategoryProducts = () => {
         // console.log("Categories", response.data.categories);
         setCategories(response.data.categories || []);
       } catch (error) {
-        console.error("Failed to fetch category:", error);
       } finally {
         setLoading(false);
       }

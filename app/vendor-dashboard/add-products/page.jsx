@@ -55,7 +55,6 @@ const AddProduct = () => {
           setCategory(response.data.categories[0].name);
         }
       } catch (error) {
-        console.error("Failed to load categories", error);
       }
     };
     fetchCategories();

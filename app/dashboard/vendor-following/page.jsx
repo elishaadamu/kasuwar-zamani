@@ -69,7 +69,6 @@ const FollowingVendorsPage = () => {
 
       setVendors(fullVendorDetails);
     } catch (err) {
-      console.error("Error fetching followed vendors:", err);
       const errorMessage =
         err.response?.data?.message ||
         "Could not load vendors. Please try again later.";

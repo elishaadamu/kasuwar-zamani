@@ -60,7 +60,6 @@ const SubscriptionPaymentContent = () => {
         setError("The selected subscription plan could not be found.");
       }
     } catch (err) {
-      console.error("Error fetching subscription:", err);
       const errorMessage =
         err.response?.data?.message ||
         err.message ||
@@ -79,7 +78,6 @@ const SubscriptionPaymentContent = () => {
         vendorId: userData?.id,
         planId: planId,
       };
-      console.log("Payment payload:", payload);
 
       const response = await axios.post(
         apiUrl(API_CONFIG.ENDPOINTS.SUBSCRIPTION.SUBSCRIBE), // Changed to SUBSCRIBE endpoint
@@ -90,13 +88,11 @@ const SubscriptionPaymentContent = () => {
       const result = response.data;
 
       // Show success message
-      console.log("Payment successful:", result);
       toast.success(result.message || "Subscription successful!");
       setTimeout(() => {
         router.push("/vendor-dashboard/my-subscription");
       }, 2000); // Delay redirect to allow user to see the success message
     } catch (error) {
-      console.error("Payment error:", error);
       const errorMessage =
         error.response?.data?.message || "Payment failed. Please try again.";
       toast.error(errorMessage);

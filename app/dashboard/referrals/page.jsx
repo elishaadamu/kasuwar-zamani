@@ -71,9 +71,6 @@ const ReferralPage = () => {
         ]);
 
         // Log responses for debugging
-        console.log("Profile Response:", profileRes.data);
-        console.log("Commissions Response:", commissionsRes.data);
-        console.log("Progress Response:", progressRes.data);
 
         // Set user profile and referral code
         const fetchedProfile = profileRes?.data?.user;
@@ -97,7 +94,6 @@ const ReferralPage = () => {
           totalReferrals: progressData.numberOfPeopleReferred || 0,
         }));
       } catch (error) {
-        console.error("Error fetching referral data:", error);
         toast.error("Failed to load referral data. Using defaults.");
         // Fallback for API errors
         setReferralData({
@@ -127,7 +123,6 @@ const ReferralPage = () => {
         setTimeout(() => setCopied(false), 2000);
       },
       (err) => {
-        console.error("Failed to copy text: ", err);
         toast.error("Failed to copy.");
       }
     );

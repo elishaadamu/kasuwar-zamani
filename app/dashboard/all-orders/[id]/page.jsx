@@ -49,7 +49,6 @@ const OrderDetails = () => {
           toast.error("Order not found or access denied.");
         }
       } catch (error) {
-        console.error("Order Detail Fetch Error:", error);
         toast.error("Protocol failed to retrieve order telemetry.");
       } finally {
         setLoading(false);

@@ -136,7 +136,6 @@ export const AppContextProvider = (props) => {
       setHasMoreProducts(newProducts.length === 20);
       setProductPage(page);
     } catch (error) {
-      console.error("Error fetching products:", error);
       customToast.error("Failed to load products", "Could not load products at this time.");
     } finally {
       setProductsLoading(false);
@@ -274,7 +273,6 @@ export const AppContextProvider = (props) => {
         setFollowingList([]); // Reset if the data is not in the expected format
       }
     } catch (error) {
-      console.error("Error fetching following list:", error);
       setFollowingList([]); // Reset on error
     }
   };
@@ -295,7 +293,6 @@ export const AppContextProvider = (props) => {
       // The backend should return { isFollowing: true/false }
       return response.data.isFollowing;
     } catch (error) {
-      console.error("Error checking follow status:", error);
       return followingList.includes(vendorId); // Fallback to existing list on error
     }
   };
@@ -329,14 +326,11 @@ export const AppContextProvider = (props) => {
         payload
       );
 
-      console.log(`Follow API Response for vendor ${vendorId}:`, response.data);
 
       // Show alert based on the explicit backend response action
       if (response.data.action === "follow") {
-        console.log(`Successfully Followed Vendor: ${vendorId}`);
         customToast.success("Vendor Subscribed!", "You'll now receive updates from this store.");
       } else if (response.data.action === "unfollow") {
-        console.log(`Successfully Unfollowed Vendor: ${vendorId}`);
         customToast.info("Vendor Unfollowed", "You will no longer see their updates.");
       }
 
@@ -345,7 +339,6 @@ export const AppContextProvider = (props) => {
 
       return response.data;
     } catch (error) {
-      console.error("Error following/unfollowing vendor:", error);
       customToast.error("Action Failed", error.response?.data?.message || "An error occurred.");
       // Revert optimistic UI on error
       fetchFollowingList(userId);
@@ -384,7 +377,6 @@ export const AppContextProvider = (props) => {
               setCartItems({});
             }
           } catch (e) {
-            console.error("Error parsing cart data from localStorage", e);
             localStorage.removeItem(cartStorageKey);
             setCartItems({});
           }
@@ -405,7 +397,6 @@ export const AppContextProvider = (props) => {
               setWishlistItems([]);
             }
           } catch (e) {
-            console.error("Error parsing wishlist data from localStorage", e);
             localStorage.removeItem(wishlistStorageKey);
             setWishlistItems([]);
           }

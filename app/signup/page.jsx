@@ -98,7 +98,6 @@ const SignupPage = () => {
       customToast.success("Welcome!", "Signup successful! Welcome to Kasuwar Zamani.");
       setTimeout(() => router.push("/"), 1500);
     } catch (error) {
-      console.error("Error signing up:", error);
       customToast.error("Signup Failed", error.response?.data?.message || "An error occurred during signup.");
     } finally {
       setLoading(false);

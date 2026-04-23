@@ -176,12 +176,10 @@ const PersonalDetails = () => {
       const response = await axios.get(
         `${apiUrl(API_CONFIG.ENDPOINTS.PROFILE.GET)}/${userData.id}`
       );
-      console.log(response.data.user);
       if (response.data.user) {
         setProfile((prev) => ({ ...prev, ...response.data.user }));
       }
     } catch (error) {
-      console.error("Error fetching profile:", error);
       toast.error("Failed to load profile data");
     } finally {
       setLoading(false);
@@ -221,7 +219,6 @@ const PersonalDetails = () => {
         payload = userPayload;
       }
 
-      console.log(payload);
       const response = await axios.put(
         `${apiUrl(API_CONFIG.ENDPOINTS.PROFILE.UPDATE_USER)}/${userData.id}`,
         payload
@@ -238,7 +235,6 @@ const PersonalDetails = () => {
         fetchProfile();
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
       toast.error(error.response?.data?.message || "Failed to update profile");
     } finally {
       setLoading(false);

@@ -44,7 +44,6 @@ const Product = () => {
           setProduct(foundProduct);
         }
       } catch (error) {
-        console.error("Error fetching vendor products:", error);
       } finally {
         setLoading(false);
       }
@@ -90,12 +89,10 @@ const Product = () => {
         if (!error && newConversation) {
           router.push(`/chat/${newConversation.id}`);
         } else {
-          console.error("Error creating conversation:", error);
           message.error("Failed to start chat. Please try again.");
         }
       }
     } catch (error) {
-      console.error("Error in handleMessageClick:", error);
       message.error("An error occurred");
     } finally {
       setIsCreatingChat(false);

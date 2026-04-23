@@ -45,7 +45,6 @@ const WithdrawalRequestPage = () => {
       );
       setWalletBalance(response.data.data.balance || 0);
     } catch (error) {
-      console.error("Failed to fetch wallet balance", error);
     }
   }, []);
 
@@ -64,11 +63,9 @@ const WithdrawalRequestPage = () => {
         apiUrl(API_CONFIG.ENDPOINTS.DELIVERY_WITHDRAWAL.GET_BY_USER + userId),
         { withCredentials: true }
       );
-      console.log("Fetched withdrawals", resp.data);
       const data = resp.data || [];
       setWithdrawals(Array.isArray(data) ? data : data.withdrawals || []);
     } catch (err) {
-      console.error("Failed to fetch withdrawals", err);
       message.error("Failed to load withdrawal history.");
       setWithdrawals([]);
     } finally {
@@ -118,7 +115,6 @@ const WithdrawalRequestPage = () => {
       fetchWithdrawals();
       fetchWalletBalance(); // Refresh balance
     } catch (err) {
-      console.error("Withdrawal submit error", err);
       message.error(
         err?.response?.data?.message || "Failed to submit withdrawal."
       );
