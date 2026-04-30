@@ -360,6 +360,23 @@ const VendorDashboard = () => {
             </div>
           </div>
 
+          {/* Quick Admin Operations */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[
+              { label: "New Product", icon: <FaPlus />, href: "/vendor-dashboard/add-products", bgColor: "bg-blue-50", textColor: "text-blue-600" },
+              { label: "Delivery Requests", icon: <FaTruck />, href: "/vendor-dashboard/request-delivery", bgColor: "bg-indigo-50", textColor: "text-indigo-600" },
+              { label: "Inventory", icon: <FaBoxOpen />, href: "/vendor-dashboard/products-list", bgColor: "bg-purple-50", textColor: "text-purple-600" },
+              { label: "Orders", icon: <FaShoppingCart />, href: "/vendor-dashboard/all-orders", bgColor: "bg-emerald-50", textColor: "text-emerald-600" },
+            ].map((btn) => (
+              <Link key={btn.label} href={btn.href} className="group bg-white p-6 rounded-[2rem] border border-gray-100 hover:border-blue-100 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300">
+                <div className={`w-12 h-12 rounded-2xl ${btn.bgColor} ${btn.textColor} flex items-center justify-center mb-4 transition-transform group-hover:scale-110 group-hover:rotate-6`}>
+                  {btn.icon}
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-gray-900">{btn.label}</span>
+              </Link>
+            ))}
+          </div>
+
           {/* Performance Chart - Minimalist Premium */}
           <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-sm group">
             <div className="flex items-center justify-between mb-8">
@@ -385,23 +402,6 @@ const VendorDashboard = () => {
                 }}
               />
             </div>
-          </div>
-
-          {/* Quick Admin Operations */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: "New Product", icon: <FaPlus />, href: "/vendor-dashboard/add-products", bgColor: "bg-blue-50", textColor: "text-blue-600" },
-              { label: "Delivery Requests", icon: <FaTruck />, href: "/vendor-dashboard/request-delivery", bgColor: "bg-indigo-50", textColor: "text-indigo-600" },
-              { label: "Inventory", icon: <FaBoxOpen />, href: "/vendor-dashboard/products-list", bgColor: "bg-purple-50", textColor: "text-purple-600" },
-              { label: "Orders", icon: <FaShoppingCart />, href: "/vendor-dashboard/all-orders", bgColor: "bg-emerald-50", textColor: "text-emerald-600" },
-            ].map((btn) => (
-              <Link key={btn.label} href={btn.href} className="group bg-white p-6 rounded-[2rem] border border-gray-100 hover:border-blue-100 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300">
-                <div className={`w-12 h-12 rounded-2xl ${btn.bgColor} ${btn.textColor} flex items-center justify-center mb-4 transition-transform group-hover:scale-110 group-hover:rotate-6`}>
-                  {btn.icon}
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-gray-900">{btn.label}</span>
-              </Link>
-            ))}
           </div>
         </div>
 
