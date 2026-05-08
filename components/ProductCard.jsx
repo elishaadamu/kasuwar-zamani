@@ -40,6 +40,7 @@ const ProductCard = ({ product }) => {
   };
 
   const hasOffer = product.offerPrice && product.offerPrice < product.price;
+  const isOutOfStock = product.stock === 0 || product.quantity === 0;
 
   return (
     <div
@@ -78,6 +79,15 @@ const ProductCard = ({ product }) => {
             <FiHeart className="h-5 w-5 text-gray-600" />
           )}
         </div>
+
+        {/* Out of Stock Overlay */}
+        {isOutOfStock && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center rounded-[1.5rem] bg-black/50 backdrop-blur-[2px]">
+            <span className="rounded-full bg-red-600 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-white shadow-lg">
+              Out of Stock
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Product Info */}
@@ -119,8 +129,10 @@ const ProductCard = ({ product }) => {
 
         {/* Add to Cart */}
         <button
+          disabled={isOutOfStock}
           onClick={(e) => {
             e.stopPropagation();
+            if (isOutOfStock) return;
             if (!isLoggedIn) {
               customToast.error("Sign In Required", "Please sign in to buy items.");
               router.push("/signin");
@@ -129,9 +141,13 @@ const ProductCard = ({ product }) => {
             addToCart(product._id);
             router.push("/cart");
           }}
-          className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-3 text-sm font-bold text-white transition-all duration-300 hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/30 active:scale-95"
+          className={`mt-3 flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white transition-all duration-300 ${
+            isOutOfStock
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-indigo-600 hover:bg-indigo-700 hover:shadow-lg hover:shadow-indigo-500/30 active:scale-95"
+          }`}
         >
-          Buy now
+          {isOutOfStock ? "Out of Stock" : "Buy now"}
         </button>
       </div>
     </div>

@@ -45,6 +45,18 @@ const SigninPageContent = () => {
 
       if (!response.data) throw new Error("No data received from server");
 
+      const userRole = response.data?.role;
+      const allowedRoles = ["user", "vendor", "delivery"];
+
+      if (!userRole || !allowedRoles.includes(userRole)) {
+        customToast.error(
+          "Access Denied",
+          `The role "${userRole || "unknown"}" is not authorized to access this platform.`
+        );
+        setLoading(false);
+        return;
+      }
+
       const encryptedUser = encryptData(response.data);
       if (!encryptedUser) throw new Error("Failed to encrypt user data");
 
@@ -52,7 +64,6 @@ const SigninPageContent = () => {
       fetchUserData();
       customToast.success("Welcome Back!", "Signin successful!");
 
-      const userRole = response.data?.role;
       if (redirect) {
         router.push(redirect);
       } else if (userRole === "vendor") {
