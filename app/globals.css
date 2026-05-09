@@ -30,3 +30,39 @@ body {
     grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
   }
 }
+
+/* Bottom nav bar spacing — mobile only */
+@media screen and (max-width: 1023px) {
+  .bottom-nav-spacer {
+    padding-bottom: 5.5rem;
+  }
+}
+
+/* Animations */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
