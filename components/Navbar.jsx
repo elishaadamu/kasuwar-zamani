@@ -173,7 +173,7 @@ const Navbar = () => {
     `transform transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`;
 
   return (
-    <nav className="border-b border-gray-300 text-gray-700 relative bg-white shadow-md z-40">
+    <nav className={`border-b border-gray-300 text-gray-700 relative bg-white shadow-md ${isMobileMenuOpen || isSearchOpen ? 'z-[400]' : 'z-40'}`}>
       <div className="max-w-[1440px] mx-auto flex items-center justify-between px-3 md:px-4 lg:px-4 py-3">
         <div className="flex items-center gap-4">
           <Image
@@ -555,26 +555,27 @@ const Navbar = () => {
           )}
 
           <div className="relative">
-            {isLoggedIn ? (
+            <div
+              onMouseEnter={() => setAccountOpen(true)}
+              onMouseLeave={() => setAccountOpen(false)}
+            >
+              <Image
+                src={assets.user_icon}
+                alt="user"
+                className="w-8 h-8 md:w-10 md:h-10 cursor-pointer object-contain"
+                onClick={() => !isLoggedIn && router.push("/signin")}
+              />
               <div
-                onMouseEnter={() => setAccountOpen(true)}
-                onMouseLeave={() => setAccountOpen(false)}
+                className={`absolute top-full mt-3 right-0 w-52 bg-white border border-gray-100 rounded-2xl shadow-2xl z-30 transform transition-all duration-300 ease-in-out origin-top-right ${
+                  accountOpen
+                    ? "opacity-100 scale-100 visible translate-y-0"
+                    : "opacity-0 scale-95 invisible -translate-y-2"
+                }`}
               >
-                <Image
-                  src={assets.user_icon}
-                  alt="user"
-                  className="w-8 h-8 md:w-10 md:h-10 cursor-pointer object-contain"
-                />
-                <div
-                  className={`absolute top-full mt-3 right-0 w-48 bg-white border border-gray-100 rounded-2xl shadow-2xl z-30 transform transition-all duration-300 ease-in-out origin-top-right ${
-                    accountOpen
-                      ? "opacity-100 scale-100 visible translate-y-0"
-                      : "opacity-0 scale-95 invisible -translate-y-2"
-                  }`}
-                >
-                  <div className="p-2">
-                    {userData?.role === "delivery" ? (
-                      <>
+                <div className="p-3">
+                  {isLoggedIn ? (
+                    <>
+                      {userData?.role === "delivery" ? (
                         <Link
                           href="/delivery-dashboard"
                           className={`block px-4 py-2.5 rounded-xl text-base font-semibold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all ${
@@ -583,9 +584,7 @@ const Navbar = () => {
                         >
                           Dashboard
                         </Link>
-                      </>
-                    ) : userData?.role === "vendor" ? (
-                      <>
+                      ) : userData?.role === "vendor" ? (
                         <Link
                           href="/vendor-dashboard"
                           className={`block px-4 py-2.5 rounded-xl text-base font-semibold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all ${
@@ -594,43 +593,44 @@ const Navbar = () => {
                         >
                           Vendor Dashboard
                         </Link>
-                      </>
-                    ) : (
-                      <Link
-                        href="/dashboard"
-                        className={`block px-4 py-2.5 rounded-xl text-base font-semibold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all ${
-                          pathname === "/dashboard" ? "bg-blue-50 text-blue-600" : ""
-                        }`}
+                      ) : (
+                        <Link
+                          href="/dashboard"
+                          className={`block px-4 py-2.5 rounded-xl text-base font-semibold text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all ${
+                            pathname === "/dashboard" ? "bg-blue-50 text-blue-600" : ""
+                          }`}
+                        >
+                          User Dashboard
+                        </Link>
+                      )}
+                      <div className="h-px bg-gray-100 my-2" />
+                      <button
+                        onClick={logout}
+                        className="flex items-center w-full px-4 py-2.5 rounded-xl text-base font-semibold text-red-600 hover:bg-red-50 transition-all"
                       >
-                        User Dashboard
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      <p className="text-xs text-gray-500 font-medium px-2 mb-1">Welcome Guest</p>
+                      <Link
+                        href="/signin"
+                        className="block px-4 py-2.5 bg-blue-600 text-white text-center rounded-xl text-sm font-bold hover:bg-blue-700 transition-all"
+                      >
+                        Sign In
                       </Link>
-                    )}
-                    <div className="h-px bg-gray-100 my-2" />
-                    <button
-                      onClick={logout}
-                      className="flex items-center w-full px-4 py-2.5 rounded-xl text-base font-semibold text-red-600 hover:bg-red-50 transition-all"
-                    >
-                      Logout
-                    </button>
-                  </div>
+                      <Link
+                        href="/signup"
+                        className="block px-4 py-2.5 bg-gray-50 text-gray-700 text-center rounded-xl text-sm font-bold hover:bg-gray-100 transition-all border border-gray-100"
+                      >
+                        Create Account
+                      </Link>
+                    </div>
+                  )}
                 </div>
               </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <Link
-                  href="/signin"
-                  className="px-6 py-2 rounded-full text-base font-semibold text-gray-700 hover:bg-gray-100 transition-all"
-                >
-                  Sign In
-                </Link>
-                <Link
-                  href="/signup"
-                  className="px-6 py-2 bg-blue-600 text-white rounded-full text-base font-semibold hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all active:scale-95"
-                >
-                  Sign Up
-                </Link>
-              </div>
-            )}
+            </div>
           </div>
         </ul>
 
@@ -655,6 +655,18 @@ const Navbar = () => {
             </div>
           </Link>
           <Image
+            className="w-6 h-6 cursor-pointer opacity-80 hover:opacity-100 transition-opacity"
+            src={assets.user_icon}
+            alt="user icon"
+            onClick={() => {
+              if (isLoggedIn) {
+                router.push(userData?.role === "vendor" ? "/vendor-dashboard" : userData?.role === "delivery" ? "/delivery-dashboard" : "/dashboard");
+              } else {
+                router.push("/signin");
+              }
+            }}
+          />
+          <Image
             className="w-6 h-6 cursor-pointer"
             src={assets.menu_icon}
             alt="menu icon"
@@ -666,7 +678,7 @@ const Navbar = () => {
       {/* Search modal */}
       {isSearchOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-start pt-20"
+          className="fixed inset-0 bg-black bg-opacity-50 z-[300] flex justify-center items-start pt-20"
           onClick={() => setIsSearchOpen(false)}
         >
           <div
@@ -724,7 +736,7 @@ const Navbar = () => {
 
       {/* Mobile Sidebar (slides in from RIGHT). active for <1024px (lg:hidden used above to show mobile controls) */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-0 z-[300] lg:hidden">
           {/* overlay */}
           <div
             className={`fixed inset-0 bg-black transition-opacity duration-300 ${
