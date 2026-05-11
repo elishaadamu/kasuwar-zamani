@@ -85,18 +85,15 @@ const BottomNavBar = () => {
   // "Me" panel menu items
   const meMenuItems = isLoggedIn
     ? [
-        { icon: FaWallet, label: "Dashboard", href: "/dashboard", color: "text-blue-500" },
-        { icon: FaCog, label: "Settings", href: "/dashboard/personal-details", color: "text-gray-500" },
-        { icon: FaTag, label: "Coupons", href: "/dashboard/coupons", color: "text-orange-500" },
-        { icon: FaUsers, label: "Refer & Earn", href: "/dashboard/referrals", color: "text-green-500" },
-        { icon: FaHistory, label: "Transaction History", href: "/dashboard/transaction-history", color: "text-purple-500" },
-        { icon: FaMapMarkerAlt, label: "My Addresses", href: "/dashboard/address", color: "text-red-500" },
-        { icon: FaHeadset, label: "Support", href: "/dashboard/support-ticket", color: "text-indigo-500" },
-        { icon: FaGift, label: "POS Sales", href: "/dashboard/pos-sales", color: "text-amber-500" },
-        { icon: FaShieldAlt, label: "PIN Management", href: "/dashboard/pin-management", color: "text-teal-500" },
-        { icon: FaKey, label: "Change Password", href: "/dashboard/change-password", color: "text-slate-500" },
-        { icon: FaTrashAlt, label: "Delete Account", href: "/dashboard/delete-account", color: "text-red-400" },
-      ]
+      { icon: FaWallet, label: "Dashboard", href: "/dashboard", color: "text-blue-500" },
+      { icon: FaCog, label: "Settings", href: "/dashboard/personal-details", color: "text-gray-500" },
+      { icon: FaTag, label: "Coupons", href: "/dashboard/coupons", color: "text-orange-500" },
+      { icon: FaUsers, label: "Refer & Earn", href: "/dashboard/referrals", color: "text-green-500" },
+      { icon: FaHistory, label: "Transaction History", href: "/dashboard/transaction-history", color: "text-purple-500" },
+      { icon: FaMapMarkerAlt, label: "My Addresses", href: "/dashboard/address", color: "text-red-500" },
+      { icon: FaHeadset, label: "Support", href: "/dashboard/support-ticket", color: "text-indigo-500" },
+      { icon: FaGift, label: "POS Sales", href: "/dashboard/pos-sales", color: "text-amber-500" },
+    ]
     : [];
 
   return (
@@ -140,18 +137,16 @@ const BottomNavBar = () => {
                   aria-label={tab.label}
                 >
                   <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${
-                      tab.isActive
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ${tab.isActive
                         ? "bg-blue-500/20 text-blue-400"
                         : "text-gray-400 group-hover:text-gray-200 group-active:scale-90"
-                    }`}
+                      }`}
                   >
                     <Icon className="w-5 h-5" />
                   </div>
                   <span
-                    className={`text-[10px] font-semibold mt-0.5 transition-colors ${
-                      tab.isActive ? "text-blue-400" : "text-gray-500 group-hover:text-gray-300"
-                    }`}
+                    className={`text-[10px] font-semibold mt-0.5 transition-colors ${tab.isActive ? "text-blue-400" : "text-gray-500 group-hover:text-gray-300"
+                      }`}
                   >
                     {tab.label}
                   </span>
