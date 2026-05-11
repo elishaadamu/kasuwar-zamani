@@ -84,7 +84,7 @@ const ProductCard = ({ product }) => {
             className="object-cover transition-transform duration-700 group-hover:scale-105"
             loading="lazy"
           />
-          
+
           {/* Featured Badge */}
           {isFeatured && (
             <div className="absolute top-4 left-4 z-10 rounded-full bg-blue-600 px-3 py-1 text-[10px] font-bold text-white shadow-lg">
@@ -137,21 +137,21 @@ const ProductCard = ({ product }) => {
               </span>
             )}
           </div>
-          
+
           {/* Condition */}
           <span className="text-sm font-semibold text-gray-500 px-3 py-1 bg-gray-50 rounded-lg">
-            {product.condition || "New"}
+            {product.condition || ""}
           </span>
         </div>
 
         {/* Rating Section (Subtle) */}
         <div className="flex items-center gap-1.5 mt-1">
-          <div className="flex text-yellow-400">
+          {/* <div className="flex text-yellow-400">
             <FaStar className="h-3 w-3 fill-current" />
           </div>
           <span className="text-[10px] font-bold text-gray-400">
             {product.averageRating?.toFixed(1) || "4.8"} ({product.reviews?.length || 24})
-          </span>
+          </span> */}
         </div>
 
         {/* Action Buttons */}
@@ -160,11 +160,10 @@ const ProductCard = ({ product }) => {
           <button
             disabled={isOutOfStock}
             onClick={handleBuyNow}
-            className={`flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-sm font-black text-white transition-all duration-300 shadow-lg ${
-              isOutOfStock
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
-                : "bg-indigo-600 shadow-indigo-200 hover:bg-indigo-700 hover:shadow-indigo-300 active:scale-95"
-            }`}
+            className={`flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-sm font-black text-white transition-all duration-300 shadow-lg ${isOutOfStock
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
+              : "bg-indigo-600 shadow-indigo-200 hover:bg-indigo-700 hover:shadow-indigo-300 active:scale-95"
+              }`}
           >
             Buy now
           </button>
@@ -177,7 +176,7 @@ const ProductCard = ({ product }) => {
             <FaCommentDots className="h-4 w-4" />
             Chat Vendor
           </button>
-          
+
           {/* Restriction Note */}
           <p className="text-[9px] text-center text-gray-400 font-medium px-4 leading-tight">
             * Secure chat only. Sharing phone numbers or emails is strictly prohibited.

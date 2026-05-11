@@ -45,8 +45,8 @@ const CategoryProducts = () => {
 
         return (
           <React.Fragment key={category._id}>
-            <section className="py-1">
-              <div className="flex flex-col text-left mb-12">
+            <section className="">
+              <div className="flex flex-col text-left mb-6">
                 <h2 className="text-xl md:text-3xl font-bold text-gray-900 mb-4">
                   {category.name}
                 </h2>
@@ -55,13 +55,13 @@ const CategoryProducts = () => {
                 </p>
               </div>
 
-              <div className="home-products grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 items-center justify-items-center gap-6 mt-6 w-full">
+              <div className="home-products grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 items-center justify-items-center gap-6 mt-6 w-full">
                 {categoryProducts.map((product) => (
                   <ProductCard key={product._id} product={product} />
                 ))}
               </div>
             </section>
-            <hr className="my-12 border-gray-200" />
+
           </React.Fragment>
         );
       })}
