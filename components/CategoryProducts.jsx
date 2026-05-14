@@ -6,7 +6,7 @@ import { useAppContext } from "@/context/AppContext";
 import ProductCard from "./ProductCard";
 
 const CategoryProducts = () => {
-  const { products, router } = useAppContext();
+  const { products } = useAppContext();
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
@@ -18,6 +18,7 @@ const CategoryProducts = () => {
         );
         setCategories(response.data.categories || []);
       } catch (error) {
+        console.error("Error fetching categories:", error);
       }
     };
 
@@ -36,36 +37,40 @@ const CategoryProducts = () => {
   }
 
   return (
-    <>
-
+    <div className="space-y-20 py-10">
       {validCategories.map((category) => {
         const categoryProducts = products
           .filter((p) => p.category === category.name)
           .slice(0, 4);
 
         return (
-          <React.Fragment key={category._id}>
-            <section className="">
-              <div className="flex flex-col text-left mb-6">
-                <h2 className="text-xl md:text-3xl font-bold text-gray-900 mb-4">
+          <section key={category._id} className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-4">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#004AAD]/5 border border-[#004AAD]/10">
+                  <div className="w-1.5 h-1.5 bg-[#004AAD] rounded-full" />
+                  <span className="text-[#004AAD] font-bold text-[10px] uppercase tracking-widest">
+                    Collection
+                  </span>
+                </div>
+                <h2 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tighter">
                   {category.name}
                 </h2>
-                <p className="text-lg text-gray-600 text-left max-w-2xl">
-                  Check out our latest arrivals in the {category.name} category.
+                <p className="text-sm md:text-base text-gray-500 font-medium max-w-xl">
+                  Discover our curated selection of premium quality items in the {category.name} collection.
                 </p>
               </div>
+            </div>
 
-              <div className="home-products grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 items-center justify-items-center gap-6 mt-6 w-full">
-                {categoryProducts.map((product) => (
-                  <ProductCard key={product._id} product={product} />
-                ))}
-              </div>
-            </section>
-
-          </React.Fragment>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 justify-items-center">
+              {categoryProducts.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
+          </section>
         );
       })}
-    </>
+    </div>
   );
 };
 

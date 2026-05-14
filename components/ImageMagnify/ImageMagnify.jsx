@@ -42,7 +42,12 @@ function ImageMagnify({
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
     >
-      <img className="small-image" src={smallImage.src} alt={smallImage.alt} />
+      <img 
+        className="small-image" 
+        src={smallImage.src} 
+        alt={smallImage.alt} 
+        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+      />
 
       <div
         style={{
