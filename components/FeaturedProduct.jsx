@@ -20,7 +20,7 @@ const FeaturedProduct = () => {
         <div className="absolute top-1/2 -left-24 w-72 h-72 bg-[#EBF2FF] rounded-full blur-3xl" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4  sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6 text-center md:text-left">
           <div className="max-w-2xl mx-auto md:mx-0">
@@ -37,7 +37,7 @@ const FeaturedProduct = () => {
               Explore our hand-selected assortment of top-tier products, crafted for those who demand excellence.
             </p>
           </div>
-          
+
           <button
             onClick={() => router.push("/all-products")}
             className="group flex items-center justify-center md:justify-start gap-2 text-[#004AAD] font-black text-sm uppercase tracking-wider hover:gap-4 transition-all"

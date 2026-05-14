@@ -28,16 +28,16 @@ const OrderSummary = ({ externalState }) => {
 
   const deliveryState = externalState ? externalState.deliveryState : _deliveryState;
   const setDeliveryState = externalState ? externalState.setDeliveryState : _setDeliveryState;
-  
+
   const deliveryLga = externalState ? externalState.deliveryLga : _deliveryLga;
   const setDeliveryLga = externalState ? externalState.setDeliveryLga : _setDeliveryLga;
-  
+
   const deliveryAddress = externalState ? externalState.deliveryAddress : _deliveryAddress;
   const setDeliveryAddress = externalState ? externalState.setDeliveryAddress : _setDeliveryAddress;
-  
+
   const selectedShipping = externalState ? externalState.selectedShipping : _selectedShipping;
   const setSelectedShipping = externalState ? externalState.setSelectedShipping : _setSelectedShipping;
-  
+
   const pin = externalState ? externalState.pin : _pin;
   const setPin = externalState ? externalState.setPin : _setPin;
 
@@ -58,7 +58,7 @@ const OrderSummary = ({ externalState }) => {
   const [loading, setLoading] = useState(false);
   const [showPin, setShowPin] = useState(false);
   const [isInterState, setIsInterState] = useState(false);
-  
+
   // Shipping logic states managed locally for calculation
   const [shippingOptions, setShippingOptions] = useState([]);
   const [shippingFee, setShippingFee] = useState(0);
@@ -107,7 +107,7 @@ const OrderSummary = ({ externalState }) => {
       const cartItemIds = Object.keys(cartItems);
       for (const itemId of cartItemIds) {
         if (cartItems[itemId] <= 0) continue;
-        
+
         const product = products.find((p) => p._id === itemId);
         if (product) {
           return {
@@ -412,9 +412,9 @@ const OrderSummary = ({ externalState }) => {
   const totalAmount = finalAmount !== null
     ? finalAmount
     : getCartAmount() +
-      shippingFee +
-      Math.floor(getCartAmount() * 0.02) -
-      couponDiscount;
+    shippingFee +
+    Math.floor(getCartAmount() * 0.02) -
+    couponDiscount;
 
   const validationErrors = useMemo(() => {
     const errors = [];
@@ -470,7 +470,7 @@ const OrderSummary = ({ externalState }) => {
                     {[
                       vendorShippingInfo.shippingLga && `${vendorShippingInfo.shippingLga} LGA`,
                       vendorShippingInfo.shippingState && `${vendorShippingInfo.shippingState} State`,
-                    ].filter(Boolean).join(', ') || "Location specified"} 
+                    ].filter(Boolean).join(', ') || "Location specified"}
                     {vendorShippingInfo.zipCode && ` · ${vendorShippingInfo.zipCode}`}
                   </p>
                 )}
@@ -572,17 +572,15 @@ const OrderSummary = ({ externalState }) => {
                       setSelectedShipping(option.name);
                       setShippingFee(option.price);
                     }}
-                    className={`flex items-center justify-between p-3.5 rounded-xl cursor-pointer transition-all duration-200 border-2 ${
-                      isSelected
-                        ? "border-blue-500 bg-blue-50/60 shadow-sm shadow-blue-100/50"
-                        : "border-transparent bg-slate-50 hover:bg-slate-100/80"
-                    }`}
+                    className={`flex items-center justify-between p-3.5 rounded-xl cursor-pointer transition-all duration-200 border-2 ${isSelected
+                      ? "border-blue-500 bg-blue-50/60 shadow-sm shadow-blue-100/50"
+                      : "border-transparent bg-slate-50 hover:bg-slate-100/80"
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       {/* Custom Radio */}
-                      <div className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                        isSelected ? "border-blue-500 bg-blue-500" : "border-slate-300 bg-white"
-                      }`}>
+                      <div className={`w-[18px] h-[18px] rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-colors ${isSelected ? "border-blue-500 bg-blue-500" : "border-slate-300 bg-white"
+                        }`}>
                         {isSelected && (
                           <div className="w-[6px] h-[6px] rounded-full bg-white" />
                         )}
@@ -771,7 +769,7 @@ const OrderSummary = ({ externalState }) => {
 
         {/* ═══════════ VALIDATION ERRORS ═══════════ */}
         {validationErrors.length > 0 && (
-          <div className="mt-4 p-3.5 bg-amber-50 rounded-xl border border-amber-100 flex items-start gap-3 animate-fadeIn">
+          <div className="mt-6 p-3.5 bg-amber-50 rounded-xl border border-amber-100 flex items-start gap-3 animate-fadeIn" style={{ marginBottom: '16px' }}>
             <div className="w-5 h-5 rounded-full bg-amber-200 flex items-center justify-center flex-shrink-0 mt-0.5">
               <svg className="w-3 h-3 text-amber-700" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
@@ -795,7 +793,7 @@ const OrderSummary = ({ externalState }) => {
         <button
           onClick={createOrder}
           disabled={loading || validationErrors.length > 0}
-          className="w-full relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white font-extrabold py-4 mt-4 rounded-xl hover:from-blue-700 hover:via-blue-800 hover:to-indigo-800 disabled:from-slate-200 disabled:via-slate-200 disabled:to-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-all duration-300 transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-500/25 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 disabled:shadow-none group"
+          className="w-full relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white font-extrabold py-4 mt-6 rounded-xl hover:from-blue-700 hover:via-blue-800 hover:to-indigo-800 disabled:from-slate-200 disabled:via-slate-200 disabled:to-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-all duration-300 transform hover:-translate-y-0.5 focus:outline-none focus:ring-4 focus:ring-blue-500/25 shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 disabled:shadow-none group"
         >
           {loading ? (
             <div className="flex items-center justify-center gap-2.5">

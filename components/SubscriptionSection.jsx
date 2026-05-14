@@ -1,8 +1,9 @@
+"use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import axios from "axios";
-import Image from "next/image";
+import { FaGem, FaBolt, FaCrown, FaCheck, FaArrowRight } from "react-icons/fa";
 
 const SubscriptionPlans = () => {
   const [plans, setPlans] = useState([]);
@@ -17,12 +18,11 @@ const SubscriptionPlans = () => {
   const fetchSubscriptionPlans = async () => {
     try {
       setLoading(true);
-      setError(null); // Reset error state on new fetch
+      setError(null);
       const response = await axios.get(
         apiUrl(API_CONFIG.ENDPOINTS.SUBSCRIPTION.GET_ALL),
         { withCredentials: true }
       );
-
       setPlans(response.data.plans);
     } catch (err) {
       setError(err.response?.data?.message || err.message);
@@ -37,23 +37,11 @@ const SubscriptionPlans = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto w-full">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                className="rounded-2xl p-6 sm:p-8 shadow-lg bg-white h-96 animate-pulse"
-              >
-                <div className="h-8 bg-gray-200 rounded w-3/4 mx-auto mb-4"></div>
-                <div className="h-4 bg-gray-200 rounded w-full mx-auto mb-8"></div>
-                <div className="h-16 bg-gray-200 rounded w-1/2 mx-auto mb-8"></div>
-                <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
-                <div className="h-12 bg-gray-200 rounded w-full mt-8"></div>
-              </div>
-            ))}
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
+        <div className="max-w-6xl mx-auto w-full px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[...Array(3)].map((_, i) => (
+            <div key={i} className="rounded-[2rem] p-8 bg-white h-[400px] animate-pulse border border-gray-100 shadow-sm" />
+          ))}
         </div>
       </div>
     );
@@ -61,15 +49,16 @@ const SubscriptionPlans = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-500 text-xl mb-4">⚠️</div>
-          <p className="text-red-600 text-lg">Error: {error}</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
+        <div className="text-center p-10 bg-white rounded-[2rem] border border-red-50 shadow-xl max-w-md mx-6">
+          <div className="text-red-500 text-3xl mb-4">!</div>
+          <h2 className="text-xl font-black text-gray-900 mb-2 uppercase tracking-tighter">Connection Error</h2>
+          <p className="text-gray-500 font-medium mb-6 text-sm">{error}</p>
           <button
             onClick={fetchSubscriptionPlans}
-            className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="w-full bg-[#004AAD] text-white py-3 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-[#003D8F] transition-all"
           >
-            Try Again
+            Retry
           </button>
         </div>
       </div>
@@ -77,94 +66,125 @@ const SubscriptionPlans = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50  px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-10 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 lg:text-5xl">
-            Choose Your Subscription Plan
+    <div className="min-h-screen bg-[#F8FAFC] relative overflow-hidden py-16 px-6 lg:px-12">
+      
+      {/* Background Accents (Subtle) */}
+      <div className="absolute inset-0 -z-10 pointer-events-none">
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-[#004AAD]/5 rounded-full blur-[120px] -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#EBF2FF] rounded-full blur-[100px] translate-y-1/3" />
+      </div>
+
+      <div className="max-w-6xl mx-auto relative">
+        
+        {/* Header Section (Scaled Down) */}
+        <div className="flex flex-col items-center text-center mb-16">
+          <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white shadow-sm border border-gray-100 mb-6">
+            <div className="w-1.5 h-1.5 bg-[#004AAD] rounded-full animate-ping" />
+            <span className="text-[#004AAD] font-black text-[9px] uppercase tracking-[0.3em]">Subscription Plans</span>
+          </div>
+          
+          <h1 className="text-4xl md:text-6xl font-black text-gray-900 tracking-tighter leading-tight mb-4">
+            Power Your <span className="text-[#004AAD]">Sales</span>
           </h1>
-          <p className="mt-3 sm:mt-4 text-base sm:text-lg text-gray-600">
-            Select the plan that best fits your business needs.
+          
+          <p className="text-base text-gray-500 font-medium max-w-xl leading-relaxed">
+            Select the perfect membership tier to unlock advanced merchant features and reach more buyers.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 items-center">
+        {/* Pricing Grid (More Compact) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
           {plans.map((plan, index) => {
-            const isPopular = index === 1; // Highlight the second plan
+            const isPopular = index === 1; 
+            const Icon = index === 0 ? FaBolt : index === 1 ? FaCrown : FaGem;
+
             return (
               <div
                 key={plan._id}
-                className={`relative rounded-2xl p-6 sm:p-8 shadow-lg transition-transform duration-300 ${isPopular
-                    ? "bg-blue-600 text-white scale-105"
-                    : "bg-white text-gray-900 hover:scale-105"
-                  }`}
+                className={`group relative flex flex-col rounded-[2rem] p-8 transition-all duration-500 border ${
+                  isPopular
+                    ? "bg-[#004AAD] border-[#004AAD] text-white shadow-xl scale-105 z-10"
+                    : "bg-white border-gray-100 text-gray-900 shadow-sm hover:shadow-md hover:-translate-y-2"
+                }`}
               >
                 {isPopular && (
-                  <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2">
-                    <span className="bg-yellow-400 text-blue-900 text-sm font-bold px-4 py-1 rounded-full uppercase">
-                      Most Popular
-                    </span>
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-yellow-400 text-gray-900 rounded-full font-black text-[9px] uppercase tracking-widest shadow-lg">
+                    Recommended
                   </div>
                 )}
 
-                <h3 className="text-xl sm:text-2xl font-bold text-center">
-                  {plan.package}
-                </h3>
-                <p
-                  className={`text-center mt-2 text-sm ${isPopular ? "text-blue-200" : "text-gray-500"
-                    }`}
-                >
-                  {plan.description}
-                </p>
-
-                <div className="mt-8 text-center">
-                  <span className="text-4xl sm:text-5xl font-extrabold">
-                    ₦{plan.price.toLocaleString()}
-                  </span>
-                  <span
-                    className={`text-base sm:text-lg ml-1 ${isPopular ? "text-blue-200" : "text-gray-500"
-                      }`}
-                  >
-                    / {plan.duration} days
-                  </span>
+                {/* Plan Identity */}
+                <div className="mb-8">
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${
+                    isPopular ? 'bg-white/10' : 'bg-[#EBF2FF]'
+                  }`}>
+                    <Icon className={`w-6 h-6 ${isPopular ? 'text-white' : 'text-[#004AAD]'}`} />
+                  </div>
+                  
+                  <h3 className="text-xl font-black tracking-tight uppercase mb-4">
+                    {plan.package}
+                  </h3>
+                  
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-4xl font-black tracking-tighter">
+                      ₦{plan.price.toLocaleString()}
+                    </span>
+                    <span className="text-xs font-bold opacity-60 uppercase tracking-widest">
+                      / {plan.duration} Days
+                    </span>
+                  </div>
                 </div>
 
-                <ul className="mt-6 sm:mt-8 space-y-4 text-sm sm:text-base">
-                  <li className="flex items-center">
-                    <span className="font-semibold">Products Limit:</span>
-                    <span className="ml-auto">
-                      {plan.products >= 1000 ? "Unlimited" : plan.products}
+                {/* Feature Highlight (Clean & Minimal) */}
+                <div className="flex-1 space-y-4 mb-8">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                      isPopular ? 'bg-white/20 text-white' : 'bg-[#EBF2FF] text-[#004AAD]'
+                    }`}>
+                      <FaCheck className="w-2 h-2" />
+                    </div>
+                    <span className="text-sm font-bold tracking-tight">
+                      {plan.products >= 1000 ? "Unlimited" : `${plan.products} Products`}
                     </span>
-                  </li>
-                </ul>
-
-                {plan.image && (
-                  <div className="mt-6">
-                    <Image
-                      src={plan.image}
-                      alt={plan.package}
-                      width={400}
-                      height={200}
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="w-full h-32 object-cover rounded-lg"
-                    />
                   </div>
-                )}
+                  <div className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                      isPopular ? 'bg-white/20 text-white' : 'bg-[#EBF2FF] text-[#004AAD]'
+                    }`}>
+                      <FaCheck className="w-2 h-2" />
+                    </div>
+                    <span className="text-sm font-bold tracking-tight">Marketplace Search</span>
+                  </div>
+                  <div className="flex items-center gap-3 opacity-60">
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                      isPopular ? 'bg-white/20 text-white' : 'bg-[#EBF2FF] text-[#004AAD]'
+                    }`}>
+                      <FaCheck className="w-2 h-2" />
+                    </div>
+                    <span className="text-sm font-bold tracking-tight">Vendor Dashboard</span>
+                  </div>
+                </div>
 
+                {/* Compact Action Button */}
                 <button
                   onClick={() => handleSelectPlan(plan)}
-                  className={`w-full mt-8 py-3 px-6 rounded-lg font-semibold text-center transition-colors duration-300 ${isPopular
-                      ? "bg-white text-blue-600 hover:bg-blue-100"
-                      : "bg-blue-600 text-white hover:bg-blue-700"
-                    } focus:outline-none focus:ring-2 focus:ring-offset-2 ${isPopular ? "focus:ring-white" : "focus:ring-blue-500"
-                    }`}
+                  className={`w-full h-14 rounded-xl font-black uppercase tracking-widest text-[9px] flex items-center justify-center gap-3 transition-all active:scale-95 shadow-md ${
+                    isPopular
+                      ? "bg-white text-[#004AAD] hover:bg-gray-50"
+                      : "bg-gray-900 text-white hover:bg-[#004AAD]"
+                  }`}
                 >
                   Select Plan
+                  <FaArrowRight className="w-2.5 h-2.5" />
                 </button>
               </div>
             );
           })}
         </div>
+
+        <p className="mt-12 text-center text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em]">
+          Secure Payment · Instant Activation
+        </p>
       </div>
     </div>
   );

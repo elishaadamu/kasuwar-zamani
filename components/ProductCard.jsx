@@ -206,8 +206,8 @@ const ProductCard = ({ product }) => {
             disabled={isOutOfStock}
             onClick={handleBuyNow}
             className={`w-full md:w-auto rounded-lg md:rounded-xl border-2 border-[#004AAD] px-3 md:px-5 py-2 md:py-2.5 text-[8px] md:text-[10px] font-bold uppercase tracking-wider transition-all duration-300 ${isOutOfStock
-                ? "border-gray-200 text-gray-300 cursor-not-allowed"
-                : "text-[#004AAD] hover:bg-[#004AAD] hover:text-white active:scale-95"
+              ? "border-gray-200 text-gray-300 cursor-not-allowed"
+              : "text-[#004AAD] hover:bg-[#004AAD] hover:text-white active:scale-95"
               }`}
           >
             Add to Cart
