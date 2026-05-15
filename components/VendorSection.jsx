@@ -3,42 +3,19 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import VendorCard from "./VendorCard";
 import axios from "axios";
-import Slider from "react-slick";
 import { FaStore } from "react-icons/fa";
 import { useAppContext } from "@/context/AppContext";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import Loading from "./Loading";
-
-// Import slick-carousel styles
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 
 const VendorSection = () => {
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
   const { isLoggedIn, authLoading } = useAppContext();
 
-  const sliderSettings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    autoplay: true,
-    autoplaySpeed: 5000,
-    slidesToShow: 2,
-    slidesToScroll: 1,
-    arrows: true,
 
-    responsive: [
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-          arrows: true,
-        },
-      },
-    ],
-  };
+
+
 
   useEffect(() => {
     if (!authLoading && !isLoggedIn) {
@@ -71,9 +48,6 @@ const VendorSection = () => {
     <div className="my-16">
       <style jsx global>{`
         @media screen and (max-width: 360px) {
-          .home-products {
-            grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
-          }
           .button-see_more {
             display: flex;
             flex-direction: column;
@@ -213,13 +187,29 @@ const VendorSection = () => {
           </Link>
         </div>
       ) : (
-        <Slider {...sliderSettings}>
-          {vendors.slice(0, 4).map((vendor) => (
-            <div key={vendor._id} className="px-2 py-2">
-              <VendorCard {...vendor} />
-            </div>
-          ))}
-        </Slider>
+        <div className="relative group/carousel">
+          {/* Custom Horizontal Scroll Carousel */}
+          <div className="flex overflow-x-auto snap-x snap-mandatory no-scrollbar gap-4 pb-12 pt-4">
+            {vendors.slice(0, 8).map((vendor) => (
+              <div 
+                key={vendor._id} 
+                className="flex-none w-full md:w-[calc(50%-0.5rem)] snap-center px-1"
+              >
+                <VendorCard {...vendor} />
+              </div>
+            ))}
+          </div>
+
+          {/* Scroll Indicators / Dots (Simulated) */}
+          <div className="flex justify-center gap-2 mt-[-2rem]">
+            {vendors.slice(0, Math.ceil(vendors.length / 2)).map((_, i) => (
+              <div 
+                key={i} 
+                className={`h-1.5 rounded-full transition-all duration-300 ${i === 0 ? "w-6 bg-indigo-600" : "w-1.5 bg-gray-300"}`}
+              />
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );
