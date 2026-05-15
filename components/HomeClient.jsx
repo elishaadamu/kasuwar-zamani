@@ -162,22 +162,21 @@ const HomeClient = ({ initialBanners }) => {
 
         {/* Main Content wrapper */}
         <div className="relative z-10 w-full">
-          <div className="max-w-[1440px] mx-auto px-4 lg:px-6">
-            <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 min-h-[500px]">
-              {/* Category Sidebar */}
-              <div className="hidden xl:block xl:col-span-1 bg-white rounded-[2rem] shadow-sm border border-gray-100 p-4 h-full">
-                <CategorySidebar />
+          <div className="px-6 max-w-[1440px] mx-auto lg:px-8 flex flex-col-reverse lg:flex-col gap-16">
+            
+            {/* Hero Banner Grid (Bento) - Top on Desktop, Bottom on Mobile */}
+            <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 min-h-[400px] lg:min-h-[650px]">
+              <div className="hidden xl:block xl:col-span-1">
+                {/* Maintain alignment with sidebar below */}
               </div>
-
-              {/* Hero Banner Grid (Bento) */}
               <div className="xl:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Main Slider Area */}
                 <div className="md:col-span-2 md:row-span-2 rounded-[2rem] overflow-hidden shadow-2xl shadow-blue-900/5 h-full relative group bg-white border border-gray-100">
                   <HeaderSlider initialBanners={initialBanners} />
                 </div>
 
-                {/* Banner Top Right */}
-                <div className="md:col-span-1 rounded-[2rem] bg-gradient-to-br from-indigo-500 to-purple-600 relative overflow-hidden group shadow-xl shadow-purple-900/10 flex items-center p-8 aspect-[4/3] md:aspect-auto">
+                {/* Banner Top Right - Scaled Up */}
+                <div className="md:col-span-1 rounded-[2.5rem] bg-gradient-to-br from-indigo-500 to-purple-600 relative overflow-hidden group shadow-2xl shadow-purple-900/20 flex items-center p-6 sm:p-10 aspect-[16/9] sm:aspect-square md:aspect-auto">
                   <div className="absolute top-0 right-0 w-40 h-40 bg-white opacity-10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
                   <div className="absolute -bottom-10 -right-10 opacity-30 w-48 h-48 rotate-12 group-hover:rotate-0 transition-transform duration-500">
                     <Image
@@ -190,15 +189,15 @@ const HomeClient = ({ initialBanners }) => {
                   </div>
                   <div className="relative z-10 text-white w-full">
                     <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10">Trending</span>
-                    <h3 className="text-3xl font-black mt-6 tracking-tight leading-none mb-3">Urban<br />Lifestyle</h3>
-                    <Link href="/all-products" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider bg-white text-indigo-600 px-5 py-3 rounded-xl hover:gap-4 transition-all mt-4 hover:shadow-lg">
+                    <h3 className="text-2xl sm:text-4xl font-black mt-4 sm:mt-8 tracking-tight leading-[0.9] mb-4">Urban<br />Lifestyle</h3>
+                    <Link href="/all-products" className="inline-flex items-center gap-2 text-[10px] sm:text-xs font-black uppercase tracking-wider bg-white text-indigo-600 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl hover:gap-4 transition-all mt-2 sm:mt-4 hover:shadow-lg">
                       Shop Now <FaArrowRight />
                     </Link>
                   </div>
                 </div>
 
-                {/* Banner Bottom Right */}
-                <div className="md:col-span-1 rounded-[2rem] bg-gradient-to-tr from-gray-900 to-blue-950 relative overflow-hidden group shadow-xl shadow-blue-900/10 flex items-center p-8 aspect-[4/3] md:aspect-auto">
+                {/* Banner Bottom Right - Scaled Up */}
+                <div className="md:col-span-1 rounded-[2.5rem] bg-gradient-to-tr from-gray-900 to-blue-950 relative overflow-hidden group shadow-2xl shadow-blue-900/20 flex items-center p-6 sm:p-10 aspect-[16/9] sm:aspect-square md:aspect-auto">
                   <div className="absolute bottom-0 right-0 w-40 h-40 bg-blue-500 opacity-20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
                   <div className="absolute top-10 -right-6 opacity-80 w-40 h-40 -rotate-12 group-hover:rotate-0 transition-transform duration-500 z-0">
                     <Image
@@ -209,12 +208,12 @@ const HomeClient = ({ initialBanners }) => {
                       className="object-contain"
                     />
                   </div>
-                  <div className="relative z-10 text-white w-full mt-auto mb-0 flex flex-col items-start justify-end h-full pt-16">
+                  <div className="relative z-10 text-white w-full mt-auto mb-0 flex flex-col items-start justify-end h-full pt-10 sm:pt-16">
                     <span className="text-[10px] font-black uppercase tracking-widest bg-blue-500/30 backdrop-blur-md px-3 py-1.5 rounded-xl border border-blue-500/20 text-blue-200">Limited Offer</span>
-                    <h3 className="text-3xl font-black mt-4 tracking-tight leading-none">Gadget<br />Madness</h3>
+                    <h3 className="text-2xl sm:text-4xl font-black mt-3 sm:mt-6 tracking-tight leading-[0.9]">Gadget<br />Madness</h3>
                     <Link
                       href="/all-products"
-                      className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider bg-blue-500 text-white px-5 py-3 rounded-xl hover:gap-4 transition-all mt-6 hover:shadow-lg hover:shadow-blue-500/20"
+                      className="inline-flex items-center gap-2 text-[10px] sm:text-xs font-black uppercase tracking-wider bg-blue-500 text-white px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl hover:gap-4 transition-all mt-4 sm:mt-6 hover:shadow-lg hover:shadow-blue-500/20"
                     >
                       Explore Selection <FaArrowRight />
                     </Link>
@@ -222,11 +221,22 @@ const HomeClient = ({ initialBanners }) => {
                 </div>
               </div>
             </div>
+
+            {/* Products & Sidebar Section - Top on Mobile, Bottom on Desktop */}
+            <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+              {/* Category Sidebar */}
+              <div className="hidden xl:block xl:col-span-1 bg-white rounded-[2rem] shadow-sm border border-gray-100 p-4 h-full">
+                <CategorySidebar />
+              </div>
+
+              {/* Main Products Area */}
+              <div className="xl:col-span-3">
+                <HomeProducts />
+              </div>
+            </div>
           </div>
 
-          <div className="px-6 max-w-[1440px] mx-auto lg:px-8 space-y-16">
-            <HomeProducts />
-
+          <div className="px-6 max-w-[1440px] mx-auto lg:px-8 space-y-16 mt-16">
             <VendorSection />
 
 
