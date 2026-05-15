@@ -141,7 +141,7 @@ const Product = () => {
           
           {/* Left Column: Image Gallery */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="relative aspect-square md:aspect-[4/3] lg:aspect-square w-full rounded-[2.5rem] overflow-hidden bg-[#EBF2FF] border border-gray-100 shadow-sm [&_img]:object-cover">
+            <div className="relative aspect-[4/5] w-full rounded-[2.5rem] overflow-hidden bg-[#EBF2FF] border border-gray-100 shadow-sm [&_img]:object-cover">
               <ImageMagnify
                 smallImage={{
                   alt: product.name,

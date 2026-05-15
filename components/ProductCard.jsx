@@ -86,8 +86,8 @@ const ProductCard = ({ product }) => {
       }}
       className="group relative flex w-full cursor-pointer flex-col overflow-hidden rounded-md bg-white shadow-sm transition-all duration-500 hover:shadow-md"
     >
-      {/* Product Image Section - Square aspect ratio */}
-      <div className="relative aspect-square w-full overflow-hidden bg-[#F3F4F6] rounded-t-md">
+      {/* Product Image Section - Adjusted aspect ratio to reduce height by 1/4 */}
+      <div className="relative aspect-[5/6] w-full overflow-hidden bg-[#F3F4F6] rounded-t-md">
         {/* Background Patterns - Removed for cleaner look on mobile as per design */}
         <div className="hidden md:block absolute inset-0 opacity-20 pointer-events-none">
           <div className="absolute top-10 left-10 h-24 w-24 rounded-full border-[3px] border-[#004AAD]" />
@@ -185,8 +185,8 @@ const ProductCard = ({ product }) => {
         </div>
       </div>
 
-      {/* Product Content Section */}
-      <div className="flex flex-col gap-2 md:gap-4 p-4 md:p-6 text-center">
+      {/* Product Content Section - Compact layout */}
+      <div className="flex flex-col gap-1 md:gap-2 p-3 md:p-4 text-center">
         {/* Product Name */}
         <h3 className="line-clamp-1 text-sm md:text-base font-semibold text-gray-800 tracking-tight">
           {product.name}
@@ -206,8 +206,8 @@ const ProductCard = ({ product }) => {
           )}
         </div>
 
-        {/* Quick Actions Row - Chat on Left, Buy on Right */}
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
+        {/* Quick Actions Row - Reduced height and spacing */}
+        <div className="flex items-center justify-between mt-1 pt-2 border-t border-gray-50">
           <button
             onClick={handleChatVendor}
             className="flex items-center gap-1.5 text-[10px] font-bold text-[#004AAD] hover:opacity-70 transition-opacity"
@@ -219,7 +219,7 @@ const ProductCard = ({ product }) => {
           <button
             onClick={handleBuyNow}
             disabled={isOutOfStock}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 ${isOutOfStock
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider transition-all duration-300 ${isOutOfStock
               ? "bg-gray-100 text-gray-400 cursor-not-allowed"
               : "bg-[#004AAD] text-white hover:bg-[#003882] shadow-sm hover:shadow-md active:scale-95"
               }`}

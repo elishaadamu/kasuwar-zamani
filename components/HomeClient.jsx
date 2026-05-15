@@ -180,12 +180,12 @@ const HomeClient = ({ initialBanners }) => {
                 <div className="md:col-span-1 rounded-[2rem] bg-gradient-to-br from-indigo-500 to-purple-600 relative overflow-hidden group shadow-xl shadow-purple-900/10 flex items-center p-8 aspect-[4/3] md:aspect-auto">
                   <div className="absolute top-0 right-0 w-40 h-40 bg-white opacity-10 rounded-full -mr-10 -mt-10 blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
                   <div className="absolute -bottom-10 -right-10 opacity-30 w-48 h-48 rotate-12 group-hover:rotate-0 transition-transform duration-500">
-                    <Image 
-                      src={assets.girl_with_headphone_image} 
-                      alt="Tech" 
-                      fill 
+                    <Image
+                      src={assets.girl_with_headphone_image}
+                      alt="Tech"
+                      fill
                       sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-contain" 
+                      className="object-contain"
                     />
                   </div>
                   <div className="relative z-10 text-white w-full">
@@ -201,19 +201,19 @@ const HomeClient = ({ initialBanners }) => {
                 <div className="md:col-span-1 rounded-[2rem] bg-gradient-to-tr from-gray-900 to-blue-950 relative overflow-hidden group shadow-xl shadow-blue-900/10 flex items-center p-8 aspect-[4/3] md:aspect-auto">
                   <div className="absolute bottom-0 right-0 w-40 h-40 bg-blue-500 opacity-20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
                   <div className="absolute top-10 -right-6 opacity-80 w-40 h-40 -rotate-12 group-hover:rotate-0 transition-transform duration-500 z-0">
-                    <Image 
-                      src={assets.apple_earphone_image} 
-                      alt="Tech" 
-                      fill 
+                    <Image
+                      src={assets.apple_earphone_image}
+                      alt="Tech"
+                      fill
                       sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-contain" 
+                      className="object-contain"
                     />
                   </div>
                   <div className="relative z-10 text-white w-full mt-auto mb-0 flex flex-col items-start justify-end h-full pt-16">
                     <span className="text-[10px] font-black uppercase tracking-widest bg-blue-500/30 backdrop-blur-md px-3 py-1.5 rounded-xl border border-blue-500/20 text-blue-200">Limited Offer</span>
                     <h3 className="text-3xl font-black mt-4 tracking-tight leading-none">Gadget<br />Madness</h3>
-                    <Link 
-                      href="/all-products" 
+                    <Link
+                      href="/all-products"
                       className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider bg-blue-500 text-white px-5 py-3 rounded-xl hover:gap-4 transition-all mt-6 hover:shadow-lg hover:shadow-blue-500/20"
                     >
                       Explore Selection <FaArrowRight />
@@ -228,7 +228,7 @@ const HomeClient = ({ initialBanners }) => {
             <HomeProducts />
 
             <VendorSection />
-            <hr className="my-12 border-gray-200" />
+
 
             <FeaturedProduct />
 
