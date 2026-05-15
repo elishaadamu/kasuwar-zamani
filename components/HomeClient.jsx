@@ -162,7 +162,7 @@ const HomeClient = ({ initialBanners }) => {
 
         {/* Main Content wrapper */}
         <div className="relative z-10 w-full">
-          <div className="max-w-[1440px] mx-auto px-4 lg:px-6 mb-16">
+          <div className="max-w-[1440px] mx-auto px-4 lg:px-6">
             <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 min-h-[500px]">
               {/* Category Sidebar */}
               <div className="hidden xl:block xl:col-span-1 bg-white rounded-[2rem] shadow-sm border border-gray-100 p-4 h-full">
