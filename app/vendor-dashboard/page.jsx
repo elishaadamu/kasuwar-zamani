@@ -22,6 +22,7 @@ import {
   FaArrowRight,
   FaHistory,
   FaTimes,
+  FaCopy,
 } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -70,6 +71,7 @@ const VendorDashboard = () => {
   });
   const [walletBalance, setWalletBalance] = useState({ balance: 0 });
   const [userData, setUserData] = useState(null);
+  const [profileData, setProfileData] = useState(null);
   const [accountDetails, setAccountDetails] = useState(null);
   const [showFundModal, setShowFundModal] = useState(false);
   const [amount, setAmount] = useState("");
@@ -184,9 +186,10 @@ const VendorDashboard = () => {
         const decryptedUserData = decryptData(encryptedUser);
         setUserData(decryptedUserData);
 
-        const [ordersRes, walletRes] = await Promise.all([
+        const [ordersRes, walletRes, profileRes] = await Promise.all([
           axios.get(apiUrl(API_CONFIG.ENDPOINTS.ORDER.GET_ALL + decryptedUserData.id)),
           axios.get(apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance + decryptedUserData.id + "/balance"), { withCredentials: true }),
+          axios.get(`${apiUrl(API_CONFIG.ENDPOINTS.PROFILE.GET)}/${decryptedUserData.id}`),
         ]);
 
         if (ordersRes.data.orders) {
@@ -203,6 +206,10 @@ const VendorDashboard = () => {
           setAccountDetails(walletRes.data.data);
           setWalletBalance(walletRes.data.data);
         }
+
+        if (profileRes.data.user) {
+          setProfileData(profileRes.data.user);
+        }
       } catch (error) {
       } finally {
         setLoading(false);
@@ -214,13 +221,26 @@ const VendorDashboard = () => {
 
   const fetchWalletBalance = async (uid) => {
     try {
-      const walletRes = await axios.get(apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance + uid + "/balance"), { withCredentials: true });
+      const [walletRes, profileRes] = await Promise.all([
+        axios.get(apiUrl(API_CONFIG.ENDPOINTS.ACCOUNT.walletBalance + uid + "/balance"), { withCredentials: true }),
+        axios.get(`${apiUrl(API_CONFIG.ENDPOINTS.PROFILE.GET)}/${uid}`),
+      ]);
+
       if (walletRes.data.data) {
         setAccountDetails(walletRes.data.data);
         setWalletBalance(walletRes.data.data);
       }
+      if (profileRes.data.user) {
+        setProfileData(profileRes.data.user);
+      }
     } catch (error) {
     }
+  };
+
+  const handleCopy = (text) => {
+    if (!text || text === "---") return;
+    navigator.clipboard.writeText(text);
+    customToast.success("Copied!", "Account number copied to clipboard.");
   };
 
   const handlePayment = () => {
@@ -283,13 +303,10 @@ const VendorDashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-        {/* Left Column: Stats & Performance */}
-        <div className="lg:col-span-2 space-y-8">
-
-          {/* Main Financial Hub - Dark Mode Style */}
-          <div className="bg-gray-900 rounded-[2rem] p-5 md:p-7 relative overflow-hidden text-white shadow-2xl shadow-blue-900/20 group">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+        {/* Main Financial Hub - Dark Mode Style */}
+        <div className="lg:col-span-2">
+          <div className="bg-gray-900 rounded-[2rem] p-5 md:p-7 h-full relative overflow-hidden text-white shadow-2xl shadow-blue-900/20 group">
             <div className="absolute top-0 right-0 w-[300px] h-[300px] bg-blue-600/15 rounded-full blur-[80px] -mr-32 -mt-16 group-hover:scale-110 transition-transform duration-1000"></div>
 
             <div className="relative z-10">
@@ -310,17 +327,20 @@ const VendorDashboard = () => {
               {/* Compact 2x2 Details Grid or Activation */}
               {accountDetails?.wallet ? (
                 <div className="grid grid-cols-2 gap-3 mb-5">
-                  <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm">
-                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Acc No</p>
-                    <p className="text-sm font-bold">{accountDetails?.wallet?.virtualAccountNumber}</p>
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm group/copy relative cursor-pointer hover:bg-white/10 transition-colors" onClick={() => handleCopy(profileData?.accNumber)}>
+                    <div className="flex justify-between items-start">
+                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Acc No</p>
+                      <FaCopy className="text-[10px] text-blue-400 opacity-0 group-hover/copy:opacity-100 transition-opacity" />
+                    </div>
+                    <p className="text-sm font-bold">{profileData?.accNumber || "---"}</p>
                   </div>
                   <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm">
                     <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Name</p>
-                    <p className="text-sm font-bold truncate">{accountDetails?.wallet?.virtualAccountName || `${userData?.firstName || ""} ${userData?.lastName || ""}`}</p>
+                    <p className="text-sm font-bold truncate">{profileData?.accName || `${userData?.firstName || ""} ${userData?.lastName || ""}`}</p>
                   </div>
                   <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm">
                     <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Bank</p>
-                    <p className="text-sm font-bold truncate">{accountDetails?.wallet?.virtualBanktName}</p>
+                    <p className="text-sm font-bold truncate">{profileData?.bankName || "---"}</p>
                   </div>
                   <div className="bg-white/5 border border-white/10 rounded-2xl p-3 backdrop-blur-sm">
                     <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-0.5">Status</p>
@@ -359,23 +379,32 @@ const VendorDashboard = () => {
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Quick Admin Operations */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { label: "New Product", icon: <FaPlus />, href: "/vendor-dashboard/add-products", bgColor: "bg-blue-50", textColor: "text-blue-600" },
-              { label: "Delivery Requests", icon: <FaTruck />, href: "/vendor-dashboard/request-delivery", bgColor: "bg-indigo-50", textColor: "text-indigo-600" },
-              { label: "Inventory", icon: <FaBoxOpen />, href: "/vendor-dashboard/products-list", bgColor: "bg-purple-50", textColor: "text-purple-600" },
-              { label: "Orders", icon: <FaShoppingCart />, href: "/vendor-dashboard/all-orders", bgColor: "bg-emerald-50", textColor: "text-emerald-600" },
-            ].map((btn) => (
-              <Link key={btn.label} href={btn.href} className="group bg-white p-6 rounded-[2rem] border border-gray-100 hover:border-blue-100 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300">
-                <div className={`w-12 h-12 rounded-2xl ${btn.bgColor} ${btn.textColor} flex items-center justify-center mb-4 transition-transform group-hover:scale-110 group-hover:rotate-6`}>
-                  {btn.icon}
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 group-hover:text-gray-900">{btn.label}</span>
-              </Link>
-            ))}
-          </div>
+        {/* Quick Admin Operations */}
+        <div className="lg:col-span-1 grid grid-cols-2 gap-4">
+          {[
+            { label: "New Product", icon: <FaPlus />, href: "/vendor-dashboard/add-products", bgColor: "bg-blue-50", textColor: "text-blue-600" },
+            { label: "Delivery Requests", icon: <FaTruck />, href: "/vendor-dashboard/request-delivery", bgColor: "bg-indigo-50", textColor: "text-indigo-600" },
+            { label: "Inventory", icon: <FaBoxOpen />, href: "/vendor-dashboard/products-list", bgColor: "bg-purple-50", textColor: "text-purple-600" },
+            { label: "Orders", icon: <FaShoppingCart />, href: "/vendor-dashboard/all-orders", bgColor: "bg-emerald-50", textColor: "text-emerald-600" },
+          ].map((btn) => (
+            <Link key={btn.label} href={btn.href} className="group bg-white p-5 rounded-[2rem] border border-gray-100 hover:border-blue-100 shadow-sm hover:shadow-xl hover:shadow-blue-900/5 transition-all duration-300 flex flex-col items-center justify-center text-center">
+              <div className={`w-10 h-10 rounded-2xl ${btn.bgColor} ${btn.textColor} flex items-center justify-center mb-3 transition-transform group-hover:scale-110 group-hover:rotate-6`}>
+                {btn.icon}
+              </div>
+              <span className="text-[9px] font-black uppercase tracking-widest text-gray-400 group-hover:text-gray-900 leading-tight">{btn.label}</span>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        {/* Left Column: Stats & Performance */}
+        <div className="lg:col-span-2 space-y-8">
+
+
 
           {/* Performance Chart - Minimalist Premium */}
           <div className="bg-white rounded-[2.5rem] border border-gray-100 p-8 shadow-sm group">
