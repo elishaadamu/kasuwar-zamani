@@ -197,14 +197,28 @@ const ProductCard = ({ product }) => {
           )}
         </div>
 
-        {/* Chat Vendor - Minimalist version */}
-        <button
-          onClick={handleChatVendor}
-          className="mt-1 flex items-center justify-center gap-1.5 text-[10px] font-bold text-[#004AAD] hover:opacity-100 transition-opacity"
-        >
-          <FaCommentDots className="h-3 w-3" />
-          CHAT VENDOR
-        </button>
+        {/* Quick Actions Row - Chat on Left, Buy on Right */}
+        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
+          <button
+            onClick={handleChatVendor}
+            className="flex items-center gap-1.5 text-[10px] font-bold text-[#004AAD] hover:opacity-70 transition-opacity"
+          >
+            <FaCommentDots className="h-3 w-3" />
+            CHAT
+          </button>
+
+          <button
+            onClick={handleBuyNow}
+            disabled={isOutOfStock}
+            className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider transition-all duration-300 ${isOutOfStock
+              ? "text-gray-300 cursor-not-allowed"
+              : "text-[#004AAD] hover:opacity-70 active:scale-95"
+              }`}
+          >
+            <FiShoppingCart className="h-3.5 w-3.5" />
+            BUY
+          </button>
+        </div>
       </div>
     </div>
   );
