@@ -338,6 +338,7 @@ const VendorPage = () => {
               src={vendor?.banner?.url || "https://picsum.photos/seed/1/1200/300"}
               alt={`${vendor.businessName} banner`}
               fill
+              sizes="100vw"
               className="object-cover"
               priority
             />
@@ -363,6 +364,7 @@ const VendorPage = () => {
                     src={vendor?.avatar?.url || "https://i.pravatar.cc/150"}
                     alt={vendor.businessName}
                     fill
+                    sizes="(max-width: 640px) 128px, 160px"
                     className="object-cover"
                   />
                 </div>

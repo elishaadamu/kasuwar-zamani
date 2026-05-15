@@ -113,6 +113,15 @@ const ProductCard = ({ product }) => {
             loading="lazy"
           />
 
+          {/* Savings Badge */}
+          {hasOffer && (
+            <div className="absolute top-2 right-2 z-20 flex items-center justify-center h-8 w-8 rounded-full bg-[#004AAD] text-white shadow-md border border-white/20">
+              <span className="text-[9px] font-black leading-none">
+                -{Math.round(((product.price - product.offerPrice) / product.price) * 100)}%
+              </span>
+            </div>
+          )}
+
           {/* Hover Overlay with Eye Icon - Matching reference */}
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-[#004AAD]/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md transform scale-90 group-hover:scale-100 transition-transform duration-300">
@@ -210,12 +219,12 @@ const ProductCard = ({ product }) => {
           <button
             onClick={handleBuyNow}
             disabled={isOutOfStock}
-            className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider transition-all duration-300 ${isOutOfStock
-              ? "text-gray-300 cursor-not-allowed"
-              : "text-[#004AAD] hover:opacity-70 active:scale-95"
+            className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all duration-300 ${isOutOfStock
+              ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+              : "bg-[#004AAD] text-white hover:bg-[#003882] shadow-sm hover:shadow-md active:scale-95"
               }`}
           >
-            <FiShoppingCart className="h-3.5 w-3.5" />
+            <FiShoppingCart className="h-4 w-4" />
             BUY
           </button>
         </div>

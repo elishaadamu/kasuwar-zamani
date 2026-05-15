@@ -182,6 +182,7 @@ const Product = () => {
                     src={imgUrl}
                     alt={`${product.name} thumbnail ${index}`}
                     fill
+                    sizes="(max-width: 640px) 25vw, (max-width: 1024px) 15vw, 100px"
                     className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   {(mainImage || images[0]) === imgUrl && (
