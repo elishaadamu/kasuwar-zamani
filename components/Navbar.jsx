@@ -14,6 +14,8 @@ import { customToast } from "@/lib/customToast";
 import {
   HiOutlineShoppingBag,
 } from "react-icons/hi2";
+import { FiSearch, FiX } from "react-icons/fi";
+import { FaArrowRight } from "react-icons/fa";
 
 const Navbar = () => {
   const {
@@ -430,21 +432,19 @@ const Navbar = () => {
             </div>
           </div>
         </div>
-        {/* Message Button */}
-        <button
-          onClick={handleMessageClick}
-          disabled={isCreatingChat}
-          className="px-3 py-1  hidden md:px-5 md:py-2.5 text-lg font-semibold rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-lg transform hover:scale-105 transition-all duration-200 whitespace-nowrap md:flex items-center gap-2"
-        >
-          {isCreatingChat ? (
-            <>
-              <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-              <span className="text-[10px] md:text-base">Starting...</span>
-            </>
-          ) : (
-            <>
+        {/* Messages relocated to icons section below */}
+        {/* Right side icons (desktop) */}
+        <ul className="hidden lg:flex items-center gap-6 relative">
+          {/* Relocated Message Button (Icon Style) */}
+          <button
+            onClick={handleMessageClick}
+            disabled={isCreatingChat}
+            className="flex relative text-gray-700 hover:text-blue-600 transition-colors"
+            title="Messages"
+          >
+            <div className="relative">
               <svg
-                className="md:w-5 md:h-5 w-4 h-4"
+                className="w-6 h-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -453,18 +453,16 @@ const Navbar = () => {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
+                  strokeWidth={1.5}
                   d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                 />
               </svg>
-              <span className="text-[10px] md:text-base">Messages</span>
-            </>
-          )}
-        </button>
-        {/* Right side icons (desktop) */}
-        <ul className="hidden lg:flex items-center gap-6 relative">
+              <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full border border-white"></span>
+            </div>
+          </button>
+
           <Image
-            className="w-5 cursor-pointer"
+            className="w-6 sm:w-7 cursor-pointer hover:scale-110 transition-transform"
             src={assets.search_icon}
             alt="search icon"
             onClick={handleSearchIconClick}
@@ -636,8 +634,28 @@ const Navbar = () => {
 
         {/* Mobile / Tablet icons (0 - 1023.99px) */}
         <div className="flex items-center lg:hidden gap-4">
+          <button
+            onClick={handleMessageClick}
+            disabled={isCreatingChat}
+            className="flex relative text-gray-700"
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={1.5}
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
+            </svg>
+          </button>
           <Image
-            className="w-5 cursor-pointer"
+            className="w-6 sm:w-7 cursor-pointer"
             src={assets.search_icon}
             alt="search icon"
             onClick={handleSearchIconClick}
@@ -678,55 +696,100 @@ const Navbar = () => {
       {/* Search modal */}
       {isSearchOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-[300] flex justify-center items-start pt-20"
+          className="fixed inset-0 bg-black/75 backdrop-blur-sm z-[300] flex justify-center items-start pt-20"
           onClick={() => setIsSearchOpen(false)}
         >
+          {/* Close Button */}
+          <button 
+            className="absolute top-8 right-8 text-white/50 hover:text-white transition-colors p-2 hover:bg-white/10 rounded-full"
+            onClick={() => setIsSearchOpen(false)}
+          >
+            <FiX className="w-8 h-8" />
+          </button>
+
           <div
             className="relative w-11/12 md:w-1/2 lg:w-1/3"
             onClick={(e) => e.stopPropagation()}
           >
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder="Search for products, brands, and more..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               id="search-modal-input"
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-6 py-5 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-white/40 focus:outline-none focus:ring-4 focus:ring-blue-500/30 text-lg md:text-xl shadow-2xl backdrop-blur-xl"
             />
             <div
-              className={`absolute top-full mt-2 left-0 w-full bg-white border rounded-lg shadow-lg z-20 max-h-96 overflow-y-auto ${
-                searchQuery.trim() !== "" ? "block" : "hidden"
+              className={`absolute top-full mt-6 left-0 w-full bg-white/95 backdrop-blur-2xl rounded-[2.5rem] shadow-[0_20px_70px_-15px_rgba(0,0,0,0.3)] z-20 border border-white/20 overflow-hidden transition-all duration-500 ${
+                searchQuery.trim() !== "" ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"
               }`}
             >
               {filteredProducts.length > 0 ? (
-                filteredProducts.map((product) => (
-                  <div
-                    key={product._id}
-                    onClick={() => handleProductClick(product._id)}
-                    className="p-3 hover:bg-gray-100 cursor-pointer flex items-center gap-3"
-                  >
-                    <Image
-                      src={product.images?.[0]?.url || ""}
-                      alt={product.name}
-                      width={50}
-                      height={50}
-                      className="rounded-md object-cover"
-                    />
-                    <div>
-                      <p className="font-medium">{product.name}</p>
-                      <p className="text-sm text-gray-600">
-                        ₦
-                        {product.price?.toLocaleString(undefined, {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </p>
-                    </div>
+                <div className="p-8">
+                   <div className="flex items-center justify-between mb-6 px-2">
+                     <h4 className="text-xs font-black uppercase tracking-[0.2em] text-gray-400">Results ({filteredProducts.length})</h4>
+                     <button className="text-[10px] font-bold text-blue-600 hover:underline">View All Products</button>
+                   </div>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                    {filteredProducts.map((product) => (
+                      <div
+                        key={product._id}
+                        onClick={() => handleProductClick(product._id)}
+                        className="group p-4 bg-gray-50/50 hover:bg-white rounded-3xl cursor-pointer flex items-center gap-5 transition-all border border-transparent hover:border-gray-100 hover:shadow-xl hover:shadow-gray-200/50"
+                      >
+                        <div className="relative w-20 h-20 rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 flex-shrink-0">
+                          <Image
+                            src={product.images?.[0]?.url || ""}
+                            alt={product.name}
+                            fill
+                            sizes="80px"
+                            className="object-contain p-2 group-hover:scale-110 transition-transform duration-500"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h5 className="font-bold text-gray-900 text-base truncate group-hover:text-blue-600 transition-colors">{product.name}</h5>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-blue-600 font-black text-sm">
+                              ₦{(product.offerPrice || product.price)?.toLocaleString()}
+                            </span>
+                            {product.offerPrice && product.offerPrice < product.price && (
+                              <span className="text-[10px] text-gray-400 line-through">
+                                ₦{product.price?.toLocaleString()}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2 mt-2">
+                             <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 uppercase tracking-widest">
+                               {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                             </span>
+                          </div>
+                        </div>
+                        <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity transform translate-x-2 group-hover:translate-x-0">
+                           <FaArrowRight className="w-3 h-3" />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))
+                </div>
               ) : (
-                <div className="p-3 text-center text-gray-500">
-                  No products found
+                <div className="p-12 text-center">
+                  <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <FiSearch className="w-8 h-8 text-blue-200" />
+                  </div>
+                  <h3 className="text-2xl font-black text-gray-900 tracking-tight mb-2">No matches found</h3>
+                  <p className="text-gray-500 font-medium max-w-xs mx-auto">Try searching for something else or browse our trending categories.</p>
+                  
+                  {/* Quick Discovery section */}
+                  <div className="mt-12 pt-8 border-t border-gray-100 text-left">
+                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-6">Popular Categories</p>
+                     <div className="flex flex-wrap gap-2">
+                        {['Electronics', 'Fashion', 'Home Decor', 'Gadgets', 'Accessories'].map(cat => (
+                          <button key={cat} className="px-5 py-2.5 rounded-full bg-gray-50 text-gray-700 text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">
+                            {cat}
+                          </button>
+                        ))}
+                     </div>
+                  </div>
                 </div>
               )}
             </div>

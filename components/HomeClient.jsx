@@ -166,9 +166,11 @@ const HomeClient = ({ initialBanners }) => {
             
             {/* Hero Banner Grid (Bento) - Top on Desktop, Bottom on Mobile */}
             <div className="grid grid-cols-1 xl:grid-cols-4 gap-8 min-h-[400px] lg:min-h-[650px]">
-              <div className="hidden xl:block xl:col-span-1">
-                {/* Maintain alignment with sidebar below */}
+              {/* Category Sidebar - Visible at top on Desktop */}
+              <div className="hidden xl:block xl:col-span-1 bg-white rounded-[2rem] shadow-sm border border-gray-100 p-4 h-full">
+                <CategorySidebar />
               </div>
+              
               <div className="xl:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Main Slider Area */}
                 <div className="md:col-span-2 md:row-span-2 rounded-[2rem] overflow-hidden shadow-2xl shadow-blue-900/5 h-full relative group bg-white border border-gray-100">
@@ -222,17 +224,9 @@ const HomeClient = ({ initialBanners }) => {
               </div>
             </div>
 
-            {/* Products & Sidebar Section - Top on Mobile, Bottom on Desktop */}
-            <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
-              {/* Category Sidebar */}
-              <div className="hidden xl:block xl:col-span-1 bg-white rounded-[2rem] shadow-sm border border-gray-100 p-4 h-full">
-                <CategorySidebar />
-              </div>
-
-              {/* Main Products Area */}
-              <div className="xl:col-span-3">
-                <HomeProducts />
-              </div>
+            {/* Products Section - Top on Mobile, Bottom on Desktop */}
+            <div className="w-full">
+              <HomeProducts />
             </div>
           </div>
 
