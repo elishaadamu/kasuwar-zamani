@@ -312,27 +312,22 @@ const VendorDashboard = () => {
             Welcome back, <span className="text-gray-900 font-bold">{dashboardData.userName}</span>. Your store is showing strong momentum.
           </p>
         </div>
-        <div className="flex p-1 bg-gray-100 rounded-2xl w-fit">
-          <button onClick={() => setTimePeriod("weekly")} className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${timePeriod === "weekly" ? "bg-white text-blue-600 shadow-sm" : "text-gray-400"}`}>Weekly</button>
-          <button onClick={() => setTimePeriod("monthly")} className={`px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${timePeriod === "monthly" ? "bg-white text-blue-600 shadow-sm" : "text-gray-400"}`}>Monthly</button>
-        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
         {/* Main Financial Hub - Dark Mode Style */}
         <div className="lg:col-span-2">
-          <div className="bg-[#0f172a] rounded-3xl p-6 relative overflow-hidden text-white shadow-2xl shadow-blue-900/30 group border border-white/5">
-            {/* Animated Background Accent */}
-            <div className="absolute top-0 right-0 w-[250px] h-[250px] bg-gradient-to-br from-blue-600/20 to-indigo-600/10 rounded-full blur-[80px] -mr-20 -mt-10 group-hover:scale-125 transition-transform duration-1000"></div>
+          <div className="bg-[#0f172a] rounded-2xl p-4 relative overflow-hidden text-white shadow-xl shadow-blue-900/20 group border border-white/5">
+            <div className="absolute top-0 right-0 w-[200px] h-[200px] bg-gradient-to-br from-blue-600/20 to-indigo-600/10 rounded-full blur-[60px] -mr-16 -mt-8 group-hover:scale-125 transition-transform duration-1000"></div>
             
-            <div className="relative flex flex-col gap-6">
+            <div className="relative flex flex-col gap-4">
               {/* Header: Balance & Status */}
-              <div className="flex justify-between items-start">
+              <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-blue-400 font-black text-[9px] uppercase tracking-[0.4em] mb-1.5">Available Balance</p>
-                  <div className="flex items-center gap-4">
-                    <h2 className="text-4xl font-black tracking-tighter flex items-baseline gap-2">
-                      <span className="text-blue-500 text-2xl font-light">₦</span>
+                  <p className="text-blue-400 font-black text-[8px] uppercase tracking-[0.4em] mb-1">Available Balance</p>
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-2xl font-black tracking-tighter flex items-baseline gap-1.5">
+                      <span className="text-blue-500 text-lg font-light">₦</span>
                       {accountDetails ? (
                         showBalance 
                           ? accountDetails?.balance?.toLocaleString(undefined, { minimumFractionDigits: 2 })
@@ -343,63 +338,63 @@ const VendorDashboard = () => {
                     </h2>
                     <button 
                       onClick={() => setShowBalance(!showBalance)}
-                      className="text-gray-500 hover:text-white transition-colors p-1"
+                      className="text-gray-500 hover:text-white transition-colors"
                     >
-                      {showBalance ? <FaEyeSlash className="w-4 h-4" /> : <FaEye className="w-4 h-4" />}
+                      {showBalance ? <FaEyeSlash className="w-3 h-3" /> : <FaEye className="w-3 h-3" />}
                     </button>
                   </div>
                 </div>
-                <div className="bg-gradient-to-br from-white/10 to-white/5 p-3 rounded-2xl border border-white/10 shadow-inner">
-                  <FaWallet className="w-6 h-6 text-blue-400" />
+                <div className="bg-white/5 p-2.5 rounded-xl border border-white/10">
+                  <FaWallet className="w-4 h-4 text-blue-400" />
                 </div>
               </div>
 
               {/* Horizontal Channels */}
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {/* Channel: Inbound (Virtual) */}
-                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 hover:bg-white/[0.06] transition-all duration-300 group/row">
-                  <div className="flex flex-col gap-4">
-                    <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
-                      <div className="flex items-center gap-3 shrink-0">
-                        <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
-                          <FaCreditCard className="w-3.5 h-3.5 text-blue-400" />
+                <div className="bg-white/[0.03] border border-white/10 rounded-xl p-3 hover:bg-white/[0.06] transition-all duration-300 group/row">
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6">
+                      <div className="flex items-center gap-2 shrink-0">
+                        <div className="w-7 h-7 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                          <FaCreditCard className="w-3 h-3 text-blue-400" />
                         </div>
                         <div>
-                          <p className="text-[9px] font-black text-white uppercase tracking-widest">Inbound</p>
+                          <p className="text-[8px] font-black text-white uppercase tracking-widest">Inbound</p>
                           {accountDetails?.wallet && (
-                            <button onClick={() => copyAllDetails('inbound')} className="flex items-center gap-1 text-[7px] font-black text-blue-400 uppercase tracking-widest hover:text-white transition-colors mt-0.5">
+                            <button onClick={() => copyAllDetails('inbound')} className="flex items-center gap-1 text-[7px] font-black text-blue-400 uppercase tracking-widest hover:text-white transition-colors">
                               <FaCopy /> Copy Details
                             </button>
                           )}
                         </div>
                       </div>
 
-                      <div className="flex-1 flex flex-wrap items-center gap-x-6 gap-y-2">
+                      <div className="flex-1 flex flex-wrap items-center gap-x-4 gap-y-1.5">
                         {!accountDetails ? (
-                           <div className="flex items-center gap-4">
+                           <div className="flex items-center gap-3">
                              <p className="text-xs font-medium text-gray-400 italic">No wallet established</p>
                              <button onClick={() => setShowCreateAccount(true)} className="text-[8px] font-black text-blue-400 uppercase tracking-widest hover:underline">Create Wallet</button>
                           </div>
                         ) : accountDetails?.wallet ? (
                           <>
-                            <div className="flex items-center gap-2 group/copy cursor-pointer" onClick={() => handleCopy(accountDetails?.wallet?.virtualAccountNumber)}>
-                              <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Acc No:</p>
-                              <p className="text-sm font-bold tracking-wider flex items-center gap-2">
+                            <div className="flex items-center gap-1.5 group/copy cursor-pointer" onClick={() => handleCopy(accountDetails?.wallet?.virtualAccountNumber)}>
+                              <p className="text-[7px] font-black text-gray-500 uppercase tracking-widest">Acc No:</p>
+                              <p className="text-xs font-bold tracking-wider flex items-center gap-1.5">
                                 {accountDetails?.wallet?.virtualAccountNumber || "---"}
                                 <FaCopy className="opacity-0 group-hover/copy:opacity-100 transition-opacity text-blue-400 text-[10px]" />
                               </p>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Bank:</p>
-                              <p className="text-sm font-bold">{accountDetails?.wallet?.virtualBanktName || "---"}</p>
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-[7px] font-black text-gray-500 uppercase tracking-widest">Bank:</p>
+                              <p className="text-xs font-bold">{accountDetails?.wallet?.virtualBanktName || "---"}</p>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <p className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Name:</p>
-                              <p className="text-sm font-bold truncate max-w-[200px]">{accountDetails?.wallet?.virtualAccountName || "---"}</p>
+                            <div className="flex items-center gap-1.5">
+                              <p className="text-[7px] font-black text-gray-500 uppercase tracking-widest">Name:</p>
+                              <p className="text-xs font-bold truncate max-w-[160px]">{accountDetails?.wallet?.virtualAccountName || "---"}</p>
                             </div>
                           </>
                         ) : (
-                          <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-3">
                              <p className="text-xs font-medium text-gray-400 italic">Virtual account not active</p>
                              <button onClick={() => setShowCreateAccount(true)} className="text-[8px] font-black text-blue-400 uppercase tracking-widest hover:underline">Activate Now</button>
                           </div>
@@ -407,10 +402,10 @@ const VendorDashboard = () => {
                       </div>
                     </div>
 
-                    <div className="flex justify-end md:justify-start pt-2 border-t border-white/5">
+                    <div className="flex justify-end md:justify-start pt-1.5 border-t border-white/5">
                       <button
                         onClick={() => setShowFundModal(true)}
-                        className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2 rounded-xl text-[8px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-900/40"
+                        className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-lg text-[8px] font-black uppercase tracking-widest transition-all shadow-lg shadow-blue-900/40"
                       >
                         Add Fund
                       </button>
