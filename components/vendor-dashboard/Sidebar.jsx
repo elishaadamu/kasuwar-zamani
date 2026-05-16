@@ -4,12 +4,87 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import Logo from "@/assets/logo/logo.png";
-import { FaTruck } from "react-icons/fa";
-import { FaHistory } from "react-icons/fa";
-import { FaStar, FaUsers, FaLayerGroup, FaUser, FaUserTie } from "react-icons/fa";
 import axios from "axios";
 import { apiUrl, API_CONFIG } from "@/configs/api";
 import { decryptData } from "@/lib/encryption";
+import {
+  FaTruck,
+  FaHistory,
+  FaStar,
+  FaUsers,
+  FaLayerGroup,
+  FaUser,
+  FaUserTie,
+  FaHome,
+  FaShoppingBag,
+  FaBox,
+  FaMoneyBillWave,
+  FaEnvelope,
+  FaTag,
+  FaShareAlt,
+  FaChevronDown,
+  FaCog,
+  FaKey,
+  FaImage,
+  FaIdCard,
+  FaLock,
+  FaSignOutAlt,
+  FaMapMarkerAlt,
+  FaCreditCard,
+  FaWallet,
+} from "react-icons/fa";
+
+const NavLink = ({ href, icon: Icon, label, isActive, onClick, indent = false }) => (
+  <Link
+    href={href}
+    onClick={onClick}
+    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all duration-200 group ${
+      indent ? "ml-6" : ""
+    } ${
+      isActive
+        ? "bg-indigo-600 text-white shadow-lg shadow-indigo-900/30"
+        : "text-slate-400 hover:bg-white/5 hover:text-white"
+    }`}
+  >
+    <span className={`w-6 h-6 flex items-center justify-center rounded-lg shrink-0 transition-all ${
+      isActive ? "bg-white/20 text-white" : "bg-white/5 text-slate-500 group-hover:bg-white/10 group-hover:text-slate-300"
+    }`}>
+      <Icon className="w-3 h-3" />
+    </span>
+    <span className="truncate">{label}</span>
+    {isActive && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-indigo-300 shrink-0"></span>}
+  </Link>
+);
+
+const CollapsibleSection = ({ icon: Icon, label, isOpen, onToggle, children, isActive }) => (
+  <div>
+    <button
+      onClick={onToggle}
+      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all duration-200 group ${
+        isActive && !isOpen
+          ? "bg-indigo-600/20 text-indigo-300"
+          : "text-slate-400 hover:bg-white/5 hover:text-white"
+      }`}
+    >
+      <span className={`w-6 h-6 flex items-center justify-center rounded-lg shrink-0 transition-all ${
+        isActive ? "bg-indigo-500/20 text-indigo-400" : "bg-white/5 text-slate-500 group-hover:bg-white/10 group-hover:text-slate-300"
+      }`}>
+        <Icon className="w-3 h-3" />
+      </span>
+      <span className="flex-1 text-left truncate">{label}</span>
+      <FaChevronDown className={`w-3 h-3 transition-transform duration-300 shrink-0 ${isOpen ? "rotate-180" : ""}`} />
+    </button>
+    {isOpen && (
+      <div className="mt-1 ml-3 pl-3 border-l border-white/5 space-y-0.5 py-1">
+        {children}
+      </div>
+    )}
+  </div>
+);
+
+const SectionLabel = ({ label }) => (
+  <p className="px-3 pt-4 pb-1 text-[8px] font-black text-slate-600 uppercase tracking-[0.3em]">{label}</p>
+);
 
 const Sidebar = ({
   isSidebarOpen,
@@ -25,26 +100,21 @@ const Sidebar = ({
   setOpenProducts,
 }) => {
   const pathname = usePathname();
-  const [userRole, setUserRole] = useState(null);
   const [userData, setUserData] = useState(null);
   const [isTeamMember, setIsTeamMember] = useState(false);
   const [isTeamLeader, setIsTeamLeader] = useState(false);
   const [isRegionalLeader, setIsRegionalLeader] = useState(false);
   const [teamData, setTeamData] = useState(null);
 
+  const close = () => setIsSidebarOpen(false);
+  const is = (path) => pathname === path;
+  const startsWith = (path) => pathname.startsWith(path);
+
   useEffect(() => {
-    const getUserRoleFromStorage = () => {
-      try {
-        const raw = localStorage.getItem("user");
-        if (!raw) return null;
-        const user = decryptData(raw) || null;
-        setUserData(user);
-        return user?.role || null;
-      } catch (err) {
-        return null;
-      }
-    };
-    setUserRole(getUserRoleFromStorage());
+    try {
+      const raw = localStorage.getItem("user");
+      if (raw) setUserData(decryptData(raw) || null);
+    } catch {}
   }, []);
 
   useEffect(() => {
@@ -54,571 +124,169 @@ const Sidebar = ({
         let response;
         try {
           response = await axios.get(apiUrl(API_CONFIG.ENDPOINTS.REGIONAL.GET_MY_TEAM_DASHBOARD), { withCredentials: true });
-        } catch (error) {
+        } catch {
           response = await axios.get(apiUrl(API_CONFIG.ENDPOINTS.REGIONAL.GET_MY_TEAM), { withCredentials: true });
         }
-
         if (response?.data?.success) {
           const data = response.data;
           setTeamData(data);
-          if (data.role === "regional-leader") {
-            setIsRegionalLeader(true);
-          } else if (data.role === "team-lead") {
-            setIsTeamLeader(true);
-          } else if (data.role === "member") {
-            setIsTeamMember(true);
-          }
+          if (data.role === "regional-leader") setIsRegionalLeader(true);
+          else if (data.role === "team-lead") setIsTeamLeader(true);
+          else if (data.role === "member") setIsTeamMember(true);
         }
-      } catch (error) {
-      }
+      } catch {}
     };
     fetchTeamData();
   }, [userData]);
 
   return (
     <aside
-      className={`fixed inset-y-0 left-0 z-[2000] w-64 bg-gray-800 text-white transform transition-transform duration-300 ease-in-out ${
+      className={`fixed inset-y-0 left-0 z-[2000] w-64 bg-[#0f1117] border-r border-white/5 text-white transform transition-transform duration-300 ease-in-out flex flex-col ${
         isSidebarOpen ? "translate-x-0" : "-translate-x-full"
       } md:translate-x-0`}
     >
-      <div className="flex flex-col h-full">
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
-          <Link href={"/"}>
-            <Image className="w-[12rem] mx-auto" src={Logo} alt="logo" />
-          </Link>
-          <button
-            className="p-2 rounded-md hover:bg-gray-700 md:hidden"
-            onClick={() => setIsSidebarOpen(false)}
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M6 18L18 6M6 6l12 12"
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-5 border-b border-white/5 shrink-0">
+        <Link href="/" onClick={close}>
+          <Image className="w-36" src={Logo} alt="Kasuwar Zamani" />
+        </Link>
+        <button
+          className="w-8 h-8 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center text-slate-400 hover:text-white transition-all md:hidden"
+          onClick={close}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Vendor Profile Chip */}
+      {userData && (
+        <div className="mx-4 mt-4 p-3 bg-white/5 rounded-2xl border border-white/5 shrink-0">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+              <FaUser className="w-3.5 h-3.5" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-black text-white truncate">{userData.name || userData.firstName || "Vendor"}</p>
+              <p className="text-[8px] font-bold text-slate-500 uppercase tracking-widest">Merchant Account</p>
+            </div>
+            <div className="w-2 h-2 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_6px_rgba(52,211,153,0.6)]"></div>
+          </div>
+        </div>
+      )}
+
+      {/* Navigation */}
+      <div className="flex-1 overflow-y-auto px-3 pb-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10">
+        <nav className="space-y-0.5">
+
+          <SectionLabel label="Main" />
+          <NavLink href="/vendor-dashboard" icon={FaHome} label="Dashboard" isActive={is("/vendor-dashboard")} onClick={close} />
+          <NavLink href="/vendor-dashboard/track-order" icon={FaTruck} label="Track Order" isActive={is("/vendor-dashboard/track-order")} onClick={close} />
+
+          {/* Team section */}
+          {(isRegionalLeader || isTeamLeader || isTeamMember) && (
+            <>
+              <SectionLabel label={isRegionalLeader ? "Region" : "Team"} />
+              <NavLink
+                href="/vendor-dashboard/team"
+                icon={FaLayerGroup}
+                label={isRegionalLeader ? "Region Teams" : isTeamLeader ? "Team Dashboard" : "My Team"}
+                isActive={startsWith("/vendor-dashboard/team")}
+                onClick={close}
               />
-            </svg>
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4">
-          <nav className="space-y-2">
-            <Link
-              href="/vendor-dashboard"
-              className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors ${
-                pathname === "/vendor-dashboard" ? "bg-gray-700" : ""
-              }`}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+              {isRegionalLeader && teamData?.teams?.map((team) => (
+                <NavLink
+                  key={team._id || team.id}
+                  href={`/vendor-dashboard/team?id=${team._id || team.id}`}
+                  icon={FaUsers}
+                  label={team.name}
+                  isActive={false}
+                  onClick={close}
+                  indent
                 />
-              </svg>
-              <span>Home</span>
-            </Link>
-            <div className="">
-              <Link href="/vendor-dashboard/track-order">
-                <div
-                  className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors ${
-                    pathname === "/vendor-dashboard/track-order"
-                      ? "bg-gray-700"
-                      : ""
-                  }`}
-                >
-                  <FaTruck className="w-5 h-5" />
-                  <span>Track Order</span>
-                </div>
-              </Link>
-            </div>
+              ))}
+            </>
+          )}
 
-            {(isRegionalLeader || isTeamLeader || isTeamMember) && (
-              <div className="mt-2 mb-2 ml-4 border-l border-gray-700 pl-2">
-                <p className="px-2 text-xs font-semibold text-blue-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                  {isRegionalLeader ? "Region Teams" : isTeamLeader ? "Team Members" : "My Team"}
-                </p>
-                 <Link
-                    href="/vendor-dashboard/team"
-                    className={`block mt-2 pl-3 pr-4 py-2 rounded-lg hover:bg-gray-700 transition-colors text-sm text-gray-300 font-medium ${
-                      pathname === "/vendor-dashboard/team" && !(typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('id')) ? "bg-gray-700 text-white" : ""
-                    }`}
-                  >
-                    View Full Dashboard
-                  </Link>
-                <div className="space-y-1">
-                  {isRegionalLeader && teamData?.teams?.map((team) => (
-                    <Link
-                      key={team._id || team.id}
-                      href={`/vendor-dashboard/team?id=${team._id || team.id}`}
-                      className={`flex items-center space-x-3 px-3 py-2 rounded-lg text-sm text-gray-400 hover:text-white transition-colors ${
-                        pathname.includes("/team") && typeof window !== "undefined" && new URLSearchParams(window.location.search).get("id") === (team._id || team.id)
-                          ? "text-white bg-gray-700"
-                          : ""
-                      }`}
-                    >
-                      <FaLayerGroup className="w-4 h-4" />
-                      <span>{team.name}</span>
-                    </Link>
-                  ))}
-
-                  {(isTeamLeader || isTeamMember) && teamData?.members?.map((member) => (
-                    <div
-                      key={member.email}
-                      className="flex items-center space-x-3 px-3 py-1.5 text-gray-400 hover:text-white transition-colors"
-                    >
-                      <FaUser className="w-3 h-3" />
-                      <span className="text-xs font-medium truncate">
-                        {member.firstName} {member.lastName}
-                      </span>
-                      {member.isTeamLead && (
-                        <FaUserTie
-                          className="w-3 h-3 text-indigo-400 ml-auto"
-                          title="Team Lead"
-                        />
-                      )}
-                    </div>
-                  ))}
-                  
-                 
-                </div>
-              </div>
-            )}
-            <div className="space-y-1">
-              <button
-                onClick={() => setOpenOrders(!openOrders)}
-                className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <div className="flex items-center space-x-2">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                    />
-                  </svg>
-                  <span>Orders</span>
-                </div>
-                <svg
-                  className={`w-4 h-4 transition-transform duration-200 ${
-                    openOrders ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-
-              <div className={`space-y-1 ${openOrders ? "block" : "hidden"}`}>
-                <Link
-                  href="/vendor-dashboard/all-orders"
-                  className={`block pl-11 pr-4 py-2 rounded-lg hover:bg-gray-700 transition-colors ${
-                    pathname === "/vendor-dashboard/all-orders"
-                      ? "bg-gray-700"
-                      : ""
-                  }`}
-                >
-                  All Orders
-                </Link>
-              </div>
-            </div>
-            <div className="space-y-1">
-              <button
-                onClick={() => setOpenProducts(!openProducts)}
-                className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <div className="flex items-center space-x-2">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
-                    ></path>
-                  </svg>
-                  <span>Vendor Products</span>
-                </div>
-                <svg
-                  className={`w-4 h-4 transition-transform duration-200 ${
-                    openProducts ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-
-              <div className={`space-y-1 ${openProducts ? "block" : "hidden"}`}>
-                <Link
-                  href="/vendor-dashboard/add-products"
-                  className={`block pl-11 pr-4 py-2 rounded-lg hover:bg-gray-700 transition-colors ${
-                    pathname === "/vendor-dashboard/add-products"
-                      ? "bg-gray-700"
-                      : ""
-                  }`}
-                >
-                  Add Products
-                </Link>
-                <Link
-                  href="/vendor-dashboard/products-list"
-                  className={`block pl-11 pr-4 py-2 rounded-lg hover:bg-gray-700 transition-colors ${
-                    pathname === "/vendor-dashboard/products-list"
-                      ? "bg-gray-700"
-                      : ""
-                  }`}
-                >
-                  Products List
-                </Link>
-              </div>
-            </div>
-            <Link
-              href="/vendor-dashboard/withdrawal-request"
-              className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors ${
-                pathname === "/vendor-dashboard/withdrawal-request"
-                  ? "bg-gray-700"
-                  : ""
-              }`}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-              <span>Withdrawal Request</span>{" "}
-            </Link>
-            <Link
-              href="/vendor-dashboard/transaction-history"
-              className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors ${
-                pathname === "/vendor-dashboard/transaction-history"
-                  ? "bg-gray-700"
-                  : ""
-              }`}
-            >
-              <FaHistory className="w-5 h-5" />
-              <span>Funding History</span>
-            </Link>{" "}
-            <Link
-              href="/vendor-dashboard/my-subscription"
-              className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors ${
-                pathname === "/vendor-dashboard/my-subscription"
-                  ? "bg-gray-700"
-                  : ""
-              }`}
-            >
-              <FaStar className="w-5 h-5" />
-              <span>Subscription</span>
-            </Link>
-            <Link
-              href="/vendor-dashboard/get-followers"
-              className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors ${
-                pathname === "/vendor-dashboard/get-followers"
-                  ? "bg-gray-700"
-                  : ""
-              }`}
-            >
-              <FaUsers className="w-5 h-5" />
-              <span>Get Followers</span>
-            </Link>
-            <div className="space-y-1">
-              <button
-                onClick={() => setOpenMenu(!openMenu)}
-                className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <div className="flex items-center space-x-2">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"
-                    />
-                  </svg>
-                  <span>Settings</span>
-                </div>
-                <svg
-                  className={`w-4 h-4 transition-transform duration-200 ${
-                    openMenu ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-
-              <div className={`space-y-1 ${openMenu ? "block" : "hidden"}`}>
-                <Link
-                  href="/vendor-dashboard/personal-details"
-                  className={`block pl-11 pr-4 py-2 rounded-lg hover:bg-gray-700 transition-colors ${
-                    pathname === "/vendor-dashboard/personal-details"
-                      ? "bg-gray-700"
-                      : ""
-                  }`}
-                >
-                  Personal Details
-                </Link>
-                <Link
-                  href="/vendor-dashboard/update-images"
-                  className={`block pl-11 pr-4 py-2 rounded-lg hover:bg-gray-700 transition-colors ${
-                    pathname === "/vendor-dashboard/update-images"
-                      ? "bg-gray-700"
-                      : ""
-                  }`}
-                >
-                  Update Images
-                </Link>
-               
-                <Link
-                  href="/vendor-dashboard/pin-management"
-                  className={`block pl-11 pr-4 py-2 rounded-lg hover:bg-gray-700 transition-colors ${
-                    pathname === "/vendor-dashboard/pin-management"
-                      ? "bg-gray-700"
-                      : ""
-                  }`}
-                >
-                  PIN Management
-                </Link>
-                <Link
-                  href="/vendor-dashboard/change-password"
-                  className={`block pl-11 pr-4 py-2 rounded-lg hover:bg-gray-700 transition-colors ${
-                    pathname === "/vendor-dashboard/change-password"
-                      ? "bg-gray-700"
-                      : ""
-                  }`}
-                >
-                  Change Password
-                </Link>
-               
-              </div>
-            </div>
-            <div className="space-y-1">
-              <button
-                onClick={() => setOpenDelivery(!openDelivery)}
-                className="w-full flex items-center justify-between px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors"
-              >
-                <div className="flex items-center space-x-2">
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"
-                    />
-                  </svg>
-                  <span>Delivery</span>
-                </div>
-                <svg
-                  className={`w-4 h-4 transition-transform duration-200 ${
-                    openDelivery ? "rotate-180" : ""
-                  }`}
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-              <div className={`space-y-1 ${openDelivery ? "block" : "hidden"}`}>
-                <Link
-                  href="/vendor-dashboard/request-delivery"
-                  className={`block pl-11 pr-4 py-2 rounded-lg hover:bg-gray-700 transition-colors ${
-                    pathname === "/vendor-dashboard/request-delivery"
-                      ? "bg-gray-700"
-                      : ""
-                  }`}
-                >
-                  Delivery Request
-                </Link>
-                <Link
-                  href="/vendor-dashboard/delivery-payment"
-                  className={`block pl-11 pr-4 py-2 rounded-lg hover:bg-gray-700 transition-colors ${
-                    pathname === "/vendor-dashboard/delivery-payment"
-                      ? "bg-gray-700"
-                      : ""
-                  }`}
-                >
-                  Pay for Delivery
-                </Link>
-              </div>
-            </div>
-            <Link
-              href="/vendor-dashboard/inbox-support"
-              className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors ${
-                pathname === "/vendor-dashboard/inbox-support"
-                  ? "bg-gray-700"
-                  : ""
-              }`}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
-              <span>Inbox & Support</span>
-            </Link>
-            <Link
-              href="/vendor-dashboard/coupons"
-              className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors ${
-                pathname === "/vendor-dashboard/coupons" ? "bg-gray-700" : ""
-              }`}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
-                />
-              </svg>
-              <span>Coupons</span>
-            </Link>
-            {/* <Link
-              href="/vendor-dashboard/support-ticket"
-              className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors ${
-                pathname === "/vendor-dashboard/support-ticket"
-                  ? "bg-gray-700"
-                  : ""
-              }`}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-              </svg>
-              <span>Support</span>
-            </Link> */}
-            <Link
-              href="/vendor-dashboard/referrals"
-              className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg hover:bg-gray-700 transition-colors ${
-                pathname === "/vendor-dashboard/referrals" ? "bg-gray-700" : ""
-              }`}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
-              <span>Refer & Earn</span>
-            </Link>
-          </nav>
-        </div>
-
-        <div className="p-4 border-t border-gray-700">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center justify-center space-x-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 transition-colors"
+          <SectionLabel label="Commerce" />
+          <CollapsibleSection
+            icon={FaShoppingBag}
+            label="Orders"
+            isOpen={openOrders}
+            onToggle={() => setOpenOrders(!openOrders)}
+            isActive={startsWith("/vendor-dashboard/all-orders")}
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-              />
-            </svg>
-            <span>Logout</span>
-          </button>
-        </div>
+            <NavLink href="/vendor-dashboard/all-orders" icon={FaBox} label="All Orders" isActive={startsWith("/vendor-dashboard/all-orders")} onClick={close} />
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            icon={FaBox}
+            label="Products"
+            isOpen={openProducts}
+            onToggle={() => setOpenProducts(!openProducts)}
+            isActive={startsWith("/vendor-dashboard/add-products") || startsWith("/vendor-dashboard/products-list")}
+          >
+            <NavLink href="/vendor-dashboard/add-products" icon={FaBox} label="Add Product" isActive={is("/vendor-dashboard/add-products")} onClick={close} />
+            <NavLink href="/vendor-dashboard/products-list" icon={FaLayerGroup} label="Products List" isActive={is("/vendor-dashboard/products-list")} onClick={close} />
+          </CollapsibleSection>
+
+          <SectionLabel label="Finance" />
+          <NavLink href="/vendor-dashboard/withdrawal-request" icon={FaMoneyBillWave} label="Withdrawals" isActive={is("/vendor-dashboard/withdrawal-request")} onClick={close} />
+          <NavLink href="/vendor-dashboard/transaction-history" icon={FaHistory} label="Funding History" isActive={is("/vendor-dashboard/transaction-history")} onClick={close} />
+          <NavLink href="/vendor-dashboard/my-subscription" icon={FaStar} label="Subscription" isActive={is("/vendor-dashboard/my-subscription")} onClick={close} />
+
+          <SectionLabel label="Logistics" />
+          <CollapsibleSection
+            icon={FaTruck}
+            label="Delivery"
+            isOpen={openDelivery}
+            onToggle={() => setOpenDelivery(!openDelivery)}
+            isActive={startsWith("/vendor-dashboard/request-delivery") || startsWith("/vendor-dashboard/delivery-payment")}
+          >
+            <NavLink href="/vendor-dashboard/request-delivery" icon={FaMapMarkerAlt} label="Request Delivery" isActive={is("/vendor-dashboard/request-delivery")} onClick={close} />
+            <NavLink href="/vendor-dashboard/delivery-payment" icon={FaCreditCard} label="Pay for Delivery" isActive={is("/vendor-dashboard/delivery-payment")} onClick={close} />
+          </CollapsibleSection>
+
+          <SectionLabel label="Growth" />
+          <NavLink href="/vendor-dashboard/get-followers" icon={FaUsers} label="Get Followers" isActive={is("/vendor-dashboard/get-followers")} onClick={close} />
+          <NavLink href="/vendor-dashboard/coupons" icon={FaTag} label="Coupons" isActive={is("/vendor-dashboard/coupons")} onClick={close} />
+          <NavLink href="/vendor-dashboard/referrals" icon={FaShareAlt} label="Refer & Earn" isActive={is("/vendor-dashboard/referrals")} onClick={close} />
+
+          <SectionLabel label="Support" />
+          <NavLink href="/vendor-dashboard/inbox-support" icon={FaEnvelope} label="Inbox & Support" isActive={is("/vendor-dashboard/inbox-support")} onClick={close} />
+
+          <SectionLabel label="Settings" />
+          <CollapsibleSection
+            icon={FaCog}
+            label="Account Settings"
+            isOpen={openMenu}
+            onToggle={() => setOpenMenu(!openMenu)}
+            isActive={
+              startsWith("/vendor-dashboard/personal-details") ||
+              startsWith("/vendor-dashboard/update-images") ||
+              startsWith("/vendor-dashboard/pin-management") ||
+              startsWith("/vendor-dashboard/change-password")
+            }
+          >
+            <NavLink href="/vendor-dashboard/personal-details" icon={FaIdCard} label="Personal Details" isActive={is("/vendor-dashboard/personal-details")} onClick={close} />
+            <NavLink href="/vendor-dashboard/update-images" icon={FaImage} label="Update Images" isActive={is("/vendor-dashboard/update-images")} onClick={close} />
+            <NavLink href="/vendor-dashboard/pin-management" icon={FaKey} label="PIN Management" isActive={is("/vendor-dashboard/pin-management")} onClick={close} />
+            <NavLink href="/vendor-dashboard/change-password" icon={FaLock} label="Change Password" isActive={is("/vendor-dashboard/change-password")} onClick={close} />
+          </CollapsibleSection>
+
+        </nav>
+      </div>
+
+      {/* Logout */}
+      <div className="p-4 border-t border-white/5 shrink-0">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/10 hover:border-rose-500/20 text-rose-400 hover:text-rose-300 text-[10px] font-black uppercase tracking-widest transition-all duration-200"
+        >
+          <FaSignOutAlt className="w-3.5 h-3.5" />
+          Sign Out
+        </button>
       </div>
     </aside>
   );
